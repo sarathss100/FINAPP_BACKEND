@@ -1,5 +1,5 @@
-import LoggerService from "../services/LoggerService";
-import logger from "../config/logger";
+import LoggerService from 'services/logger/LoggerService';
+import logger from 'config/logger/logger';
 
 // Mock the logger module
 jest.mock('../config/logger', () => ({

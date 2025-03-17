@@ -1,9 +1,8 @@
-import { Router } from "express";
+import { Router } from 'express';
+import v1Routes from './v1';
 
 const router = Router();
 
-router.use('/v1', (req, res) => {
-    res.status(200).json('Success')
-});
+router.use('/v1', v1Routes);
 
 export default router;

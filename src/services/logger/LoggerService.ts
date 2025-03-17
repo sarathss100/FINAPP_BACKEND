@@ -1,5 +1,5 @@
-import logger from "../config/logger";
-import { ILogger } from "../interfaces/ILogger";
+import logger from '../../config/logger/logger';
+import ILogger from './interfaces/ILogger';
 
 class LoggerService implements ILogger {
     info(message: string): void {
@@ -19,7 +19,7 @@ class LoggerService implements ILogger {
     }
 
     debug(message: string): void {
-        logger.debug(message)
+        logger.debug(message);
     }
 }
 

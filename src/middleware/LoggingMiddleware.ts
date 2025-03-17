@@ -1,5 +1,5 @@
 import expressWinston from 'express-winston';
-import logger from '../config/logger';
+import logger from 'config/logger/logger';
 
 const loggingMiddleware = expressWinston.logger({
     winstonInstance: logger,
