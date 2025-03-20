@@ -19,6 +19,7 @@
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
     "express-winston": "^4.2.0",
+    "firebase-admin": "^13.2.0",
     "mongoose": "^8.12.1",
     "tsconfig-paths": "^4.2.0",
     "winston": "^3.17.0",

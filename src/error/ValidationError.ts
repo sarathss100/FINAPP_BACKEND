@@ -1,4 +1,3 @@
-
 class ValidationError extends Error {
     public _statusCode: number;
     public _errors: string[];

@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import IHasher from 'interfaces/IHasher';
+import IHasher from 'types/IHasher';
 
 class BcryptHasher implements IHasher {
     async hash(password: string): Promise<string> {

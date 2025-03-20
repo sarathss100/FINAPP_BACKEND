@@ -1,9 +1,9 @@
 import app from './app';
 import mongooseConnection from './config/database/mongooseConnection';
 
-const PORT: number = parseInt(process.env.PORT || '3000', 10);
+const PORT: number = parseInt(process.env.PORT || '5000', 10);
 
-async function startServer() {
+(async function () {
     try {
         await mongooseConnection.connect();
 
@@ -14,6 +14,7 @@ async function startServer() {
         // Handle server errors
         server.on('error', (error) => {
             console.error(`Server failed to start on PORT ${PORT}:`, error.message);
+            process.exit(1);
         });
 
         // shutdown
@@ -26,6 +27,5 @@ async function startServer() {
         console.error(`MongoDB Connection Failed:`, error instanceof Error ? error.message : error);
         process.exit(1);
     }
-}
+})();
 
-startServer();
