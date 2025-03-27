@@ -3,6 +3,8 @@ import express, { Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 import loggingMiddleware from './middleware/LoggingMiddleware';
 import router from './routes/routes';
+import cors from 'cors';
+import corsOptions from 'utils/corsOptions';
 
 const app = express();
 
@@ -11,6 +13,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(loggingMiddleware); 
+app.use(cors(corsOptions));
 
 app.use('/api', router);
 

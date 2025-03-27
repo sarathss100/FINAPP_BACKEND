@@ -12,5 +12,6 @@ const authService = new AuthService(userRepository, hasher);
 const authController: IAuthController = new AuthController(authService);
 
 router.post('/signup', authController.signup.bind(authController));
+router.post('/verify-token', authController.verifyToken.bind(authController));
 
 export default router;

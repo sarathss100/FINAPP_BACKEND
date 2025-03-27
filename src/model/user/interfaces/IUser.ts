@@ -5,6 +5,7 @@ interface IUser extends Document {
     last_name: string;
     phone_number: string;
     password: string;
+    role: string;
     createdAt?: Date;
     updatedAt?: Date;
 }

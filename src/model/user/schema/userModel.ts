@@ -5,6 +5,7 @@ const UserSchema = new Schema({
     last_name: { type: String, required: true },
     phone_number: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    role: { type: String, default: 'user' }
 }, { timestamps: true });
 
 export default UserSchema;

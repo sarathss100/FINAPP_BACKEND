@@ -1,5 +1,5 @@
 import { SignupDto } from 'dtos/auth/SignupDto';
-import IAuthUser from 'services/auth/interfaces/IAuthUser';
+import IAuthUser from './IAuthUser';
 
 interface IUserRepository {
     createUser(data: SignupDto): Promise<IAuthUser>;
