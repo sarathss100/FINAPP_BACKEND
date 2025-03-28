@@ -3,8 +3,12 @@ import IAuthUser from 'services/auth/interfaces/IAuthUser';
 import ITokenPayload from 'types/ITokenPayload';
 
 // Token secret keys 
-const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET ?? 'Secret';
-const REFERSH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET ?? 'secret';
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
+const REFERSH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
+
+if (!ACCESS_TOKEN_SECRET || !REFERSH_TOKEN_SECRET) {
+    throw new Error(`Missing required environment variables: ACCESS_TOKEN_SECRET or REFRESH_TOKEN_SECRET`);
+}
 
 /**
  * Generates an access token for a user.
@@ -41,11 +45,16 @@ export const generateRefreshToken = function (user: IAuthUser): string {
 export const verifyAccessToken = function (token: string): ITokenPayload {
     try {
         // Verify and decode the token 
-        const decode = jwt.verify(token, ACCESS_TOKEN_SECRET);
-        
-        return decode as ITokenPayload;
-    } catch (tokenError) {
-        throw new Error(`Invalid or expired access token`);
+        const res = jwt.verify(token, ACCESS_TOKEN_SECRET) as ITokenPayload;
+        return res;
+    } catch (error) {
+        if (error instanceof jwt.TokenExpiredError) {
+            throw new Error(`Access token has expired`);
+        } else if (error instanceof jwt.JsonWebTokenError) {
+            throw new Error(`Invalid access token`);
+        } else {
+            throw new Error(`An unexpected error occured while verifying the access token`);
+        }
     }
 };
 
