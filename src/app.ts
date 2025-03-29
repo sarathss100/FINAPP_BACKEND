@@ -5,6 +5,8 @@ import loggingMiddleware from './middleware/LoggingMiddleware';
 import router from './routes/routes';
 import cors from 'cors';
 import corsOptions from 'utils/corsOptions';
+import rateLimiter from 'utils/rateLimiter';
+import helmet from 'helmet';
 
 const app = express();
 
@@ -14,6 +16,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(loggingMiddleware); 
 app.use(cors(corsOptions));
+app.use(helmet());
+app.use(rateLimiter);
 
 app.use('/api', router);
 

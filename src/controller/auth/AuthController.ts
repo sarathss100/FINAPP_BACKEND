@@ -19,18 +19,26 @@ class AuthController implements IAuthController {
             const result = await this._authService.signup(signupData);
 
             // Extract the accessToken from the result
-            const { accessToken } = result;
+            const { accessToken, userId, role } = result;
 
             // Set the accessToken as an HTTP-only cookie
             response.cookie('accessToken', accessToken, {
                 httpOnly: true,
+                secure: process.env.NODE_ENV === 'production' ? true : false,
+                sameSite: process.env.NODE_ENV === 'production' ? 'none': 'lax',
+                maxAge: 15 * 60 * 1000,
+            });
+
+            // Cookie for user metadata 
+            response.cookie('userMetaData', JSON.stringify({ userId, role, isLoggedIn: true }), {
+                httpOnly: false,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'strict',
                 maxAge: 15 * 60 * 1000
             });
 
             // Send a success response
-            sendSuccessResponse(response, StatusCodes.CREATED, `User created successfully`, { userId: result.userId, role: result.role });
+            sendSuccessResponse(response, StatusCodes.CREATED, `User created successfully`, { userId, role });
         } catch (error) {
             // Send a error response
             sendErrorResponse(response, StatusCodes.BAD_REQUEST, error instanceof Error ? error.message : `An error occured during signup`);
@@ -38,15 +46,19 @@ class AuthController implements IAuthController {
     }
 
     async verifyToken(request: Request, response: Response): Promise<void> {
-        console.log(`verifyToken: request comes here`);
         try {
-            const { accessToken } = request.cookies;
+            const authHeader: string | undefined = request.headers.cookie;
+            const parsedAuthHeader = JSON.parse(authHeader!);
+            const { accessToken } = parsedAuthHeader;
+        
             if (!accessToken) {
-                throw new Error(`Access Token Not found in Cookies`);
+                throw new Error(`Access Token Not found`);
             }
 
-            await this._authService.verifyToken(accessToken);
+            const res = await this._authService.verifyToken(accessToken);
 
+            console.log(res);
+            
             sendSuccessResponse(response, StatusCodes.OK, `Valid Access Token`, { valid: true, message: `Valid Access Token` });
         } catch (error) {
             sendErrorResponse(response, StatusCodes.UNAUTHORIZED, error instanceof Error ? error.message : `Invalid or Expired Token`);

@@ -49,7 +49,8 @@ class AuthService implements IAuthService {
             try {
                 await RedisService.storeRefreshToken(createUser.userId, refreshToken, REFRESH_TOKEN_TTL);
             } catch (redisError) {
-                console.error(`Redis storage error:`, redisError);
+                // Roll back user creation if Redis fails 
+                await RedisService.deleteRefreshToken(createUser.userId);
                 throw new Error(`An error occured while storing the refresh token.`);
             }
             
@@ -72,7 +73,8 @@ class AuthService implements IAuthService {
 
     async verifyToken(token: string): Promise<void> {
         try {
-            await verifyAccessToken(token);
+            const res = verifyAccessToken(token);
+            return res;
         } catch (tokenError) {
             throw tokenError;
         }
@@ -134,3 +136,6 @@ class AuthService implements IAuthService {
 }
 
 export default AuthService;
+
+
+
