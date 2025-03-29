@@ -15,7 +15,7 @@ class UserRepository implements IUserRepository {
     async findByPhoneNumber(phoneNumber: string): Promise<IAuthUser | null> {
         const user = await UserModel.findOne({ phone_number: phoneNumber });
         if (!user) return null;
-        return { userId: user.id, phoneNumber: user.phone_number, status: `Sucesss`, role: user.role };
+        return { userId: user.id, phoneNumber: user.phone_number, status: `Sucesss`, role: user.role, hashedPassword: user.password };
     }
 }
 

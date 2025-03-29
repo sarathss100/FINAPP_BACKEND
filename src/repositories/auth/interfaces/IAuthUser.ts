@@ -3,6 +3,7 @@ interface IAuthUser {
     phoneNumber: string;
     status: string;
     role: string;
+    hashedPassword?: string;
 }
 
 export default IAuthUser;

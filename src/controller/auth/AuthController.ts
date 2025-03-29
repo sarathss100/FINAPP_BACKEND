@@ -52,6 +52,36 @@ class AuthController implements IAuthController {
             sendErrorResponse(response, StatusCodes.UNAUTHORIZED, error instanceof Error ? error.message : `Invalid or Expired Token`);
         }
     }
+
+    async signin(request: Request, response: Response): Promise<void> {
+        try {
+            const signinData = request.body;
+            
+            // Call the signup method from AuthService
+            const result = await this._authService.signin(signinData);
+
+            // Extract the accessToken from the result
+            const { accessToken } = result;
+
+            // Set the accessToken as an HTTP-only cookie
+            response.cookie('accessToken', accessToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 15 * 60 * 1000
+            });
+
+            // Send a success response
+            sendSuccessResponse(response, StatusCodes.CREATED, `User created successfully`, { userId: result.userId, role: result.role });
+        } catch (error) {
+            let errorMessage = `An unexpected Error occured while SignIn`;
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            }
+            // Send a error response
+            sendErrorResponse(response, StatusCodes.BAD_REQUEST, errorMessage);
+        }
+    }
 }
 
 export default AuthController;

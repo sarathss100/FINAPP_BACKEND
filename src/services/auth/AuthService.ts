@@ -7,6 +7,9 @@ import { ZodError } from 'zod';
 import { generateAccessToken, generateRefreshToken, verifyAccessToken } from 'utils/tokenUtils';
 import RedisService from 'services/redis/RedisService';
 import IAuthServiceUser from './interfaces/IAuthUser';
+import { SigninDto, SigninSchema } from 'dtos/auth/SigninDto';
+import { sendErrorResponse } from 'utils/responseHandler';
+import { StatusCodes } from 'utils/statusCodes';
 
 class AuthService implements IAuthService {
     constructor(
@@ -74,6 +77,60 @@ class AuthService implements IAuthService {
             throw tokenError;
         }
     }
+
+    async signin(signinData: SigninDto): Promise<IAuthServiceUser & { accessToken: string }> {
+        try {
+            // Validate signup data
+            SigninSchema.parse(signinData);
+
+            const user = await this._userRepository.findByPhoneNumber(signinData.phone_number);
+            if (!user) {
+                throw new Error(`The user dosen't exist`);
+            }
+
+            const hashedPasswordInDatabase = user.hashedPassword;
+            const userProvidedPassword = signinData.password;
+
+            // Check whether the password matches
+            const isMatched = await this.hasher.verify(userProvidedPassword, hashedPasswordInDatabase!);
+
+            if (!isMatched) {
+                throw new Error('Please Enter Correct Password');
+            } 
+
+            // Generate tokens using the utility functions 
+            let accessToken, refreshToken;
+            try {
+                accessToken = generateAccessToken(user);
+                refreshToken = generateRefreshToken(user);
+            } catch (tokenError) {
+                console.error(`Token generation error:`, tokenError);
+                throw new Error(`An error occured while generating authentication tokens.`);
+            }
+
+            //Store the refresh token in Redis with a TTL 
+            const REFRESH_TOKEN_TTL = 7 * 24 * 60 * 60;
+            try {
+                await RedisService.storeRefreshToken(user.userId, refreshToken, REFRESH_TOKEN_TTL);
+            } catch (redisError) {
+                console.error(`Redis storage error:`, redisError);
+                throw new Error(`An error occured while storing the refresh token.`);
+            }
+            
+            // Send the response to the controller 
+            return { ...user, accessToken };
+        } catch (error) {
+            // Extract and log the error message
+            let errorMessage = `An unexpected error occured during signin`;
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            }
+
+            console.log(errorMessage);
+
+            throw new Error(errorMessage);
+        };
+    } 
 }
 
 export default AuthService;
