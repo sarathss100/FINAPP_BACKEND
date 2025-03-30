@@ -3,7 +3,7 @@ import IAuthController from './IAuthController';
 import IAuthService from 'services/auth/interfaces/IAuthService';
 import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
 import { StatusCodes } from 'utils/statusCodes';
-import { httpOnlyCookieOptions } from 'utils/cookiesOptions';
+// import { httpOnlyCookieOptions } from 'utils/cookiesOptions';
 
 class AuthController implements IAuthController {
     private readonly _authService: IAuthService;
@@ -23,10 +23,20 @@ class AuthController implements IAuthController {
             const { accessToken, userId, role } = result;
 
             // Set the accessToken as an HTTP-only cookie
-            response.cookie('accessToken', accessToken, httpOnlyCookieOptions);
+            response.cookie('accessToken', accessToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production' ? true : false,
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                maxAge: 15 * 60 * 1000,
+            });
 
             // Set the user ID, role and LoggedIn state as an HTTP-only cookie
-            response.cookie('userMetaData', JSON.stringify({ userId, role, isLoggedIn: true }), httpOnlyCookieOptions);
+            response.cookie('userMetaData', JSON.stringify({ userId, role, isLoggedIn: true }), {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production' ? true : false,
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                maxAge: 15 * 60 * 1000,
+            });
 
             // Send a success response
             sendSuccessResponse(response, StatusCodes.CREATED, `User created successfully`, { userId, role });
@@ -70,17 +80,17 @@ class AuthController implements IAuthController {
             // Set the accessToken as an HTTP-only cookie
             response.cookie('accessToken', accessToken, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-                maxAge: 15 * 60 * 1000
+                secure: process.env.NODE_ENV === 'production' ? true : false,
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                maxAge: 15 * 60 * 1000,
             });
 
             // Cookie for user metadata 
             response.cookie('userMetaData', JSON.stringify({ userId, role, isLoggedIn: true }), {
-                httpOnly: false,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-                maxAge: 15 * 60 * 1000
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production' ? true : false,
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                maxAge: 15 * 60 * 1000,
             });
 
             // Send a success response
@@ -110,6 +120,19 @@ class AuthController implements IAuthController {
             if (!signoutStatus) {
                 throw new Error(`An unexpected Error occured while try to sign out`);
             }
+
+            response.clearCookie('accessToken', {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production'? true : false,
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            });
+
+            response.clearCookie('userMetaData', {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production'? true : false,
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            });
+
             sendSuccessResponse(response, StatusCodes.OK, `User Signed out Successfully`);
         } catch (error) {
             let errorMessage = `An unexpected Error occured while signing out`;

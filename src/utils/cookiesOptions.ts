@@ -7,4 +7,11 @@ export const httpOnlyCookieOptions = {
     secure: isProduction ? true : false,
     sameSite: isProduction ? 'strict' : 'lax',
     maxAge: 15 * 60 * 1000,
-} as const;
+};
+
+// Options for HTTP-only cookies
+export const httpOnlyCookieOptionsForRemoveRequest = {
+    httpOnly: true,
+    secure: isProduction ? true : false,
+    sameSite: isProduction ? 'strict' : 'lax',
+};
