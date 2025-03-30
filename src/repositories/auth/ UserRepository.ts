@@ -2,6 +2,7 @@ import { SignupDto } from 'dtos/auth/SignupDto';
 import IUserRepository from './interfaces/IUserRepository';
 import UserModel from 'model/user/model/UserModel';
 import IAuthUser from './interfaces/IAuthUser';
+import { ResetPasswordDto } from 'dtos/auth/ResetPasswordDto';
 
 class UserRepository implements IUserRepository {
 
@@ -16,6 +17,13 @@ class UserRepository implements IUserRepository {
         const user = await UserModel.findOne({ phone_number: phoneNumber });
         if (!user) return null;
         return { userId: user.id, phoneNumber: user.phone_number, status: user.status, role: user.role, hashedPassword: user.password };
+    }
+
+    // Reset Password user by phone number 
+    async resetPassword(data: ResetPasswordDto): Promise<boolean | null> {
+        const user = await UserModel.updateOne({ phone_number: data.phone_number }, { $set: { password: data.password } });
+        if (!user) return null;
+        return true;
     }
 }
 

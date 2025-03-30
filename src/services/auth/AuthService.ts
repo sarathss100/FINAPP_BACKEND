@@ -9,6 +9,7 @@ import RedisService from 'services/redis/RedisService';
 import IAuthServiceUser from './interfaces/IAuthUser';
 import { SigninDto, SigninSchema } from 'dtos/auth/SigninDto';
 import ITokenPayload from 'types/ITokenPayload';
+import { ResetPasswordDto, ResetPasswordSchema } from 'dtos/auth/ResetPasswordDto';
 
 class AuthService implements IAuthService {
     constructor(
@@ -170,6 +171,45 @@ class AuthService implements IAuthService {
             if (!phoneNumber) throw new Error('Phone number is missing');
             const userDetails = await this._userRepository.findByPhoneNumber(phoneNumber);
             return userDetails?.status ?  true : false;
+        } catch (error) {
+            // Extract and log the error message
+            let errorMessage = `Something went wrong!`;
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            } 
+
+            throw new Error(errorMessage);
+        }
+    }
+
+    async resetPassword(data: ResetPasswordDto): Promise<boolean> {
+        try {
+            // Validate the data
+            ResetPasswordSchema.parse(data);
+
+            const user = await this._userRepository.findByPhoneNumber(data.phone_number);
+            if (!user) {
+                throw new Error(`This number dosen't exists`);
+            }
+
+            const hashedPasswordInDatabase = user.hashedPassword;
+            const userProvidedPassword = data.password;
+
+            // Check whether the password matches
+            const isMatched = await this.hasher.verify(userProvidedPassword, hashedPasswordInDatabase!);
+
+            if (isMatched) {
+                throw new Error("The entered password is the same as your current password. Please enter a new password.");
+            }
+
+             // Hash the password
+            const hashedPassword = await this.hasher.hash(data.password);
+
+            // Update the data with hashedPassword and send to repository layer
+            const userData = { ...data, password: hashedPassword };
+
+            const isUpdated = await this._userRepository.resetPassword(userData);
+            return isUpdated ? true : false ;
         } catch (error) {
             // Extract and log the error message
             let errorMessage = `Something went wrong!`;

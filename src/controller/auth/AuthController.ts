@@ -159,7 +159,27 @@ class AuthController implements IAuthController {
             
             sendSuccessResponse(response, StatusCodes.OK, `Phone Number Verified Successfully`);
         } catch (error) {
-            let errorMessage = `An unexpected Error occured while signing out`;
+            let errorMessage = `An unexpected Error occured while verifying Phone Number`;
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            } 
+            // Send error response
+            sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, errorMessage);
+        }
+    }
+
+    async resetPassword(request: Request, response: Response): Promise<void> {
+        try {
+            const data = request.body;
+
+            // Call the verifyPhoneNumber method from AuthService
+            const isPasswordResetted = await this._authService.resetPassword(data);
+    
+            if (!isPasswordResetted) throw new Error(`Failed to Reset the Password`);
+            
+            sendSuccessResponse(response, StatusCodes.OK, `Changed Password Successfully`);
+        } catch (error) {
+            let errorMessage = `Internal Server Error`;
             if (error instanceof Error) {
                 errorMessage = error.message;
             } 
