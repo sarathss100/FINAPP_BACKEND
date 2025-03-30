@@ -72,8 +72,8 @@ class AuthService implements IAuthService {
 
     async verifyToken(token: string): Promise<ITokenPayload> {
         try {
-            const res = verifyAccessToken(token);
-            return res;
+            const decodedData = verifyAccessToken(token);
+            return decodedData;
         } catch (tokenError) {
             throw tokenError;
         }
@@ -134,6 +134,36 @@ class AuthService implements IAuthService {
             throw new Error(errorMessage);
         };
     } 
+
+    async signout(token: string): Promise<boolean> {
+        try {
+            const verifiedUserDetails = this.verifyToken(token);
+            if (!verifiedUserDetails) {
+                throw new Error(`accessTokenVerification Failure`);
+            }
+            const userId = (await verifiedUserDetails).userId;
+
+            if (!userId) {
+                throw new Error(`User ID not found in verifiedUserDetails`);
+            }
+
+            const isRefreshTokenRemoved = await RedisService.deleteRefreshToken(userId);
+
+            if (!isRefreshTokenRemoved!) {
+                throw new Error(`Failed to Remove refresh Token From Redis`);
+            }
+            
+            return true;
+        } catch (error) {
+            // Extract and log the error message
+            let errorMessage = `An error occured while try to signout`;
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            } 
+
+            throw new Error(errorMessage);
+        }
+    }
 }
 
 export default AuthService;

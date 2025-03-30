@@ -22,8 +22,11 @@ class RedisService {
      * Delete a refresh token from redis 
      * @param userId The ID of the user.
      */
-    async deleteRefreshToken(userId: string): Promise<void> {
-        await redisClient.del(`refresh_token:${userId}`);
+    async deleteRefreshToken(userId: string): Promise<boolean | undefined> {
+        const response = await redisClient.del(`refresh_token:${userId}`);
+        if (response === 1) {
+            return true;
+        } 
     }
 }
 

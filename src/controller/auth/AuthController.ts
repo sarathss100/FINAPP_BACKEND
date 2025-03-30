@@ -3,7 +3,7 @@ import IAuthController from './IAuthController';
 import IAuthService from 'services/auth/interfaces/IAuthService';
 import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
 import { StatusCodes } from 'utils/statusCodes';
-import { ZodError } from 'zod';
+import { httpOnlyCookieOptions } from 'utils/cookiesOptions';
 
 class AuthController implements IAuthController {
     private readonly _authService: IAuthService;
@@ -23,20 +23,10 @@ class AuthController implements IAuthController {
             const { accessToken, userId, role } = result;
 
             // Set the accessToken as an HTTP-only cookie
-            response.cookie('accessToken', accessToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production' ? true : false,
-                sameSite: process.env.NODE_ENV === 'production' ? 'none': 'lax',
-                maxAge: 15 * 60 * 1000,
-            });
+            response.cookie('accessToken', accessToken, httpOnlyCookieOptions);
 
-            // Cookie for user metadata 
-            response.cookie('userMetaData', JSON.stringify({ userId, role, isLoggedIn: true }), {
-                httpOnly: false,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-                maxAge: 15 * 60 * 1000
-            });
+            // Set the user ID, role and LoggedIn state as an HTTP-only cookie
+            response.cookie('userMetaData', JSON.stringify({ userId, role, isLoggedIn: true }), httpOnlyCookieOptions);
 
             // Send a success response
             sendSuccessResponse(response, StatusCodes.CREATED, `User created successfully`, { userId, role });
@@ -56,7 +46,10 @@ class AuthController implements IAuthController {
                 throw new Error(`Access Token Not found`);
             }
 
-            const res = await this._authService.verifyToken(accessToken);
+            const verificationStatus = await this._authService.verifyToken(accessToken);
+            if (!verificationStatus) {
+                throw new Error(`Verification Failed`);
+            }
             
             sendSuccessResponse(response, StatusCodes.OK, `Valid Access Token`, { valid: true, message: `Valid Access Token` });
         } catch (error) {
@@ -101,6 +94,30 @@ class AuthController implements IAuthController {
             } 
             // Send a error response
             sendErrorResponse(response, StatusCodes.BAD_REQUEST, errorMessage);
+        }
+    }
+
+    async signout(request: Request, response: Response): Promise<void> {
+        try {
+            const { accessToken } = request.cookies;
+
+            if (!accessToken) {
+                throw new Error(`Access Token Not found!`);
+            }
+
+            // Call the signout method from AuthService
+            const signoutStatus = await this._authService.signout(accessToken);
+            if (!signoutStatus) {
+                throw new Error(`An unexpected Error occured while try to sign out`);
+            }
+            sendSuccessResponse(response, StatusCodes.OK, `User Signed out Successfully`);
+        } catch (error) {
+            let errorMessage = `An unexpected Error occured while signing out`;
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            } 
+            // Send error response
+            sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, errorMessage);
         }
     }
 }
