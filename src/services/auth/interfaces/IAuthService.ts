@@ -7,6 +7,7 @@ interface IAuthService {
     signup(signupData: SignupDto): Promise<IAuthUser & { accessToken: string }>;
     signin(signinData: SigninDto): Promise<IAuthUser & { accessToken: string }>;
     verifyToken(token: string): Promise<ITokenPayload>;
+    verifyPhoneNumber(phoneNumber: string): Promise<boolean>;
     signout(token: string): Promise<boolean>;
 }
 

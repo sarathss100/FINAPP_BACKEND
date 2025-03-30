@@ -164,6 +164,22 @@ class AuthService implements IAuthService {
             throw new Error(errorMessage);
         }
     }
+
+    async verifyPhoneNumber(phoneNumber: string): Promise<boolean> {
+        try {
+            if (!phoneNumber) throw new Error('Phone number is missing');
+            const userDetails = await this._userRepository.findByPhoneNumber(phoneNumber);
+            return userDetails?.status ?  true : false;
+        } catch (error) {
+            // Extract and log the error message
+            let errorMessage = `Something went wrong!`;
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            } 
+
+            throw new Error(errorMessage);
+        }
+    }
 }
 
 export default AuthService;

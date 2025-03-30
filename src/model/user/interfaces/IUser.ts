@@ -6,6 +6,7 @@ interface IUser extends Document {
     phone_number: string;
     password: string;
     role: string;
+    status: boolean;
     createdAt?: Date;
     updatedAt?: Date;
 }

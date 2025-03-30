@@ -143,6 +143,30 @@ class AuthController implements IAuthController {
             sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, errorMessage);
         }
     }
+
+    async verifyPhoneNumber(request: Request, response: Response): Promise<void> {
+        try {
+            const { phoneNumber } = request.body;
+
+            if (!phoneNumber) {
+                throw new Error(`Phone not found on the request`);
+            }
+
+            // Call the verifyPhoneNumber method from AuthService
+            const isVerifiedPhoneNumber = await this._authService.verifyPhoneNumber(phoneNumber);
+    
+            if (!isVerifiedPhoneNumber) throw new Error(`Please Enter a Valid Phone Number`);
+            
+            sendSuccessResponse(response, StatusCodes.OK, `Phone Number Verified Successfully`);
+        } catch (error) {
+            let errorMessage = `An unexpected Error occured while signing out`;
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            } 
+            // Send error response
+            sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, errorMessage);
+        }
+    }
 }
 
 export default AuthController;

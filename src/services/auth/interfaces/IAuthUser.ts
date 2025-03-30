@@ -1,7 +1,7 @@
 interface IAuthServiceUser {
     userId: string;
     phoneNumber: string;
-    status: string;
+    status: boolean;
     role: string;
 }
 
