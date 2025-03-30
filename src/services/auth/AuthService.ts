@@ -8,8 +8,7 @@ import { generateAccessToken, generateRefreshToken, verifyAccessToken } from 'ut
 import RedisService from 'services/redis/RedisService';
 import IAuthServiceUser from './interfaces/IAuthUser';
 import { SigninDto, SigninSchema } from 'dtos/auth/SigninDto';
-import { sendErrorResponse } from 'utils/responseHandler';
-import { StatusCodes } from 'utils/statusCodes';
+import ITokenPayload from 'types/ITokenPayload';
 
 class AuthService implements IAuthService {
     constructor(
@@ -71,7 +70,7 @@ class AuthService implements IAuthService {
         };
     } 
 
-    async verifyToken(token: string): Promise<void> {
+    async verifyToken(token: string): Promise<ITokenPayload> {
         try {
             const res = verifyAccessToken(token);
             return res;
@@ -126,6 +125,8 @@ class AuthService implements IAuthService {
             let errorMessage = `An unexpected error occured during signin`;
             if (error instanceof Error) {
                 errorMessage = error.message;
+            } else if (error instanceof ZodError) {
+                errorMessage = `Please enter valid Phone Number or Password`;
             }
 
             console.log(errorMessage);

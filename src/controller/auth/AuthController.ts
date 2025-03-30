@@ -3,6 +3,7 @@ import IAuthController from './IAuthController';
 import IAuthService from 'services/auth/interfaces/IAuthService';
 import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
 import { StatusCodes } from 'utils/statusCodes';
+import { ZodError } from 'zod';
 
 class AuthController implements IAuthController {
     private readonly _authService: IAuthService;
@@ -56,8 +57,6 @@ class AuthController implements IAuthController {
             }
 
             const res = await this._authService.verifyToken(accessToken);
-
-            console.log(res);
             
             sendSuccessResponse(response, StatusCodes.OK, `Valid Access Token`, { valid: true, message: `Valid Access Token` });
         } catch (error) {
@@ -73,7 +72,7 @@ class AuthController implements IAuthController {
             const result = await this._authService.signin(signinData);
 
             // Extract the accessToken from the result
-            const { accessToken } = result;
+            const { accessToken, userId, role } = result;
 
             // Set the accessToken as an HTTP-only cookie
             response.cookie('accessToken', accessToken, {
@@ -83,13 +82,23 @@ class AuthController implements IAuthController {
                 maxAge: 15 * 60 * 1000
             });
 
+            // Cookie for user metadata 
+            response.cookie('userMetaData', JSON.stringify({ userId, role, isLoggedIn: true }), {
+                httpOnly: false,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 15 * 60 * 1000
+            });
+
             // Send a success response
-            sendSuccessResponse(response, StatusCodes.CREATED, `User created successfully`, { userId: result.userId, role: result.role });
+            sendSuccessResponse(response, StatusCodes.CREATED, `User created successfully`, { userId, role });
         } catch (error) {
             let errorMessage = `An unexpected Error occured while SignIn`;
             if (error instanceof Error) {
                 errorMessage = error.message;
-            }
+            } else  {
+                errorMessage = `Invalid Phone Number or Password`;
+            } 
             // Send a error response
             sendErrorResponse(response, StatusCodes.BAD_REQUEST, errorMessage);
         }
