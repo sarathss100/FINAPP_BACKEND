@@ -1,0 +1,14 @@
+
+interface IUserDetails {
+    userId: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
+    status: boolean;
+    email?: string;
+    lastPasswordChange?: Date;
+    twoFactorEnabled?: boolean;
+    connectedAccounts?: string[];
+}
+
+export default IUserDetails;
