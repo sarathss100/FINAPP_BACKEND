@@ -1,14 +1,14 @@
 import { Router } from 'express';
 import AuthService from 'services/auth/AuthService';
 import AuthController from 'controller/auth/AuthController';
-import IAuthController from 'controller/auth/IAuthController';
-import UserRepository from 'repositories/auth/ UserRepository';
+import IAuthController from 'controller/auth/ineterfaces/IAuthController';
 import BcryptHasher from 'utils/hash';
+import AuthRepository from 'repositories/auth/AuthRepository';
 
 const router = Router();
-const userRepository = new UserRepository();
+const authRepository = new AuthRepository();
 const hasher = new BcryptHasher();
-const authService = new AuthService(userRepository, hasher);
+const authService = new AuthService(authRepository, hasher);
 const authController: IAuthController = new AuthController(authService);
 
 router.post('/signup', authController.signup.bind(authController));

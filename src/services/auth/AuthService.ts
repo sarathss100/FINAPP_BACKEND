@@ -1,6 +1,6 @@
 import { SignupSchema, SignupDto } from 'dtos/auth/SignupDto';
 import IAuthService from './interfaces/IAuthService';
-import IUserRepository from 'repositories/auth/interfaces/IUserRepository';
+import IAuthRepository from 'repositories/auth/interfaces/IAuthRepository';
 import IHasher from 'types/IHasher';
 import ValidationError from 'error/ValidationError';
 import { ZodError } from 'zod';
@@ -12,27 +12,29 @@ import ITokenPayload from 'types/ITokenPayload';
 import { ResetPasswordDto, ResetPasswordSchema } from 'dtos/auth/ResetPasswordDto';
 
 class AuthService implements IAuthService {
-    constructor(
-        private _userRepository: IUserRepository,
-        private hasher: IHasher
-    ) {}
+    private _authRepository: IAuthRepository;
+    private _hasher: IHasher;
+    constructor(authRepository: IAuthRepository, hasher: IHasher) {
+        this._authRepository = authRepository;
+        this._hasher = hasher;
+    }
 
     async signup(signupData: SignupDto): Promise<IAuthServiceUser & { accessToken: string }> {
         try {
             // Validate signup data
             SignupSchema.parse(signupData);
 
-            const existingUser = await this._userRepository.findByPhoneNumber(signupData.phone_number);
+            const existingUser = await this._authRepository.findByPhoneNumber(signupData.phone_number);
             if (existingUser) {
                 throw new ValidationError(['User already exists'], 'Duplicate Entry');
             }
             
             // Hash the password
-            const hashedPassword = await this.hasher.hash(signupData.password);
+            const hashedPassword = await this._hasher.hash(signupData.password);
 
             // Create the user
             const userData = { ...signupData, password: hashedPassword };
-            const createUser = await this._userRepository.createUser(userData);
+            const createUser = await this._authRepository.createUser(userData);
             
             // Generate tokens using the utility functions 
             let accessToken, refreshToken;
@@ -85,7 +87,7 @@ class AuthService implements IAuthService {
             // Validate signup data
             SigninSchema.parse(signinData);
 
-            const user = await this._userRepository.findByPhoneNumber(signinData.phone_number);
+            const user = await this._authRepository.findByPhoneNumber(signinData.phone_number);
             if (!user) {
                 throw new Error(`The user dosen't exist`);
             }
@@ -94,7 +96,7 @@ class AuthService implements IAuthService {
             const userProvidedPassword = signinData.password;
 
             // Check whether the password matches
-            const isMatched = await this.hasher.verify(userProvidedPassword, hashedPasswordInDatabase!);
+            const isMatched = await this._hasher.verify(userProvidedPassword, hashedPasswordInDatabase!);
 
             if (!isMatched) {
                 throw new Error('Please Enter Correct Password');
@@ -169,7 +171,7 @@ class AuthService implements IAuthService {
     async verifyPhoneNumber(phoneNumber: string): Promise<boolean> {
         try {
             if (!phoneNumber) throw new Error('Phone number is missing');
-            const userDetails = await this._userRepository.findByPhoneNumber(phoneNumber);
+            const userDetails = await this._authRepository.findByPhoneNumber(phoneNumber);
             return userDetails?.status ?  true : false;
         } catch (error) {
             // Extract and log the error message
@@ -187,7 +189,7 @@ class AuthService implements IAuthService {
             // Validate the data
             ResetPasswordSchema.parse(data);
 
-            const user = await this._userRepository.findByPhoneNumber(data.phone_number);
+            const user = await this._authRepository.findByPhoneNumber(data.phone_number);
             if (!user) {
                 throw new Error(`This number dosen't exists`);
             }
@@ -196,19 +198,19 @@ class AuthService implements IAuthService {
             const userProvidedPassword = data.password;
 
             // Check whether the password matches
-            const isMatched = await this.hasher.verify(userProvidedPassword, hashedPasswordInDatabase!);
+            const isMatched = await this._hasher.verify(userProvidedPassword, hashedPasswordInDatabase!);
 
             if (isMatched) {
                 throw new Error("The entered password is the same as your current password. Please enter a new password.");
             }
 
              // Hash the password
-            const hashedPassword = await this.hasher.hash(data.password);
+            const hashedPassword = await this._hasher.hash(data.password);
 
             // Update the data with hashedPassword and send to repository layer
             const userData = { ...data, password: hashedPassword };
 
-            const isUpdated = await this._userRepository.resetPassword(userData);
+            const isUpdated = await this._authRepository.resetPassword(userData);
             return isUpdated ? true : false ;
         } catch (error) {
             // Extract and log the error message

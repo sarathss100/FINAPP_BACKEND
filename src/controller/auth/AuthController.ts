@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import IAuthController from './IAuthController';
+import IAuthController from './ineterfaces/IAuthController';
 import IAuthService from 'services/auth/interfaces/IAuthService';
 import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
 import { StatusCodes } from 'utils/statusCodes';
@@ -188,5 +188,4 @@ class AuthController implements IAuthController {
         }
     }
 }
-
 export default AuthController;
