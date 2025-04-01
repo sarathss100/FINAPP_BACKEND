@@ -3,7 +3,7 @@ import IAuthService from './interfaces/IAuthService';
 import IAuthRepository from 'repositories/auth/interfaces/IAuthRepository';
 import IHasher from 'types/IHasher';
 import ValidationError from 'error/ValidationError';
-import { ZodError } from 'zod';
+import { boolean, ZodError } from 'zod';
 import { generateAccessToken, generateRefreshToken, verifyAccessToken } from 'utils/tokenUtils';
 import RedisService from 'services/redis/RedisService';
 import IAuthServiceUser from './interfaces/IAuthUser';
@@ -76,6 +76,9 @@ class AuthService implements IAuthService {
     async verifyToken(token: string): Promise<ITokenPayload> {
         try {
             const decodedData = verifyAccessToken(token);
+            const { phoneNumber } = decodedData;
+            const getUserDetails = await this._authRepository.findByPhoneNumber(phoneNumber);
+            decodedData.status = getUserDetails?.status;
             return decodedData;
         } catch (tokenError) {
             throw tokenError;

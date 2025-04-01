@@ -65,7 +65,7 @@ class AuthController implements IAuthController {
                 throw new Error(`Verification Failed`);
             }
             
-            sendSuccessResponse(response, StatusCodes.OK, `Valid Access Token`, { valid: true, message: `Valid Access Token` });
+            sendSuccessResponse(response, StatusCodes.OK, `Valid Access Token`, { valid: true, message: `Valid Access Token`, status: verificationStatus.status });
         } catch (error) {
             sendErrorResponse(response, StatusCodes.UNAUTHORIZED, error instanceof Error ? error.message : `Invalid or Expired Token`);
         }
