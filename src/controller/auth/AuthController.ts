@@ -159,7 +159,7 @@ class AuthController implements IAuthController {
             // Call the verifyPhoneNumber method from AuthService
             const isVerifiedPhoneNumber = await this._authService.verifyPhoneNumber(phoneNumber);
     
-            if (!isVerifiedPhoneNumber) throw new Error(`Please Enter a Valid Phone Number`);
+            if (!isVerifiedPhoneNumber) throw new Error(`User does not exist!`);
             
             sendSuccessResponse(response, StatusCodes.OK, `Phone Number Verified Successfully`);
         } catch (error) {
