@@ -11,10 +11,18 @@ class AdminRepository implements IAdminRepository {
             firstName: user.first_name,
             lastName: user.last_name,
             phoneNumber: user.phone_number,
-            status: user.status
+            status: user.status,
+            role: user.role
         }));
 
         return userDetails;
+    }
+
+    // Handle toggling user status (block/unblock) for admin
+    async toggleUserStatus(_id: string, status: boolean): Promise<boolean | null> {
+        const updateResult = await UserModel.updateOne({ _id }, { $set: { status } });
+        if (updateResult.modifiedCount > 0) return true;
+        return false;
     }
 }
 

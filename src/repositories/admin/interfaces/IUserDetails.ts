@@ -4,6 +4,7 @@ interface IUserDetails {
     firstName: string;
     lastName: string;
     phoneNumber: string;
+    role: string;
     status: boolean;
     email?: string;
     lastPasswordChange?: Date;
