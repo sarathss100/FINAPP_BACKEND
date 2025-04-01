@@ -19,6 +19,18 @@ class AdminService implements IAdminService {
             throw error;
         }
     }
+
+    async toggleUserStatus(_id: string, status: boolean): Promise<boolean> {
+        try {
+            // Handle toggling user status (block/unblock) for admin
+            const isToggled = await this._adminRepository.toggleUserStatus(_id, status);
+            if (!isToggled) throw new Error(`Failed to update the user's status. Please ensure the user ID is valid and try again.`);
+
+            return isToggled;
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default AdminService;

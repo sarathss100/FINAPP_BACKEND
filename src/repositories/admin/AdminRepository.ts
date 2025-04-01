@@ -19,7 +19,7 @@ class AdminRepository implements IAdminRepository {
     }
 
     // Handle toggling user status (block/unblock) for admin
-    async toggleUserStatus(_id: string, status: boolean): Promise<boolean | null> {
+    async toggleUserStatus(_id: string, status: boolean): Promise<boolean> {
         const updateResult = await UserModel.updateOne({ _id }, { $set: { status } });
         if (updateResult.modifiedCount > 0) return true;
         return false;

@@ -10,6 +10,6 @@ const adminService = new AdminService(adminRepository);
 const adminController: IAdminController = new AdminController(adminService);
 
 router.get('/all-users', adminController.getAllUsers.bind(adminController));
+router.post('/toggle-user-status', adminController.toggleUserStatus.bind(adminController));
 
 export default router;
-
