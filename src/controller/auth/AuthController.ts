@@ -41,8 +41,12 @@ class AuthController implements IAuthController {
             // Send a success response
             sendSuccessResponse(response, StatusCodes.CREATED, `User created successfully`, { userId, role });
         } catch (error) {
+            let errorMessage = `Account creation failed due to a serer error. Please try again later or contact support`;
+            if (error instanceof Error) {
+                errorMessage = `An account with this Phone Number already exists. Please log in or use a different Phone Number.`;
+            } 
             // Send a error response
-            sendErrorResponse(response, StatusCodes.BAD_REQUEST, error instanceof Error ? error.message : `An error occured during signup`);
+            sendErrorResponse(response, StatusCodes.BAD_REQUEST, errorMessage);
         }
     }
 
