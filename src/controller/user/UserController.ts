@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import IUserService from 'services/user/interfaces/IUserService';
 import IUserController from './interfaces/IUserController';
 import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
-import { StatusCodes } from 'utils/statusCodes';
+import { StatusCodes } from 'constants/statusCodes';
 
 class UserController implements IUserController {
     private readonly _userService: IUserService;

@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { UserRole } from 'types/roles';
+import { UserRole } from 'types/auth/roles';
 import { sendErrorResponse } from 'utils/responseHandler';
-import { StatusCodes } from 'utils/statusCodes';
-import { verifyAccessToken } from 'utils/tokenUtils';
+import { StatusCodes } from 'constants/statusCodes';
+import { verifyAccessToken } from 'utils/auth/tokenUtils';
 import IAuthenticationRequest from './interfaces/IAuthenticationRequest';
 
 // Middleware to verify JWT and check roles

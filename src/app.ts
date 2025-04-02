@@ -4,8 +4,8 @@ import cookieParser from 'cookie-parser';
 import loggingMiddleware from './middleware/LoggingMiddleware';
 import router from './routes/routes';
 import cors from 'cors';
-import corsOptions from 'utils/corsOptions';
-import rateLimiter from 'utils/rateLimiter';
+import corsOptions from 'utils/middleware/corsOptions';
+import rateLimiter from 'utils/middleware/rateLimiter';
 import helmet from 'helmet';
 
 const app = express();

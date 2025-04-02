@@ -1,7 +1,7 @@
 import IUserRepository from 'repositories/user/interfaces/IUserRepository';
 import IUserService from './interfaces/IUserService';
 import IProfile from './interfaces/IProfile';
-import { verifyAccessToken } from 'utils/tokenUtils';
+import { verifyAccessToken } from 'utils/auth/tokenUtils';
 
 class UserService implements IUserService {
     private _userRepository: IUserRepository;

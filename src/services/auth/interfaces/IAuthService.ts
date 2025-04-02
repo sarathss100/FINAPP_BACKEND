@@ -1,7 +1,7 @@
 import { SignupDto } from 'dtos/auth/SignupDto';
 import IAuthUser from './IAuthUser';
 import { SigninDto } from 'dtos/auth/SigninDto';
-import ITokenPayload from 'types/ITokenPayload';
+import ITokenPayload from 'types/auth/ITokenPayload';
 import { ResetPasswordDto } from 'dtos/auth/ResetPasswordDto';
 
 interface IAuthService {

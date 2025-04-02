@@ -1,6 +1,6 @@
 import IAdminService from 'services/admin/interfaces/IAdminService';
 import IAdminController from './interfaces/IAdminController';
-import { StatusCodes } from 'utils/statusCodes';
+import { StatusCodes } from 'constants/statusCodes';
 import { sendSuccessResponse, sendErrorResponse } from 'utils/responseHandler';
 import { Request, Response } from 'express';
 

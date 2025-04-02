@@ -1,15 +1,17 @@
 import { SignupSchema, SignupDto } from 'dtos/auth/SignupDto';
 import IAuthService from './interfaces/IAuthService';
 import IAuthRepository from 'repositories/auth/interfaces/IAuthRepository';
-import IHasher from 'types/IHasher';
-import ValidationError from 'error/ValidationError';
-import { boolean, ZodError } from 'zod';
-import { generateAccessToken, generateRefreshToken, verifyAccessToken } from 'utils/tokenUtils';
+import IHasher from 'types/utils/IHasher';
+import { ZodError } from 'zod';
+import { generateAccessToken, generateRefreshToken, verifyAccessToken } from 'utils/auth/tokenUtils';
 import RedisService from 'services/redis/RedisService';
 import IAuthServiceUser from './interfaces/IAuthUser';
 import { SigninDto, SigninSchema } from 'dtos/auth/SigninDto';
-import ITokenPayload from 'types/ITokenPayload';
+import ITokenPayload from 'types/auth/ITokenPayload';
 import { ResetPasswordDto, ResetPasswordSchema } from 'dtos/auth/ResetPasswordDto';
+import { AuthenticationError, ServerError, ValidationError } from 'error/AppError';
+import { ErrorMessages } from 'constants/errorMessages';
+import { StatusCodes } from 'constants/statusCodes';
 
 class AuthService implements IAuthService {
     private _authRepository: IAuthRepository;
@@ -26,7 +28,7 @@ class AuthService implements IAuthService {
 
             const existingUser = await this._authRepository.findByPhoneNumber(signupData.phone_number);
             if (existingUser) {
-                throw new ValidationError(['User already exists'], 'Duplicate Entry');
+                throw new ValidationError(ErrorMessages.USER_ALREADY_EXISTS);
             }
             
             // Hash the password
@@ -42,8 +44,7 @@ class AuthService implements IAuthService {
                 accessToken = generateAccessToken(createUser);
                 refreshToken = generateRefreshToken(createUser);
             } catch (tokenError) {
-                console.error(`Token generation error:`, tokenError);
-                throw new Error(`An error occured while generating authentication tokens.`);
+                throw new ServerError(ErrorMessages.TOKEN_GENERATION_ERROR);
             }
 
             //Store the refresh token in Redis with a TTL 
@@ -53,22 +54,18 @@ class AuthService implements IAuthService {
             } catch (redisError) {
                 // Roll back user creation if Redis fails 
                 await RedisService.deleteRefreshToken(createUser.userId);
-                throw new Error(`An error occured while storing the refresh token.`);
+                throw new ServerError(ErrorMessages.REFRESH_TOKEN_STORAGE_ERROR);
             }
             
             // Send the response to the controler 
             return { ...createUser, accessToken };
         } catch (error) {
             if (error instanceof ZodError) {
-                // Extract detailed validation messages
-                const errorMessages = error.errors.map(err => `${err.message}`);
-                console.error(`Signup validation error:`, errorMessages);
-                throw new ValidationError(errorMessages, 'Validation Error');
-            } else if (error instanceof ValidationError) {
-                throw error; // Preserve existing ValidationErrors
+                throw ErrorMessages.VALIDATION_ERROR;
+            } else if (error instanceof Error) {
+                throw error.message;
             } else {
-                console.error(`Unexpected signup error:`, error);
-                throw new Error('An unexpected error occurred during signup.');
+                throw new ServerError(ErrorMessages.INTERNAL_SERVER_ERROR);
             }
         };
     } 
@@ -80,8 +77,8 @@ class AuthService implements IAuthService {
             const getUserDetails = await this._authRepository.findByPhoneNumber(phoneNumber);
             decodedData.status = getUserDetails?.status;
             return decodedData;
-        } catch (tokenError) {
-            throw tokenError;
+        } catch (error) {
+            throw new AuthenticationError(ErrorMessages.TOKEN_VERIFICATION_FAILED);
         }
     }
 
@@ -92,7 +89,7 @@ class AuthService implements IAuthService {
 
             const user = await this._authRepository.findByPhoneNumber(signinData.phone_number);
             if (!user) {
-                throw new Error(`The user dosen't exist`);
+                throw new ValidationError(ErrorMessages.USER_NOT_FOUND, StatusCodes.BAD_REQUEST);
             }
 
             const hashedPasswordInDatabase = user.hashedPassword;
@@ -100,9 +97,8 @@ class AuthService implements IAuthService {
 
             // Check whether the password matches
             const isMatched = await this._hasher.verify(userProvidedPassword, hashedPasswordInDatabase!);
-
             if (!isMatched) {
-                throw new Error('Please Enter Correct Password');
+                throw new ValidationError(ErrorMessages.INVALID_CREDENTIALS, StatusCodes.UNAUTHORIZED);
             } 
 
             // Generate tokens using the utility functions 
@@ -111,8 +107,7 @@ class AuthService implements IAuthService {
                 accessToken = generateAccessToken(user);
                 refreshToken = generateRefreshToken(user);
             } catch (tokenError) {
-                console.error(`Token generation error:`, tokenError);
-                throw new Error(`An error occured while generating authentication tokens.`);
+                throw new ServerError(ErrorMessages.TOKEN_GENERATION_ERROR, StatusCodes.INTERNAL_SERVER_ERROR);
             }
 
             //Store the refresh token in Redis with a TTL 
@@ -120,24 +115,13 @@ class AuthService implements IAuthService {
             try {
                 await RedisService.storeRefreshToken(user.userId, refreshToken, REFRESH_TOKEN_TTL);
             } catch (redisError) {
-                console.error(`Redis storage error:`, redisError);
-                throw new Error(`An error occured while storing the refresh token.`);
+                throw new ServerError(ErrorMessages.REFRESH_TOKEN_STORAGE_ERROR, StatusCodes.INTERNAL_SERVER_ERROR);
             }
             
             // Send the response to the controller 
             return { ...user, accessToken };
         } catch (error) {
-            // Extract and log the error message
-            let errorMessage = `An unexpected error occured during signin`;
-            if (error instanceof Error) {
-                errorMessage = error.message;
-            } else if (error instanceof ZodError) {
-                errorMessage = `Please enter valid Phone Number or Password`;
-            }
-
-            console.log(errorMessage);
-
-            throw new Error(errorMessage);
+            throw error;
         };
     } 
 

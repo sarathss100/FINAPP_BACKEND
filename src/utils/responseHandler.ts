@@ -1,4 +1,4 @@
-import { SuccessResponse } from 'types/IResponseTypes';
+import { SuccessResponse } from 'types/response/IResponseTypes';
 import { Response } from 'express';
 
 /**
