@@ -17,7 +17,7 @@ app.use(cookieParser());
 app.use(loggingMiddleware); 
 app.use(cors(corsOptions));
 app.use(helmet());
-app.use(rateLimiter);
+// app.use(rateLimiter);
 
 app.use('/api', router);
 

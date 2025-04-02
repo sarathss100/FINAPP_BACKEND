@@ -17,7 +17,7 @@ if (!ACCESS_TOKEN_SECRET || !REFERSH_TOKEN_SECRET) {
  */
 export const generateAccessToken = function (user: IAuthUser): string {
     return jwt.sign(
-        { userId: user.userId, phoneNumber: user.phoneNumber },
+        { userId: user.userId, phoneNumber: user.phoneNumber, role: user.role },
         ACCESS_TOKEN_SECRET,
         { expiresIn: '15m' }
     )
@@ -30,7 +30,7 @@ export const generateAccessToken = function (user: IAuthUser): string {
  */
 export const generateRefreshToken = function (user: IAuthUser): string {
     return jwt.sign(
-        { userId: user.userId, phoneNumber: user.phoneNumber },
+        { userId: user.userId, phoneNumber: user.phoneNumber, role: user.role },
         REFERSH_TOKEN_SECRET,
         { expiresIn: '7d' }
     )
