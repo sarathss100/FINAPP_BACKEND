@@ -101,6 +101,10 @@ class AuthService implements IAuthService {
                 throw new ValidationError(ErrorMessages.USER_NOT_FOUND, StatusCodes.BAD_REQUEST);
             }
 
+            if (user && user.status === false) {
+                throw new ForbiddenError(ErrorMessages.USER_IS_BLOCKED);
+            }
+
             const hashedPasswordInDatabase = user.hashedPassword;
             const userProvidedPassword = signinData.password;
 
