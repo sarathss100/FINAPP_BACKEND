@@ -8,7 +8,7 @@ import IAuthServiceUser from './interfaces/IAuthUser';
 import { SigninDto, SigninSchema } from 'dtos/auth/SigninDto';
 import ITokenPayload from 'types/auth/ITokenPayload';
 import { ResetPasswordDto, ResetPasswordSchema } from 'dtos/auth/ResetPasswordDto';
-import { AppError, AuthenticationError, ServerError, ValidationError } from 'error/AppError';
+import { AppError, AuthenticationError, ForbiddenError, ServerError, ValidationError } from 'error/AppError';
 import { ErrorMessages } from 'constants/errorMessages';
 import { StatusCodes } from 'constants/statusCodes';
 
@@ -169,6 +169,7 @@ class AuthService implements IAuthService {
         try {
             if (!phoneNumber) throw new ValidationError(ErrorMessages.PHONE_NUMBER_MISSING, StatusCodes.BAD_REQUEST);
             const userDetails = await this._authRepository.findByPhoneNumber(phoneNumber);
+            if (userDetails?.status === false) throw new ForbiddenError(ErrorMessages.USER_IS_BLOCKED);
             return !!userDetails?.status;
         } catch (error) {
             if (error instanceof AppError) {
