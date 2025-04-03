@@ -1,5 +1,4 @@
 import { SignupDto } from 'dtos/auth/SignupDto';
-import IUserRepository from './interfaces/IAuthRepository';
 import UserModel from 'model/user/model/UserModel';
 import IAuthUser from '../base/interfaces/IAuthUser';
 import { ResetPasswordDto } from 'dtos/auth/ResetPasswordDto';

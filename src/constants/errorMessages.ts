@@ -15,12 +15,22 @@ export const ErrorMessages = {
     PHONE_NUMBER_NOT_FOUND: 'This phone number does not exist.',
     STATUS_CHECK_FAILED: 'Failed to verify the user status.',
     AUTH_COOKIE_MISSING: 'Authorization cookie is missing. Please log in again',
-    ACCESS_TOKEN_NOT_FOUND: 'Access token not found',
+    ACCESS_TOKEN_NOT_FOUND: 'Access token not found on the request',
     SIGNOUT_ERROR: 'An error occured while signing out.',
     PASSWORD_RESET_FAILED: 'Failed to reset the password',
+    FORBIDDEN_INSUFFICIENT_PERMISSIONS: 'Forbidden: You do not have sufficient permissions to perform this action.',
+    USER_ID_MISSING_IN_TOKEN: 'User ID is missing in the decoded data. Ensure the token payload includes a valid "userId" field.',
+
+    // User Profile Errors 
+    FETCH_USER_PROFILE_FAILED: 'An unexpected error occured while trying to fetch user profile details. Please try again later or contact support if the issue persists.',
+
+    // User Management Errors 
+    STATUS_UPDATE_FAILED: 'Failed to update user status. Please try agian later or contact support.',
+    NO_USERS_FOUND: 'No users found. Please ensure users exist in the system.',
 
     // Validation Errors
     VALIDATION_ERROR: 'Validation failed. Please check your input and try again.',
     INVALID_PHONE_NUMBER_OR_PASSWORD: 'Please enter a valid phone number or password.',
     TOKEN_GENERATION_ERROR: 'An error occurred while generating authentication tokens.',
+    INVALID_INPUT: 'Invalid input. Please provide valid data.',
 } as const;

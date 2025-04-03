@@ -10,4 +10,6 @@ export const SuccessMessages = {
 
     // General Success Messages
     OPERATION_SUCCESS: 'Operation completed successfully.',
+    USER_PROFILE_FETCHED: 'User profile details have been successfully retrived.',
+    USER_STATUS_UPDATED: 'User status updated successfully.',
 } as const;

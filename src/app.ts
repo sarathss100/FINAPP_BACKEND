@@ -5,7 +5,7 @@ import loggingMiddleware from './middleware/LoggingMiddleware';
 import router from './routes/routes';
 import cors from 'cors';
 import corsOptions from 'utils/middleware/corsOptions';
-import rateLimiter from 'utils/middleware/rateLimiter';
+// import rateLimiter from 'utils/middleware/rateLimiter';
 import helmet from 'helmet';
 
 const app = express();

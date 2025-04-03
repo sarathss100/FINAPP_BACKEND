@@ -70,7 +70,13 @@ export const verifyRefreshToken = function (token: string): ITokenPayload {
         const decoded = jwt.verify(token, REFERSH_TOKEN_SECRET);
      
         return decoded as ITokenPayload;
-    } catch (tokenError) {
-        throw new Error(`Invalid or expired refresh token`); 
+    } catch (error) {
+        if (error instanceof jwt.TokenExpiredError) {
+            throw new Error(`Access token has expired`);
+        } else if (error instanceof jwt.JsonWebTokenError) {
+            throw new Error(`Invalid access token`);
+        } else {
+            throw new Error(`An unexpected error occured while verifying the access token`);
+        }
     }
 };

@@ -7,7 +7,7 @@ import { SuccessMessages } from 'constants/successMessages';
 import { ErrorMessages } from 'constants/errorMessages';
 import { AuthenticationError, ServerError } from 'error/AppError';
 import { AppError } from 'error/AppError';
-// import { httpOnlyCookieOptions } from 'utils/cookiesOptions';+---6
+// import { httpOnlyCookieOptions } from 'utils/cookiesOptions';
 
 class AuthController implements IAuthController {
     private readonly _authService: IAuthService;
@@ -45,12 +45,11 @@ class AuthController implements IAuthController {
             // Send a success response
             sendSuccessResponse(response, StatusCodes.CREATED, SuccessMessages.SIGNUP_SUCCESS, { userId, role });
         } catch (error) {
-            let errorMessage: typeof ErrorMessages.INTERNAL_SERVER_ERROR = ErrorMessages.INTERNAL_SERVER_ERROR;
-            if (error instanceof Error) {
-                errorMessage = error.message as typeof ErrorMessages.INTERNAL_SERVER_ERROR;
-            } 
-            // Send a error response
-            sendErrorResponse(response, StatusCodes.BAD_REQUEST, errorMessage);
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
         }
     }
 
@@ -61,7 +60,7 @@ class AuthController implements IAuthController {
 
             // Check if the cookie exists
             if (!authHeader) {
-                throw new AuthenticationError(ErrorMessages.AUTH_COOKIE_MISSING);
+                throw new AuthenticationError(ErrorMessages.AUTH_COOKIE_MISSING, StatusCodes.UNAUTHORIZED);
             }
   
             // Parse the cookie to extract 
@@ -69,22 +68,21 @@ class AuthController implements IAuthController {
             const { accessToken } = parsedAuthHeader;
         
             if (!accessToken) {
-                throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND);
+                throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
             }
 
             const verificationStatus = await this._authService.verifyToken(accessToken);
             if (!verificationStatus) {
-                throw new AuthenticationError(ErrorMessages.TOKEN_VERIFICATION_FAILED);
+                throw new AuthenticationError(ErrorMessages.TOKEN_VERIFICATION_FAILED, StatusCodes.UNAUTHORIZED);
             }
             
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.TOKEN_VERIFIED, { valid: true, status: verificationStatus.status });
         } catch (error) {
-            let errorMessage: typeof ErrorMessages.INTERNAL_SERVER_ERROR = ErrorMessages.INTERNAL_SERVER_ERROR;
-            if (error instanceof Error) {
-                errorMessage = error.message as typeof ErrorMessages.INTERNAL_SERVER_ERROR;
-            } 
-            // Send a error response
-            sendErrorResponse(response, StatusCodes.BAD_REQUEST, errorMessage);
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
         }
     }
 
@@ -117,10 +115,11 @@ class AuthController implements IAuthController {
             // Send a success response
             sendSuccessResponse(response, StatusCodes.CREATED, SuccessMessages.SIGNIN_SUCCESS, { userId, role });
         } catch (error) {
-            const errorMessage: string = (error as AppError).message || ErrorMessages.INTERNAL_SERVER_ERROR;
-            const statusCode: number = (error as AppError).statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
-            // Send a error response
-            sendErrorResponse(response, statusCode, errorMessage);
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
         }
     }
 
@@ -152,14 +151,11 @@ class AuthController implements IAuthController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.SIGNOUT_SUCCESS);
         } catch (error) {
-            let errorMessage = `An unexpected Error occured while signing out`;
-            
-            if (error instanceof Error) {
-                errorMessage = error.message;
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
             }
-           
-            // Send error response
-            sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, errorMessage);
         }
     }
 
@@ -173,17 +169,15 @@ class AuthController implements IAuthController {
 
             // Call the verifyPhoneNumber method from AuthService
             const isVerifiedPhoneNumber = await this._authService.verifyPhoneNumber(phoneNumber);
-    
-            if (!isVerifiedPhoneNumber) throw new AuthenticationError(ErrorMessages.PHONE_NUMBER_MISSING, StatusCodes.BAD_REQUEST);
+            if (!isVerifiedPhoneNumber) throw new AuthenticationError(ErrorMessages.USER_NOT_FOUND, StatusCodes.BAD_REQUEST);
             
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.PHONE_NUMBER_VERIFIED);
         } catch (error) {
-            let errorMessage: typeof ErrorMessages.INTERNAL_SERVER_ERROR = ErrorMessages.INTERNAL_SERVER_ERROR;
-            if (error instanceof Error) {
-                errorMessage = error.message as typeof ErrorMessages.INTERNAL_SERVER_ERROR;
-            } 
-            // Send a error response
-            sendErrorResponse(response, StatusCodes.BAD_REQUEST, errorMessage);
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
         }
     }
 
@@ -193,17 +187,15 @@ class AuthController implements IAuthController {
 
             // Call the verifyPhoneNumber method from AuthService
             const isPasswordResetted = await this._authService.resetPassword(data);
-    
             if (!isPasswordResetted) throw new ServerError(ErrorMessages.PASSWORD_RESET_FAILED, StatusCodes.BAD_REQUEST);
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.PASSWORD_RESET_SUCCESS);
         } catch (error) {
-            let errorMessage: typeof ErrorMessages.INTERNAL_SERVER_ERROR = ErrorMessages.INTERNAL_SERVER_ERROR;
-            if (error instanceof Error) {
-                errorMessage = error.message as typeof ErrorMessages.INTERNAL_SERVER_ERROR;
-            } 
-            // Send a error response
-            sendErrorResponse(response, StatusCodes.BAD_REQUEST, errorMessage);
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
         }
     }
 }

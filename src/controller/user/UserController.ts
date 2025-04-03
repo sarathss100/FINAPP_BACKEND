@@ -3,6 +3,9 @@ import IUserService from 'services/user/interfaces/IUserService';
 import IUserController from './interfaces/IUserController';
 import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
 import { StatusCodes } from 'constants/statusCodes';
+import { AppError, AuthenticationError } from 'error/AppError';
+import { ErrorMessages } from 'constants/errorMessages';
+import { SuccessMessages } from 'constants/successMessages';
 
 class UserController implements IUserController {
     private readonly _userService: IUserService;
@@ -15,26 +18,22 @@ class UserController implements IUserController {
             const { accessToken } = request.cookies;
 
             if (!accessToken) {
-                throw new Error(`AccessToken not found on the request`);
+                throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
             }
 
             // Call the verifyPhoneNumber method from AuthService
             const userProfileDetails = await this._userService.getUserProfileDetails(accessToken);
     
             if (userProfileDetails) {
-                sendSuccessResponse(response, StatusCodes.OK, `User profile details have been successfully retrieved.`, {...userProfileDetails});
+                sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.USER_PROFILE_FETCHED, {...userProfileDetails});
             }
             
         } catch (error) {
-            if (error instanceof Error) {
-                console.error(error.message);
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
             }
-            let errorMessage = `An unexpected error occurred while trying to fetch user profile details. Please try again later or contact support if the issue persists.`;
-            // if (error instanceof Error) {
-            //     errorMessage = error.message;
-            // } 
-            // Send error response
-            sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, errorMessage);
         }
     }
 }
