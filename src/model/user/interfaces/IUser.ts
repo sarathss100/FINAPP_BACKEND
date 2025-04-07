@@ -7,6 +7,7 @@ interface IUser extends Document {
     password: string;
     role: string;
     status: boolean;
+    profile_picture_url: string;
     createdAt?: Date;
     updatedAt?: Date;
 }

@@ -1,3 +1,6 @@
+import { ErrorMessages } from 'constants/errorMessages';
+import { StatusCodes } from 'constants/statusCodes';
+import { AuthenticationError, ServerError } from 'error/AppError';
 import jwt from 'jsonwebtoken';
 import IAuthUser from 'services/auth/interfaces/IAuthUser';
 import ITokenPayload from 'types/auth/ITokenPayload';
@@ -79,4 +82,24 @@ export const verifyRefreshToken = function (token: string): ITokenPayload {
             throw new Error(`An unexpected error occured while verifying the access token`);
         }
     }
+};
+
+/**
+ * Decodes and validates an access token, ensuring it contains a valid user ID.
+ * @param accessToken The access token to decode and validate.
+ * @returns The user ID extracted from the token payload.
+ * @throws AuthenticationError if the token verification fails.
+ * @throws ServerError if the token is valid but does not contain a user ID.
+ */
+export const decodeAndValidateToken = function (accessToken: string): string {
+    // Verify the access token
+    const decodedData = verifyAccessToken(accessToken);
+    if (!decodedData) throw new AuthenticationError(ErrorMessages.TOKEN_VERIFICATION_FAILED, StatusCodes.UNAUTHORIZED);
+
+    // Extract the user ID from the decoded token payload
+    const { userId } = decodedData;
+    if (!userId) throw new ServerError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
+
+    // Return the user ID for further use
+    return userId;
 };

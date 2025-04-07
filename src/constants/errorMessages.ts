@@ -24,6 +24,10 @@ export const ErrorMessages = {
 
     // User Profile Errors
     FETCH_USER_PROFILE_FAILED: 'An unexpected error occurred while fetching user profile details. Please try again later or contact support.',
+    USER_PROFILE_PICTURE_MISSING_ERROR: 'The request is missing the image data required to upload the profile picture.',
+    CLOUDINARY_IMAGE_UPLOAD_FAILED: 'Failed to upload the image to Cloudinary. Please try again later or contact support.',
+    FAILED_TO_UPLOAD_PROFILE_PICTURE: 'Failed to upload the profile picture. Please try again later or contact support.',
+    FAILED_TO_FETCH_PROFILE_PICTURE_URL: 'Failed to retrieve the profile picture URL. Please try again later or contact support.',
 
     // User Management Errors
     STATUS_UPDATE_FAILED: 'Failed to update user status. Please try again later or contact support.',

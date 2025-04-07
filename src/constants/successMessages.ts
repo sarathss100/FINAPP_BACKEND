@@ -10,6 +10,10 @@ export const SuccessMessages = {
 
     // General Success Messages
     OPERATION_SUCCESS: 'Operation completed successfully.',
+
+    // User Success Messages
     USER_PROFILE_FETCHED: 'User profile details have been successfully retrived.',
+    USER_PROFILE_PICTURE_URL_FETCHED: 'User profile picture url have been successfully retrived.',
     USER_STATUS_UPDATED: 'User status updated successfully.',
+    USER_PROFILE_PICTURE_UPLOADED: 'Successfully uploaded profile picture',
 } as const;
