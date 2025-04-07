@@ -1,11 +1,10 @@
 import IUserRepository from 'repositories/user/interfaces/IUserRepository';
 import IUserService from './interfaces/IUserService';
 import IProfile from './interfaces/IProfile';
-import { decodeAndValidateToken, verifyAccessToken } from 'utils/auth/tokenUtils';
+import { decodeAndValidateToken } from 'utils/auth/tokenUtils';
 import { AppError, AuthenticationError, ServerError, ValidationError } from 'error/AppError';
 import { ErrorMessages } from 'constants/errorMessages';
 import { StatusCodes } from 'constants/statusCodes';
-import { request } from 'http';
 import uploadToCloudinary from 'services/cloudinary/cloudinaryService';
 
 class UserService implements IUserService {

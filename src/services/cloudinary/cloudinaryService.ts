@@ -1,6 +1,7 @@
 import { v2 as cloudinaryV2 } from 'cloudinary';
 import { ErrorMessages } from 'constants/errorMessages';
 import { ServerError } from 'error/AppError';
+import { Stream as stream } from 'stream';
 
 cloudinaryV2.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -12,7 +13,6 @@ const uploadToCloudinary = async function (fileBuffer: Buffer, originalname: str
     try {
         return new Promise((resolve, reject) => {
             // Create a stream from the buffer
-            const stream = require('stream');
             const bufferStream = new stream.PassThrough();
             bufferStream.end(fileBuffer);
             

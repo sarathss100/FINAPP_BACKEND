@@ -3,7 +3,7 @@ import IUserService from 'services/user/interfaces/IUserService';
 import IUserController from './interfaces/IUserController';
 import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
 import { StatusCodes } from 'constants/statusCodes';
-import { AppError, AuthenticationError, ServerError, ValidationError } from 'error/AppError';
+import { AppError, AuthenticationError, ValidationError } from 'error/AppError';
 import { ErrorMessages } from 'constants/errorMessages';
 import { SuccessMessages } from 'constants/successMessages';
 
