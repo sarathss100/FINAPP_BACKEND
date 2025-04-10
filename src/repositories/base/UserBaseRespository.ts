@@ -1,4 +1,4 @@
-import UserModel from 'model/user/model/UserModel';
+import { UserModel } from 'model/user/model/UserModel';
 import IAuthUser from './interfaces/IAuthUser';
 import IUserBaseRespository from './interfaces/IUserBaseRespository';
 

@@ -16,4 +16,5 @@ export const SuccessMessages = {
     USER_PROFILE_PICTURE_URL_FETCHED: 'User profile picture url have been successfully retrived.',
     USER_STATUS_UPDATED: 'User status updated successfully.',
     USER_PROFILE_PICTURE_UPLOADED: 'Successfully uploaded profile picture',
-} as const;
+    USER_GOAL_UPDATED: 'User goal updated successfully.',
+} as const

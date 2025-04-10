@@ -1,7 +1,7 @@
 import IProfile from 'services/user/interfaces/IProfile';
 import IUserRepository from './interfaces/IUserRepository';
 import UserBaseRespository from 'repositories/base/UserBaseRespository';
-import UserModel from 'model/user/model/UserModel';
+import { UserModel } from 'model/user/model/UserModel';
 
 class UserRepository extends UserBaseRespository implements IUserRepository {
     // Find a user's profile information by their unique user ID.
