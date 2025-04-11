@@ -10,6 +10,10 @@ const FaqSchema = new Schema({
         type: String,
         required: true,
         trim: true,
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false,
     }
 }, { timestamps: true });
 

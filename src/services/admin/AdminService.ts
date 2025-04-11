@@ -4,6 +4,7 @@ import IAdminRepository from 'repositories/admin/interfaces/IAdminRepository';
 import { AppError, ServerError, ValidationError } from 'error/AppError';
 import { ErrorMessages } from 'constants/errorMessages';
 import { StatusCodes } from 'constants/statusCodes';
+import IFaq from 'types/admin/IFaq';
 
 class AdminService implements IAdminService {
     private _adminRepository: IAdminRepository;
@@ -27,6 +28,7 @@ class AdminService implements IAdminService {
         }
     }
 
+    // Handle toggling user status (block/unblock) for admin
     async toggleUserStatus(_id: string, status: boolean): Promise<boolean> {
         try {
             // Validate input
@@ -39,6 +41,25 @@ class AdminService implements IAdminService {
             if (!isToggled) throw new ServerError(ErrorMessages.STATUS_UPDATE_FAILED, StatusCodes.BAD_REQUEST);
 
             return isToggled;
+        } catch (error) {
+            if (error instanceof AppError) {
+                throw error;
+            } else {
+                throw error;
+            }
+        }
+    }
+
+    async addFaq(newFaq: IFaq): Promise<boolean> {
+        try {
+            if (!newFaq.question || !newFaq.answer) {
+                throw new ValidationError(ErrorMessages.INVALID_INPUT, StatusCodes.INVALID_INPUT);
+            }
+
+            // Handle add a new FAQ entry to the list for admin
+            const isAdded = await this._adminRepository.addFaq(newFaq);
+            if (!isAdded) throw new ServerError(ErrorMessages.FAILED_TO_ADD_THE_FAQ, StatusCodes.INTERNAL_SERVER_ERROR);
+            return isAdded;
         } catch (error) {
             if (error instanceof AppError) {
                 throw error;

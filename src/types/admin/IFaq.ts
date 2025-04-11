@@ -1,10 +1,7 @@
-import { Document } from 'mongoose';
-
 // Define the Faq interface
-interface IFaq extends Document {
+interface IFaq {
     question: string;
     answer: string;
-    isDeleted: boolean;
     createdAt?: Date;
     updatedAt?: Date;
 }

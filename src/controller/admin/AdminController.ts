@@ -58,6 +58,32 @@ class AdminController implements IAdminController {
             }
         }
     }
+
+    async addFaq(request: Request, response: Response): Promise<void> {
+        try {
+            const { question, answer } = request.body;
+
+            if (!question || !answer) {
+                throw new ValidationError(ErrorMessages.INVALID_INPUT, StatusCodes.INVALID_INPUT)
+            }
+            
+            // Call the add FAQ in the adminService
+            const isAdded = await this._adminService.addFaq({ question, answer });
+    
+            if (isAdded) {
+                sendSuccessResponse(response, StatusCodes.OK,  SuccessMessages.FAQ_ADDED);
+            } else {
+                sendErrorResponse(response, StatusCodes.BAD_REQUEST, ErrorMessages.FAILED_TO_ADD_THE_FAQ);
+            }
+            
+        } catch (error) {
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
 }
 
 export default AdminController;

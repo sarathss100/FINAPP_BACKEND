@@ -11,5 +11,6 @@ const adminController: IAdminController = new AdminController(adminService);
 
 router.get('/all-users', adminController.getAllUsers.bind(adminController));
 router.post('/toggle-user-status', adminController.toggleUserStatus.bind(adminController));
+router.post('/add-faq', adminController.addFaq.bind(adminController));
 
 export default router;
