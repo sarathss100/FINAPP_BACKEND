@@ -42,4 +42,6 @@ export const ErrorMessages = {
 
     // Admin Errors
     FAILED_TO_ADD_THE_FAQ: 'Failed to add the FAQ. Please try again later or contact developer support.',
+    NO_FAQ_FOUND: 'No FAQs are currently available. Please check back later or add a new FAQ.',
+    FAILED_TO_FETCH_FAQS: 'We were unable to retrieve the FAQs. Please try again later or contact support if the issue continues.',
 } as const;

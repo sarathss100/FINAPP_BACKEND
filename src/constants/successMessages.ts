@@ -20,4 +20,5 @@ export const SuccessMessages = {
 
     // Admin Success Messages
     FAQ_ADDED: 'FAQ have been added successfully.',
+    FAQ_FETCHED_SUCCESSFULLY: 'FAQs have been successfully retrieved.'
 } as const

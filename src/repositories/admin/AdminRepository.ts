@@ -1,8 +1,8 @@
 import { UserModel } from 'model/user/model/UserModel';
 import IAdminRepository from './interfaces/IAdminRepository';
 import IUserDetails from './interfaces/IUserDetails';
-import IFaq from 'types/admin/IFaq';
 import { FaqModel } from 'model/admin/model/FaqModel';
+import { IFaq } from 'dtos/base/FaqDto';
 
 class AdminRepository implements IAdminRepository {
     // Retrieve all users from the database
@@ -43,9 +43,11 @@ class AdminRepository implements IAdminRepository {
         return true;
     }
 
-    // Add FAQ entry to the list
+    // Fetches all FAQ entries from the database for admin
     async getAllFaqs(): Promise<IFaq[] | null> {
-        return null;
+        const result = await FaqModel.find();
+        console.log(`Admin Repository:`, result);
+        return result;
     }
 }
 

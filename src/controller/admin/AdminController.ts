@@ -6,6 +6,7 @@ import { Request, Response } from 'express';
 import { AppError, ValidationError } from 'error/AppError';
 import { ErrorMessages } from 'constants/errorMessages';
 import { SuccessMessages } from 'constants/successMessages';
+import faqSchema from '../../dtos/base/FaqDto';
 
 class AdminController implements IAdminController {
     private readonly _adminService: IAdminService;
@@ -61,11 +62,14 @@ class AdminController implements IAdminController {
 
     async addFaq(request: Request, response: Response): Promise<void> {
         try {
-            const { question, answer } = request.body;
+            // Validate the request body using zod
+            const parsedData = faqSchema.safeParse(request.body);
 
-            if (!question || !answer) {
+            if (!parsedData.success) {
                 throw new ValidationError(ErrorMessages.INVALID_INPUT, StatusCodes.INVALID_INPUT)
             }
+
+            const { question, answer } = parsedData.data;
             
             // Call the add FAQ in the adminService
             const isAdded = await this._adminService.addFaq({ question, answer });
@@ -75,7 +79,25 @@ class AdminController implements IAdminController {
             } else {
                 sendErrorResponse(response, StatusCodes.BAD_REQUEST, ErrorMessages.FAILED_TO_ADD_THE_FAQ);
             }
-            
+        } catch (error) {
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    async getAllFaqs(request: Request, response: Response): Promise<void> {
+        try {
+            // Call the getall FAQ details in the adminService
+            const faqDetails = await this._adminService.getAllFaqs();
+
+            if (faqDetails) {
+                sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.FAQ_ADDED, { faqDetails });
+            } else {
+                sendErrorResponse(response, StatusCodes.BAD_REQUEST, ErrorMessages.FAILED_TO_ADD_THE_FAQ);
+            }
         } catch (error) {
             if (error instanceof AppError) {
                 sendErrorResponse(response, error.statusCode, error.message);

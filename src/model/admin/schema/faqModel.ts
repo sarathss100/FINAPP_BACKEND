@@ -14,6 +14,10 @@ const FaqSchema = new Schema({
     isDeleted: {
         type: Boolean,
         default: false,
+    },
+    isPublished: {
+        type: Boolean,
+        default: false,
     }
 }, { timestamps: true });
 
