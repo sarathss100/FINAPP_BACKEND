@@ -35,11 +35,13 @@ class AdminRepository implements IAdminRepository {
 
     // Update FAQ entry to the list
     async updateFaq(faqId: string, updatedData: Partial<IFaq>): Promise<boolean> {
+        console.log(faqId, updatedData);
         return true;
     }
 
     // Delete FAQ entry to the list
     async deleteFaq(faqId: string): Promise<boolean> {
+        console.log(faqId);
         return true;
     }
 

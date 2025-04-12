@@ -7,7 +7,6 @@ class PublicRepository implements IPublicRepository {
     // Fetches All published and non-deleted FAQ entries from the database
     async getFaqs(): Promise<IFaq[] | null> {
         const result = await FaqModel.find({ isPublished: true, isDeleted: false });
-        if (!result) return null;
         return result;
     }
 }
