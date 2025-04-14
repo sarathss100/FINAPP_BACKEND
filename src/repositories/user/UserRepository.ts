@@ -22,6 +22,13 @@ class UserRepository extends UserBaseRespository implements IUserRepository {
         const user = await UserModel.findOne({ _id: userId }, { _id: 0, profile_picture_url: 1 });
         return user?.profile_picture_url || './user.png';
     }
+
+    // Toggles the Two-Factor Authentication (2FA) status for a specific user in the database.
+    async toggleTwoFactorAuthentication(userId: string, value: boolean): Promise<boolean> {
+        const result = await UserModel.findByIdAndUpdate({ _id: userId }, { $set: { is2FA: value } });
+        console.log(`User Repository`, result);
+        return result ? true : false;
+    }
 }
 
 export default UserRepository;

@@ -62,7 +62,6 @@ class UserController implements IUserController {
         }
     }
 
-
     async getUserProfilePictureUrl(request: Request, response: Response): Promise<void> {
         try {
             const { accessToken } = request.cookies;
@@ -75,6 +74,32 @@ class UserController implements IUserController {
             const userProfilePictureUrl = await this._userService.getUserProfilePictureUrl(accessToken);
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.USER_PROFILE_PICTURE_URL_FETCHED, { userProfilePictureUrl }); 
+        } catch (error) {
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    async toggleTwoFactorAuthentication(request: Request, response: Response): Promise<void> {
+        try {
+            const { accessToken } = request.cookies;
+            const { value } = request.body;
+
+            if (typeof value !== "boolean") throw new ValidationError(ErrorMessages.INVALID_INPUT, StatusCodes.INVALID_INPUT);
+
+            console.log(`User Controller `, accessToken, value);
+
+            if (!accessToken) {
+                throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
+            }
+
+            // Extract the file path 
+            const isToggled = await this._userService.toggleTwoFactorAuthentication(accessToken, value);
+
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.SUCCESSFULLY_TOGGLED_2FA, { isToggled });
         } catch (error) {
             if (error instanceof AppError) {
                 sendErrorResponse(response, error.statusCode, error.message);

@@ -75,6 +75,29 @@ class UserService implements IUserService {
             }
         }
     }
+
+    async toggleTwoFactorAuthentication(accessToken: string, value: boolean): Promise<boolean> {
+        try {
+            // Decode and validate the token
+            const userId = decodeAndValidateToken(accessToken);
+
+            console.log(`User Service 1`, accessToken, userId, value);
+
+            // Toggle User Two Factor Authentcation (2FA) status for a user in the repository layer.
+            const isToggled = await this._userRepository.toggleTwoFactorAuthentication(userId, value);
+            console.log(`User Service 1`, isToggled);
+
+            if (!isToggled) throw new ServerError(ErrorMessages.FAILED_TO_TOGGLE_2FA);
+
+            return isToggled; // Return the Success status
+        } catch (error) {
+            if (error) {
+                throw error;
+            } else {
+                throw error;
+            }
+        }
+    }
 }
 
 export default UserService;
