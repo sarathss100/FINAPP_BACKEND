@@ -18,6 +18,7 @@ export const SuccessMessages = {
     USER_PROFILE_PICTURE_UPLOADED: 'Successfully uploaded profile picture',
     USER_GOAL_UPDATED: 'User goal updated successfully.',
     SUCCESSFULLY_TOGGLED_2FA: 'The Two-Factor Authentication (2FA) status has been successfully updated.',
+    USER_ACCOUNT_DElETED: 'User Account has been successfully Deleted.',
 
     // Admin Success Messages
     FAQ_ADDED: 'FAQ have been added successfully.',

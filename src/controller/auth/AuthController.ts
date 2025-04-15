@@ -94,7 +94,7 @@ class AuthController implements IAuthController {
             const result = await this._authService.signin(signinData);
 
             // Extract the accessToken from the result
-            const { accessToken, userId, role } = result;
+            const { accessToken, userId, role, is2FA } = result;
 
             // Set the accessToken as an HTTP-only cookie
             response.cookie('accessToken', accessToken, {
@@ -113,7 +113,7 @@ class AuthController implements IAuthController {
             });
 
             // Send a success response
-            sendSuccessResponse(response, StatusCodes.CREATED, SuccessMessages.SIGNIN_SUCCESS, { userId, role });
+            sendSuccessResponse(response, StatusCodes.CREATED, SuccessMessages.SIGNIN_SUCCESS, { userId, role, is2FA });
         } catch (error) {
             if (error instanceof AppError) {
                 sendErrorResponse(response, error.statusCode, error.message);

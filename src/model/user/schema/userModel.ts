@@ -6,7 +6,8 @@ const UserSchema = new Schema({
     phone_number: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: String, default: 'user' },
-    is2FA: {type: Boolean, default: false },
+    is2FA: { type: Boolean, default: false },
+    isDeleted: { type: Boolean, default: false },
     status: { type: Boolean, default: true },
     profile_picture_url: { type: String, default: './user.png' },
 }, { timestamps: true });

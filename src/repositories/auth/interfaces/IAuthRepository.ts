@@ -6,6 +6,7 @@ interface IAuthRepository {
     createUser(data: SignupDto): Promise<IAuthUser>;
     findByPhoneNumber(phoneNumber: string): Promise<IAuthUser | null>;
     resetPassword(data: ResetPasswordDto): Promise<boolean | null>;
+    restoreUserAccount(userId: string): Promise<void>;
 }
 
 export default IAuthRepository;

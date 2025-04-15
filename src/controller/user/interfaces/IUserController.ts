@@ -5,6 +5,7 @@ interface IUserController {
     uploadProfilePicture(request: Request, response: Response): Promise<void>;
     getUserProfilePictureUrl(request: Request, response: Response): Promise<void>;
     toggleTwoFactorAuthentication(request: Request, response: Response): Promise<void>;
+    deleteUserAccount(request: Request, response: Response): Promise<void>;
 }
 
 export default IUserController;

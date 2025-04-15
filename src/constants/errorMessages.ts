@@ -30,6 +30,8 @@ export const ErrorMessages = {
     FAILED_TO_FETCH_PROFILE_PICTURE_URL: 'Failed to retrieve the profile picture URL. Please try again later or contact support.',
     FAILED_TO_UPDATE_THE_GOAL_AMOUNT: 'Failed to update the Goal Amount. Please try again later or contact support.',
     FAILED_TO_TOGGLE_2FA: 'Failed to update the Two-Factor Authentication (2FA) status. Please try again later or contact support for assistance.',
+    FAILED_TO_DELETE_USER: 'Failed to delete User Account. Please try again later or contact support for assistance.',
+    FAILED_TO_RESTORE_USER: 'Failed to restore User Account. Please try again later or contact support for assistance.',
 
     // User Management Errors
     STATUS_UPDATE_FAILED: 'Failed to update user status. Please try again later or contact support.',

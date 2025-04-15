@@ -8,6 +8,7 @@ interface IUser extends Document {
     role: string;
     status: boolean;
     is2FA: boolean;
+    isDeleted: boolean;
     profile_picture_url: string;
     createdAt?: Date;
     updatedAt?: Date;

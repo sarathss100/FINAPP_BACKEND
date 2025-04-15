@@ -3,13 +3,14 @@ import IUserService from 'services/user/interfaces/IUserService';
 import IUserController from './interfaces/IUserController';
 import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
 import { StatusCodes } from 'constants/statusCodes';
-import { AppError, AuthenticationError, ValidationError } from 'error/AppError';
+import { AppError, AuthenticationError, ServerError, ValidationError } from 'error/AppError';
 import { ErrorMessages } from 'constants/errorMessages';
 import { SuccessMessages } from 'constants/successMessages';
 
 class UserController implements IUserController {
     private readonly _userService: IUserService;
-    constructor(userService: IUserService) {
+  
+    constructor(userService: IUserService ) {
         this._userService = userService;
     }
 
@@ -86,20 +87,41 @@ class UserController implements IUserController {
     async toggleTwoFactorAuthentication(request: Request, response: Response): Promise<void> {
         try {
             const { accessToken } = request.cookies;
-            const { value } = request.body;
-
-            if (typeof value !== "boolean") throw new ValidationError(ErrorMessages.INVALID_INPUT, StatusCodes.INVALID_INPUT);
-
-            console.log(`User Controller `, accessToken, value);
 
             if (!accessToken) {
                 throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
             }
 
             // Extract the file path 
-            const isToggled = await this._userService.toggleTwoFactorAuthentication(accessToken, value);
+            const isToggled = await this._userService.toggleTwoFactorAuthentication(accessToken);
+            
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.SUCCESSFULLY_TOGGLED_2FA, { isToggled });
+        } catch (error) {
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    async deleteUserAccount(request: Request, response: Response): Promise<void> {
+        try {
+            const { accessToken } = request.cookies;
+
+            if (!accessToken) {
+                throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
+            }
+
+            // Extract the file path 
+            const isDeleted = await this._userService.deleteUserAccount(accessToken);
+
+            if (!isDeleted) {
+                throw new ServerError(ErrorMessages.FAILED_TO_DELETE_USER);
+            }
+            
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.USER_ACCOUNT_DElETED, { isDeleted });
         } catch (error) {
             if (error instanceof AppError) {
                 sendErrorResponse(response, error.statusCode, error.message);

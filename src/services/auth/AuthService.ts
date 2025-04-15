@@ -15,6 +15,7 @@ import { StatusCodes } from 'constants/statusCodes';
 class AuthService implements IAuthService {
     private _authRepository: IAuthRepository;
     private _hasher: IHasher;
+
     constructor(authRepository: IAuthRepository, hasher: IHasher) {
         this._authRepository = authRepository;
         this._hasher = hasher;
@@ -113,6 +114,8 @@ class AuthService implements IAuthService {
             if (!isMatched) {
                 throw new ValidationError(ErrorMessages.INVALID_CREDENTIALS, StatusCodes.UNAUTHORIZED);
             } 
+
+            await this._authRepository.restoreUserAccount(user.userId);
 
             // Generate tokens using the utility functions 
             let accessToken, refreshToken;
