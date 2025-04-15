@@ -60,10 +60,8 @@ class UserRepository extends UserBaseRespository implements IUserRepository {
             // Attempts to find the user document by `userId` and updates it to set the `isDeleted` field to `true`.
             const user = await UserModel.updateOne({ _id: userId }, { $set: { isDeleted: true } });
 
-            console.log(`User Repository`, user);
-
             // If no user is found with the given `userId`, throw a `NotFoundError` with an appropriate error message.
-            if (!user) {
+            if (!user.acknowledged) {
                 throw new NotFoundError(ErrorMessages.USER_NOT_FOUND);
             }
 

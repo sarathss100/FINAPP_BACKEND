@@ -100,7 +100,7 @@ class UserService implements IUserService {
             const userId = decodeAndValidateToken(accessToken);
 
             // Delete User Account for a user in the repository layer.
-            const isDeleted = await this._userRepository.toggleTwoFactorAuthentication(userId);
+            const isDeleted = await this._userRepository.deleteUserAccount(userId);
 
             return isDeleted; // Return the Success status
         } catch (error) {
