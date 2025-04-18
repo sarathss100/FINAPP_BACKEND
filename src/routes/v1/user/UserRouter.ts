@@ -17,6 +17,6 @@ router.get('/profile', userController.getUserProfileDetails.bind(userController)
 router.get('/profile/profile-picture', userController.getUserProfilePictureUrl.bind(userController));
 router.post('/profile/profile-picture', upload.single('file'), userController.uploadProfilePicture.bind(userController));
 router.post('/profile/toggle-2FA', userController.toggleTwoFactorAuthentication.bind(userController));
-router.delete('/profile/delete', userController.deleteUserAccount.bind(userController));
+router.delete('/profile', userController.deleteUserAccount.bind(userController));
 
 export default router;

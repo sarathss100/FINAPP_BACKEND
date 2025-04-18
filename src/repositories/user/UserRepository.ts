@@ -2,10 +2,9 @@ import IProfile from 'services/user/interfaces/IProfile';
 import IUserRepository from './interfaces/IUserRepository';
 import UserBaseRespository from 'repositories/base/UserBaseRespository';
 import { UserModel } from 'model/user/model/UserModel';
-import { NotFoundError, ValidationError } from 'error/AppError';
+import { NotFoundError } from 'error/AppError';
 import { Error } from 'mongoose';
 import { ErrorMessages } from 'constants/errorMessages';
-import { StatusCodes } from 'constants/statusCodes';
 
 class UserRepository extends UserBaseRespository implements IUserRepository {
     // Find a user's profile information by their unique user ID.
@@ -41,7 +40,7 @@ class UserRepository extends UserBaseRespository implements IUserRepository {
             const newIs2FAValue = !user.is2FA;
 
             // Update the database with the new `is2FA` value
-            const result = await UserModel.updateOne(   
+            await UserModel.updateOne(   
             { _id: userId },
             { $set: { is2FA: newIs2FAValue } }
             );
