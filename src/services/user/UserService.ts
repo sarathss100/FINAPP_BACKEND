@@ -2,7 +2,7 @@ import IUserRepository from 'repositories/user/interfaces/IUserRepository';
 import IUserService from './interfaces/IUserService';
 import IProfile from './interfaces/IProfile';
 import { decodeAndValidateToken } from 'utils/auth/tokenUtils';
-import { AppError, AuthenticationError, ServerError, ValidationError } from 'error/AppError';
+import { AuthenticationError, ServerError, ValidationError } from 'error/AppError';
 import { ErrorMessages } from 'constants/errorMessages';
 import { StatusCodes } from 'constants/statusCodes';
 import uploadToCloudinary from 'services/cloudinary/cloudinaryService';
@@ -23,11 +23,7 @@ class UserService implements IUserService {
 
             return profileDetails;
         } catch (error) {
-            if (error instanceof AppError) {
-                throw error;
-            } else {
-                throw error;
-            }
+            throw new Error((error as Error).message);
         }
     }
 
@@ -48,11 +44,7 @@ class UserService implements IUserService {
 
             return cloudinaryUrl; // Return the updated URL
         } catch (error) {
-            if (error) {
-                throw error;
-            } else {
-                throw error;
-            }
+            throw new Error((error as Error).message);
         }
     }
 
@@ -68,11 +60,7 @@ class UserService implements IUserService {
 
             return profilePictureUrl; // Return the URL 
         } catch (error) {
-            if (error) {
-                throw error;
-            } else {
-                throw error;
-            }
+            throw new Error((error as Error).message);
         }
     }
 
@@ -86,11 +74,7 @@ class UserService implements IUserService {
 
             return isToggled; // Return the Success status
         } catch (error) {
-            if (error) {
-                throw error;
-            } else {
-                throw error;
-            }
+            throw new Error((error as Error).message);
         }
     }
 
@@ -104,11 +88,7 @@ class UserService implements IUserService {
 
             return isDeleted; // Return the Success status
         } catch (error) {
-            if (error) {
-                throw error;
-            } else {
-                throw error;
-            }
+            throw new Error((error as Error).message);
         }
     }
 }

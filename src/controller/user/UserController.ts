@@ -121,7 +121,7 @@ class UserController implements IUserController {
                 throw new ServerError(ErrorMessages.FAILED_TO_DELETE_USER);
             }
             
-            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.USER_ACCOUNT_DElETED, { isDeleted });
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.USER_ACCOUNT_DELETED, { isDeleted });
         } catch (error) {
             if (error instanceof AppError) {
                 sendErrorResponse(response, error.statusCode, error.message);

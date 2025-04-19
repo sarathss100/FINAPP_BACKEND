@@ -17,6 +17,7 @@ router.get('/heartbeat', (req: Request, res: Response, next: NextFunction) => {
       console.error('Heartbeat API error:', error);
       res.status(500).json({ error: 'Failed to check heartbeat' });
     });
+  next();
 });
 
 // Place consent request
@@ -79,32 +80,33 @@ router.post('/consent', (req: Request, res: Response, next: NextFunction) => {
       console.error('Consent request API error:', error);
       res.status(500).json({ error: 'Failed to place consent request' });
     });
+  next();
 });
 
 // Get consent status
-router.post('/consent/status', (req: Request, res: Response, next: NextFunction) => {
-  const { consentHandle } = req.body;
+// router.post('/consent/status', (req: Request, res: Response, next: NextFunction) => {
+//   const { consentHandle } = req.body;
   
-  if (!consentHandle) {
-    return res.status(400).json({ error: 'Consent handle is required' });
-  }
+//   if (!consentHandle) {
+//     return res.status(400).json({ error: 'Consent handle is required' });
+//   }
   
-  const statusRequest = {
-    ver: "1.0",
-    timestamp: new Date().toISOString(),
-    txnid: uuidv4(),
-    consentHandle
-  };
+//   const statusRequest = {
+//     ver: "1.0",
+//     timestamp: new Date().toISOString(),
+//     txnid: uuidv4(),
+//     consentHandle
+//   };
   
-  oneMoneyService.getConsentStatus(statusRequest)
-    .then(response => {
-      res.status(200).json(response);
-    })
-    .catch(error => {
-      console.error('Consent status API error:', error);
-      res.status(500).json({ error: 'Failed to get consent status' });
-    });
-});
+//   oneMoneyService.getConsentStatus(statusRequest)
+//     .then(response => {
+//       res.status(200).json(response);
+//     })
+//     .catch(error => {
+//       console.error('Consent status API error:', error);
+//       res.status(500).json({ error: 'Failed to get consent status' });
+//     });
+// });
 
 // Get consent artefact
 router.get('/consent/:id', (req: Request, res: Response, next: NextFunction) => {
@@ -118,6 +120,7 @@ router.get('/consent/:id', (req: Request, res: Response, next: NextFunction) => 
       console.error('Get consent artefact API error:', error);
       res.status(500).json({ error: 'Failed to get consent artefact' });
     });
+  next();
 });
 
 export default router;

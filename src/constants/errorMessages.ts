@@ -42,7 +42,11 @@ export const ErrorMessages = {
     INVALID_PHONE_NUMBER_OR_PASSWORD: 'Please enter a valid phone number or password.',
     TOKEN_GENERATION_ERROR: 'An error occurred while generating authentication tokens. Please try again later.',
     INVALID_INPUT: 'Invalid input. Please provide valid data.',
+    GOAL_ID_NOT_FOUND: 'No goal ID found. Please try again later or contact support',
 
+    // Goal Errors
+    FAILED_TO_DELETE_GOAL: 'Failed to delete Goal. Please try again later or contact support for assistance.',
+    
     // Admin Errors
     FAILED_TO_ADD_THE_FAQ: 'Failed to add the FAQ. Please try again later or contact developer support.',
     NO_FAQ_FOUND: 'No FAQs are currently available. Please check back later or add a new FAQ.',

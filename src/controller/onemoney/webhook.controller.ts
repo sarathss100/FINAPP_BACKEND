@@ -63,7 +63,7 @@ export default class WebhookController {
       if (sessionStatus === 'COMPLETED') {
         // Data is ready, fetch it
         const fiData = await this.oneMoneyService.fetchFIData(sessionId);
-        console.log('Fetched FI data for session:', sessionId);
+        console.log('Fetched FI data for session:', sessionId, fiData);
         
         // Process and decrypt the FI data as needed
         // Store in database, etc.

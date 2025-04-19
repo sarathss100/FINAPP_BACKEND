@@ -38,7 +38,7 @@ interface IGoal extends Document {
     is_completed: boolean; 
     created_by: Types.ObjectId; 
     last_updated_by?: Types.ObjectId;
-    audit_logs: Array<{
+    audit_logs?: Array<{
         action: 'Created' | 'Updated' | 'Deleted';
         updated_by: Types.ObjectId;
         updated_at: Date;
