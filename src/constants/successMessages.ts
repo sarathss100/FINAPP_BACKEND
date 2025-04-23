@@ -24,6 +24,7 @@ export const SuccessMessages = {
     USER_ACCOUNT_DELETED: 'User account deleted successfully.',
 
     // Goal Success Messages
+    GOAL_CREATED: 'User goal created successfully.',
     GOAL_REMOVED: 'Goal removed successfully.',
     GOALS_RETRIEVED: 'User goals retrieved successfully.',
 

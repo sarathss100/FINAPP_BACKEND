@@ -5,6 +5,7 @@ interface IGoalController {
     updateGoal(request: Request, response: Response): Promise<void>;
     removeGoal(request: Request, response: Response): Promise<void>;
     getUserGoals(request: Request, response: Response): Promise<void>;
+    getTotalActiveGoalAmount(request: Request, response: Response): Promise<void>;
 }
 
 export default IGoalController;

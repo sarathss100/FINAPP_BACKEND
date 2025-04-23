@@ -43,7 +43,7 @@ class GoalController implements IGoalController {
             // Call the service layer to create the goal
             const createdGoal = await this._goalService.createGoal(accessToken, goalData);
 
-            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.USER_PROFILE_PICTURE_UPLOADED, { createdGoal } );
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOAL_CREATED, { createdGoal } );
         } catch (error) {
             if (error instanceof AppError) {
                 sendErrorResponse(response, error.statusCode, error.message);
@@ -87,7 +87,7 @@ class GoalController implements IGoalController {
             // Call the service layer to create the goal
             const createdGoal = await this._goalService.updateGoal(accessToken, goalId, goalData);
 
-            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.USER_PROFILE_PICTURE_UPLOADED, { createdGoal } );
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.USER_GOAL_UPDATED, { createdGoal } );
         } catch (error) {
             if (error instanceof AppError) {
                 sendErrorResponse(response, error.statusCode, error.message);
@@ -136,6 +136,26 @@ class GoalController implements IGoalController {
             const userGoalDetails = await this._goalService.getUserGoals(accessToken);
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOALS_RETRIEVED, { ...userGoalDetails });
+        } catch (error) {
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    async getTotalActiveGoalAmount(request: Request, response: Response): Promise<void> {
+        try {
+            const { accessToken } = request.cookies;
+            if (!accessToken) {
+                throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
+            }
+
+            // Call the service layer to get the user goals
+            const totalActiveGoalAmount = await this._goalService.getTotalActiveGoalAmount(accessToken);
+
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOALS_RETRIEVED, { totalActiveGoalAmount });
         } catch (error) {
             if (error instanceof AppError) {
                 sendErrorResponse(response, error.statusCode, error.message);

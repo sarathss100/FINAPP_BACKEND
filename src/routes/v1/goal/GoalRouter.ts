@@ -13,5 +13,6 @@ router.post('/create', goalController.createGoal.bind(goalController));
 router.post('/update', goalController.updateGoal.bind(goalController));
 router.delete('/delete', goalController.removeGoal.bind(goalController));
 router.get('/details', goalController.getUserGoals.bind(goalController));
+router.get('/total-goal-amount', goalController.getTotalActiveGoalAmount.bind(goalController));
 
 export default router;

@@ -5,6 +5,7 @@ interface IGoalService {
     updateGoal(accessToken: string, goalId: string, goalData: Partial<IGoalDTO>): Promise<IGoalDTO>;
     removeGoal(goalId: string): Promise<boolean>;
     getUserGoals(accessToken: string): Promise<IGoalDTO[]>;
+    getTotalActiveGoalAmount(accessToken: string): Promise<number>;
 }
 
 export default IGoalService;
