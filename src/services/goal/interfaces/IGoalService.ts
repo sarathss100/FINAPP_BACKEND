@@ -6,6 +6,7 @@ interface IGoalService {
     removeGoal(goalId: string): Promise<boolean>;
     getUserGoals(accessToken: string): Promise<IGoalDTO[]>;
     getTotalActiveGoalAmount(accessToken: string): Promise<number>;
+    findLongestTimePeriod(accessToken: string): Promise<string>;
 }
 
 export default IGoalService;

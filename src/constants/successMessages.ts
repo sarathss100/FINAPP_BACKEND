@@ -27,6 +27,7 @@ export const SuccessMessages = {
     GOAL_CREATED: 'User goal created successfully.',
     GOAL_REMOVED: 'Goal removed successfully.',
     GOALS_RETRIEVED: 'User goals retrieved successfully.',
+    GOALS_LONGEST_TIME_REMAINING: 'Goal with the longest time remaining retrieved successfully.',
 
     // Admin Success Messages
     FAQ_ADDED: 'FAQ added successfully.',

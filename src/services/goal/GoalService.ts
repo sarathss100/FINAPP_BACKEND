@@ -2,9 +2,10 @@ import { IGoalDTO } from 'dtos/goal/GoalDto';
 import IGoalService from './interfaces/IGoalService';
 import { decodeAndValidateToken } from 'utils/auth/tokenUtils';
 import IGoalManagementRepository from 'repositories/goal/interfaces/IGoalManagementRepository';
-import { AuthenticationError } from 'error/AppError';
+import { AuthenticationError, NotFoundError } from 'error/AppError';
 import { ErrorMessages } from 'constants/errorMessages';
 import { StatusCodes } from 'constants/statusCodes';
+import formatDuration from 'utils/dateFormatter';
 
 /**
  * Service class for managing goals, including creating, updating, deleting, and retrieving goals.
@@ -162,6 +163,62 @@ class GoalService implements IGoalService {
         } catch (error) {
             // Log and re-throw the error to propagate it to the caller.
             console.error('Error retrieving user goals:', error);
+            throw new Error((error as Error).message);
+        }
+    }
+
+
+    /**
+    * Retrieves the longest target time period among incomplete goals associated with the authenticated user.
+    * 
+    * @param {string} accessToken - The access token used to authenticate the user and extract their ID.
+    * @returns {Promise<void>} - A promise that resolves when the operation completes. Logs the longest time period.
+    * @throws {AuthenticationError} - Throws an error if the access token is invalid or missing the user ID.
+    * @throws {Error} - Throws an error if the database operation fails or if there is an issue processing the goals.
+    */
+    async findLongestTimePeriod(accessToken: string): Promise<string> {
+        try {
+            // Decode and validate the access token to extract the user ID associated with it.
+            const userId = decodeAndValidateToken(accessToken);
+            if (!userId) {
+                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
+            }
+
+            // Retrieve all goals associated with the extracted user ID from the repository.
+            const goalDetails = await this._goalRepository.getUserGoals(userId);
+
+            // Calculate the longest target time period among incomplete goals.
+            let longestTimePeriod = 0;
+            let longestGoal = null;
+            let formattedDuration = '';
+
+            for (const goal of goalDetails) {
+                if (!goal.is_completed) {
+                   // Calculate the time left as the difference between target_date and the current date.
+                    const timeLeft = new Date(goal.target_date).getTime() - new Date().getTime();
+
+                    if (timeLeft > longestTimePeriod) {
+                        longestTimePeriod = timeLeft; // Update the longest time period
+                        longestGoal = goal; // Track the goal with the longest time left
+                    }
+                }
+            }
+
+            if (longestTimePeriod > 0) {
+                // Format the longest time period into a human-readable string
+                if (longestGoal) {
+                    formattedDuration = formatDuration(new Date(), new Date(longestGoal.target_date));
+                } else {
+                    throw new NotFoundError(ErrorMessages.NO_GOALS_FOUND, StatusCodes.NOT_FOUND);
+                }
+            } else {
+                throw new NotFoundError(ErrorMessages.NO_INCOMPLETE_GOALS_FOUND, StatusCodes.NOT_FOUND);
+            }
+        
+            return formattedDuration || `0 Y, 0 M, 0 D`;
+        } catch (error) {
+            // Log the error and re-throw it to propagate the error to the caller.
+            console.error('Error while calculating the longest target time period:', error);
             throw new Error((error as Error).message);
         }
     }
