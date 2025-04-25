@@ -7,6 +7,7 @@ interface IGoalController {
     getUserGoals(request: Request, response: Response): Promise<void>;
     getTotalActiveGoalAmount(request: Request, response: Response): Promise<void>;
     findLongestTimePeriod(request: Request, response: Response): Promise<void>;
+    analyzeGoal(request: Request, response: Response): Promise<void>;
 }
 
 export default IGoalController;
