@@ -16,5 +16,6 @@ router.get('/details', goalController.getUserGoals.bind(goalController));
 router.get('/total-goal-amount', goalController.getTotalActiveGoalAmount.bind(goalController));
 router.get('/longest-time-period', goalController.findLongestTimePeriod.bind(goalController));
 router.get('/analyze', goalController.analyzeGoal.bind(goalController));
+router.get('/by-category', goalController.goalsByCategory.bind(goalController));
 
 export default router;

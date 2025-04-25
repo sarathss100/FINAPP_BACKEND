@@ -8,6 +8,7 @@ const goalDTOSchema = z.object({
     goal_category: z.enum(['Education', 'Retirement', 'Travel', 'Investment', 'Other']).default('Other'),
     target_amount: z.number().min(0, 'Target amount must be non-negative.'),
     initial_investment: z.number().min(0, 'Initial investment must be non-negative.'),
+    current_amount: z.number().min(0, 'Curent amount must be non-negative.').optional(),
     currency: z.enum(['USD', 'EUR', 'INR', 'GBP']).default('INR'),
     target_date: z.string().datetime({ offset: true }).transform(value => new Date(value)).refine(date => date > new Date(), { message: 'Target data must be in the future' }),
     contribution_frequency: z.enum(['Monthly', 'Quarterly', 'Yearly']),

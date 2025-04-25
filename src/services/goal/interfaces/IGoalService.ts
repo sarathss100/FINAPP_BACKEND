@@ -1,5 +1,6 @@
 import { IGoalDTO } from 'dtos/goal/GoalDto';
 import ISmartAnalysisResult from './ISmartAnalysisResult';
+import IGoalCategory from './IGoalCategory';
 
 interface IGoalService {
     createGoal(accessToken: string, goalData: IGoalDTO): Promise<IGoalDTO>;
@@ -9,6 +10,7 @@ interface IGoalService {
     getTotalActiveGoalAmount(accessToken: string): Promise<number>;
     findLongestTimePeriod(accessToken: string): Promise<string>;
     analyzeGoal(accessToken: string): Promise<ISmartAnalysisResult>;
+    goalsByCategory(accessToken: string): Promise<IGoalCategory>;   
 }
 
 export default IGoalService;

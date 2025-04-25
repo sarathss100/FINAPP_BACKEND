@@ -7,6 +7,7 @@ import { ErrorMessages } from 'constants/errorMessages';
 import { StatusCodes } from 'constants/statusCodes';
 import formatDuration from 'utils/dateFormatter';
 import ISmartAnalysisResult from './interfaces/ISmartAnalysisResult';
+import IGoalCategory from './interfaces/IGoalCategory';
 
 /**
  * Service class for managing goals, including creating, updating, deleting, and retrieving goals.
@@ -234,162 +235,220 @@ class GoalService implements IGoalService {
     * @throws {Error} - Throws an error if the database operation fails or an unexpected error occurs during analysis.
     */
     async analyzeGoal(accessToken: string): Promise<ISmartAnalysisResult> {
-    try {
-        // Decode and validate the access token to extract the user ID associated with it.
-        const userId = decodeAndValidateToken(accessToken);
-        if (!userId) {
-            throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-        }
-
-        // Retrieve the goal data from the repository using the user ID.
-        const goals = await this._goalRepository.getUserGoals(userId);
-        if (!goals || goals.length === 0) {
-            throw new NotFoundError(ErrorMessages.NO_GOALS_FOUND, StatusCodes.NOT_FOUND);
-        }
-
-        // Initialize aggregates for overall analysis.
-        let totalSpecificScore = 0,
-            totalMeasurableScore = 0,
-            totalAchievableScore = 0,
-            totalRelevantScore = 0,
-            totalTimeBoundScore = 0,
-            totalGoals = 0,
-            totalOverallScore = 0;
-
-        const feedback: Record<string, string> = {};
-        const suggestions: string[] = [];
-        const criteriaScores: Record<string, number> = {
-            specific: 0,
-            measurable: 0,
-            achievable: 0,
-            relevant: 0,
-            timeBound: 0,
-        };
-
-        // Analyze each goal and aggregate scores
-        for (const goal of goals) {
-            totalGoals++; // Increment the total number of goals
-
-            // Evaluate Specific
-            let specificScore = 0;
-            if (goal.goal_name && goal.goal_name.length > 0) {
-                specificScore = 100;
-            } else if (goal.goal_name && goal.goal_name.length > 3) {
-                specificScore = 50;
+        try {
+            // Decode and validate the access token to extract the user ID associated with it.
+            const userId = decodeAndValidateToken(accessToken);
+            if (!userId) {
+                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
             }
-            totalSpecificScore += specificScore;
 
-            // Evaluate Measurable
-            let measurableScore = 0;
-            if (goal.target_amount && goal.target_amount > 0) {
-                measurableScore = 100;
+            // Retrieve the goal data from the repository using the user ID.
+            const goals = await this._goalRepository.getUserGoals(userId);
+            if (!goals || goals.length === 0) {
+                throw new NotFoundError(ErrorMessages.NO_GOALS_FOUND, StatusCodes.NOT_FOUND);
             }
-            totalMeasurableScore += measurableScore;
 
-            // Evaluate Achievable
-            let achievableScore = 0;
-            const monthsRemaining = Math.max(0, (new Date(goal.target_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30));
-            const requiredMonthlyContribution = monthsRemaining > 0 ? goal.target_amount / monthsRemaining : Infinity;
-            const reasonableThreshold = 0.3 * 50000;
+            // Initialize aggregates for overall analysis.
+            let totalSpecificScore = 0,
+                totalMeasurableScore = 0,
+                totalAchievableScore = 0,
+                totalRelevantScore = 0,
+                totalTimeBoundScore = 0,
+                totalGoals = 0,
+                totalOverallScore = 0;
 
-            if (requiredMonthlyContribution <= reasonableThreshold) {
-                achievableScore = 100;
-            } else if (requiredMonthlyContribution <= reasonableThreshold * 1.5) {
-                achievableScore = 50;
-            }
-            totalAchievableScore += achievableScore;
-
-            // Evaluate Relevant
-            let relevantScore = 0;
-            switch (goal.priority_level) {
-                case 'High':
-                    relevantScore = 100;
-                    break;
-                case 'Medium':
-                    relevantScore = 50;
-                    break;
-            }
-            totalRelevantScore += relevantScore;
-
-            // Evaluate Time-bound
-            let timeBoundScore = 0;
-            if (new Date(goal.target_date) > new Date()) {
-                timeBoundScore = 100;
-            } else if (monthsRemaining > 60) {
-                timeBoundScore = 50;
-            }
-            totalTimeBoundScore += timeBoundScore;
-
-            // Calculate total score for this goal
-            const goalTotalScore =
-                (specificScore * 0.2) +
-                (measurableScore * 0.2) +
-                (achievableScore * 0.25) +
-                (relevantScore * 0.15) +
-                (timeBoundScore * 0.2);
-
-            totalOverallScore += goalTotalScore;
-
-            // Add suggestions if needed
-            if (specificScore < 100) {
-                suggestions.push(`Improve the specificity of the goal: "${goal.goal_name}".`);
-            }
-            if (measurableScore < 100) {
-                suggestions.push(`Set a measurable target amount for the goal: "${goal.goal_name}".`);
-            }
-            if (achievableScore < 100) {
-                suggestions.push(`Adjust the target date or amount for the goal: "${goal.goal_name}" to make it achievable.`);
-            }
-            if (relevantScore < 100) {
-                suggestions.push(`Increase the priority level of the goal: "${goal.goal_name}" to make it more relevant.`);
-            }
-            if (timeBoundScore < 100) {
-                suggestions.push(`Set a realistic target date for the goal: "${goal.goal_name}".`);
-            }
-        }
-
-        // Calculate average scores
-        if (totalGoals > 0) {
-            criteriaScores.specific = Math.round(totalSpecificScore / totalGoals);
-            criteriaScores.measurable = Math.round(totalMeasurableScore / totalGoals);
-            criteriaScores.achievable = Math.round(totalAchievableScore / totalGoals);
-            criteriaScores.relevant = Math.round(totalRelevantScore / totalGoals);
-            criteriaScores.timeBound = Math.round(totalTimeBoundScore / totalGoals);
-
-            const overallScore = Math.round(totalOverallScore / totalGoals);
-
-            return {
-                isSmartCompliant: overallScore === 100,
-                feedback: {
-                    Overall: `Your overall SMART score is ${overallScore} out of 100.`,
-                },
-                suggestions,
-                totalScore: overallScore,
-                criteriaScores,
+            const feedback: Record<string, string> = {};
+            const suggestions: string[] = [];
+            const criteriaScores: Record<string, number> = {
+                specific: 0,
+                measurable: 0,
+                achievable: 0,
+                relevant: 0,
+                timeBound: 0,
             };
-        } else {
-            return {
-                isSmartCompliant: false,
-                feedback: {
-                    Overall: `No goals found to analyze.`,
-                },
-                suggestions: [],
-                totalScore: 0,
-                criteriaScores: {
-                    specific: 0,
-                    measurable: 0,
-                    achievable: 0,
-                    relevant: 0,
-                    timeBound: 0,
-                },
-            };
+
+            // Analyze each goal and aggregate scores
+            for (const goal of goals) {
+                totalGoals++; // Increment the total number of goals
+
+                // Evaluate Specific
+                let specificScore = 0;
+                if (goal.goal_name && goal.goal_name.length > 0) {
+                    specificScore = 100;
+                } else if (goal.goal_name && goal.goal_name.length > 3) {
+                    specificScore = 50;
+                }
+                totalSpecificScore += specificScore;
+
+                // Evaluate Measurable
+                let measurableScore = 0;
+                if (goal.target_amount && goal.target_amount > 0) {
+                    measurableScore = 100;
+                }
+                totalMeasurableScore += measurableScore;
+
+                // Evaluate Achievable
+                let achievableScore = 0;
+                const monthsRemaining = Math.max(0, (new Date(goal.target_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30));
+                const requiredMonthlyContribution = monthsRemaining > 0 ? goal.target_amount / monthsRemaining : Infinity;
+                const reasonableThreshold = 0.3 * 50000;
+
+                if (requiredMonthlyContribution <= reasonableThreshold) {
+                    achievableScore = 100;
+                } else if (requiredMonthlyContribution <= reasonableThreshold * 1.5) {
+                    achievableScore = 50;
+                }
+                totalAchievableScore += achievableScore;
+
+                // Evaluate Relevant
+                let relevantScore = 0;
+                switch (goal.priority_level) {
+                    case 'High':
+                        relevantScore = 100;
+                        break;
+                    case 'Medium':
+                        relevantScore = 50;
+                        break;
+                }
+                totalRelevantScore += relevantScore;
+
+                // Evaluate Time-bound
+                let timeBoundScore = 0;
+                if (new Date(goal.target_date) > new Date()) {
+                    timeBoundScore = 100;
+                } else if (monthsRemaining > 60) {
+                    timeBoundScore = 50;
+                }
+                totalTimeBoundScore += timeBoundScore;
+
+                // Calculate total score for this goal
+                const goalTotalScore =
+                    (specificScore * 0.2) +
+                    (measurableScore * 0.2) +
+                    (achievableScore * 0.25) +
+                    (relevantScore * 0.15) +
+                    (timeBoundScore * 0.2);
+
+                totalOverallScore += goalTotalScore;
+
+                // Add suggestions if needed
+                if (specificScore < 100) {
+                    suggestions.push(`Improve the specificity of the goal: "${goal.goal_name}".`);
+                }
+                if (measurableScore < 100) {
+                    suggestions.push(`Set a measurable target amount for the goal: "${goal.goal_name}".`);
+                }
+                if (achievableScore < 100) {
+                    suggestions.push(`Adjust the target date or amount for the goal: "${goal.goal_name}" to make it achievable.`);
+                }
+                if (relevantScore < 100) {
+                    suggestions.push(`Increase the priority level of the goal: "${goal.goal_name}" to make it more relevant.`);
+                }
+                if (timeBoundScore < 100) {
+                    suggestions.push(`Set a realistic target date for the goal: "${goal.goal_name}".`);
+                }
+            }
+
+            // Calculate average scores
+            if (totalGoals > 0) {
+                criteriaScores.specific = Math.round(totalSpecificScore / totalGoals);
+                criteriaScores.measurable = Math.round(totalMeasurableScore / totalGoals);
+                criteriaScores.achievable = Math.round(totalAchievableScore / totalGoals);
+                criteriaScores.relevant = Math.round(totalRelevantScore / totalGoals);
+                criteriaScores.timeBound = Math.round(totalTimeBoundScore / totalGoals);
+
+                const overallScore = Math.round(totalOverallScore / totalGoals);
+
+                return {
+                    isSmartCompliant: overallScore === 100,
+                    feedback: {
+                        Overall: `Your overall SMART score is ${overallScore} out of 100.`,
+                        },
+                    suggestions,
+                    totalScore: overallScore,
+                    criteriaScores,
+                };
+            } else {
+                return {
+                    isSmartCompliant: false,
+                    feedback: {
+                        Overall: `No goals found to analyze.`,
+                    },
+                    suggestions: [],
+                    totalScore: 0,
+                    criteriaScores: {
+                        specific: 0,
+                        measurable: 0,
+                        achievable: 0,
+                        relevant: 0,
+                        timeBound: 0,
+                    },
+               };
+            }
+        } catch (error) {
+            // Log and re-throw the error to propagate it to the caller.
+            console.error('Error analyzing goal:', error);
+            throw new Error((error as Error).message);
         }
-    } catch (error) {
-        // Log and re-throw the error to propagate it to the caller.
-        console.error('Error analyzing goal:', error);
-        throw new Error((error as Error).message);
     }
-}
+
+    async goalsByCategory(accessToken: string): Promise<IGoalCategory> {
+        try {
+            // Decode and validate the access token to extract the user ID associated with it.
+            const userId = decodeAndValidateToken(accessToken);
+            if (!userId) {
+                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
+            }
+
+            // Call the repository to retrieve the goals associated with the extracted user ID.
+            const goals = await this._goalRepository.getUserGoals(userId);
+            if (!goals || goals.length === 0) {
+                throw new NotFoundError(ErrorMessages.NO_GOALS_FOUND, StatusCodes.NOT_FOUND);
+            }
+
+            const shortTermGoals: IGoalDTO[] = [];
+            const mediumTermGoals: IGoalDTO[] = []; 
+            const longTermGoals: IGoalDTO[] = [];
+
+            // Time thresholds in milliseconds 
+            const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000
+            const ONE_YEAR_IN_MS = 365 * ONE_DAY_IN_MS;
+            const FIVE_YEARS_IN_MS = 5 * ONE_YEAR_IN_MS;
+            
+            // Iterate through the goals and categorize based on time difference
+            for (const goal of goals) {
+                const targetDate = new Date(goal.target_date).getTime(); // Target date in milliseconds 
+                const currentDate = Date.now(); // Current date in milliseconds
+                const timeLeft = targetDate - currentDate; // Time difference in milliseconds
+
+                if (timeLeft <= 0) {
+                    // Skip expired goals
+                    continue;
+                }
+
+                if (timeLeft <= ONE_YEAR_IN_MS) {
+                    shortTermGoals.push(goal); // Short-term goal
+                } else if (timeLeft > ONE_YEAR_IN_MS && timeLeft <= FIVE_YEARS_IN_MS) {
+                    mediumTermGoals.push(goal); // Medium-term goal
+                } else {
+                    longTermGoals.push(goal); // Long-term goal
+                }
+            }
+
+            const shortTermGoalsTargetAmount = shortTermGoals.reduce((sum, goal) => sum + goal.target_amount, 0);
+            const mediumTermGoalsTargetAmount = mediumTermGoals.reduce((sum, goal) => sum + goal.target_amount, 0);         
+            const longTermGoalsTargetAmount = longTermGoals.reduce((sum, goal) => sum + goal.target_amount, 0);
+            const shortTermGoalsCurrntAmount = shortTermGoals.reduce((sum, goal) => sum + (goal.current_amount || 0), 0);
+            const mediumTermGoalsCurrntAmount = mediumTermGoals.reduce((sum, goal) => sum + (goal.current_amount || 0), 0); 
+            const longTermGoalsCurrntAmount = longTermGoals.reduce((sum, goal) => sum + (goal.current_amount || 0), 0);
+
+            return { shortTermGoalsCurrntAmount, shortTermGoalsTargetAmount, mediumTermGoalsCurrntAmount, mediumTermGoalsTargetAmount, longTermGoalsCurrntAmount, longTermGoalsTargetAmount };
+        } catch (error) {
+            // Log and re-throw the error to propagate it to the caller.
+            console.error('Error categorizing goals:', error);
+            throw new Error((error as Error).message);
+        }
+    }
 }
 
 export default GoalService;
