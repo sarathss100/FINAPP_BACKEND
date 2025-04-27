@@ -257,7 +257,7 @@ class GoalService implements IGoalService {
                 totalGoals = 0,
                 totalOverallScore = 0;
 
-            const feedback: Record<string, string> = {};
+            // const feedback: Record<string, string> = {};
             const suggestions: string[] = [];
             const criteriaScores: Record<string, number> = {
                 specific: 0,
