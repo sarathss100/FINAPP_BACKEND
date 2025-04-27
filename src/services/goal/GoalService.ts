@@ -269,6 +269,9 @@ class GoalService implements IGoalService {
 
             // Analyze each goal and aggregate scores
             for (const goal of goals) {
+                if (goal.is_completed) {
+                    continue; // Skip completed goals
+                }
                 totalGoals++; // Increment the total number of goals
 
                 // Evaluate Specific
@@ -417,6 +420,9 @@ class GoalService implements IGoalService {
             
             // Iterate through the goals and categorize based on time difference
             for (const goal of goals) {
+                if (goal.is_completed) {
+                    continue; // Skip completed goals
+                } 
                 const targetDate = new Date(goal.target_date).getTime(); // Target date in milliseconds 
                 const currentDate = Date.now(); // Current date in milliseconds
                 const timeLeft = targetDate - currentDate; // Time difference in milliseconds

@@ -5,7 +5,7 @@ import { ErrorMessages } from 'constants/errorMessages';
 import { StatusCodes } from 'constants/statusCodes';
 import { Request, Response } from 'express';
 import { AppError, AuthenticationError, ServerError, ValidationError } from 'error/AppError';
-import goalDTOSchema from 'dtos/goal/GoalDto';
+import goalDTOSchema, { IGoalDTO } from 'dtos/goal/GoalDto';
 import { SuccessMessages } from 'constants/successMessages';
 
 class GoalController implements IGoalController {
@@ -134,9 +134,9 @@ class GoalController implements IGoalController {
             }
 
             // Call the service layer to get the user goals
-            const userGoalDetails = await this._goalService.getUserGoals(accessToken);
+            const userGoalDetails: IGoalDTO[] = await this._goalService.getUserGoals(accessToken);
 
-            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOALS_RETRIEVED, { ...userGoalDetails });
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOALS_RETRIEVED, { userGoalDetails });
         } catch (error) {
             if (error instanceof AppError) {
                 sendErrorResponse(response, error.statusCode, error.message);
@@ -196,7 +196,7 @@ class GoalController implements IGoalController {
             // Call the service layer to get the user goals
             const analysisResult = await this._goalService.analyzeGoal(accessToken);
 
-            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOALS_ANALYSIS_RESULT, { analysisResult });
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOALS_ANALYSIS_RESULT, { ...analysisResult });
         } catch (error) {
             if (error instanceof AppError) {
                 sendErrorResponse(response, error.statusCode, error.message);
