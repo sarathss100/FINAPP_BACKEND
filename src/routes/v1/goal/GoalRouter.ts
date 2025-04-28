@@ -19,5 +19,6 @@ router.get('/analyze', goalController.analyzeGoal.bind(goalController));
 router.get('/by-category', goalController.goalsByCategory.bind(goalController));
 router.get('/daily-contribution', goalController.dailyContribution.bind(goalController));
 router.get('/monthly-contribution', goalController.monthlyContribution.bind(goalController));
+router.get('/goal-detail', goalController.getGoalById.bind(goalController));
 
 export default router;

@@ -517,6 +517,36 @@ class GoalService implements IGoalService {
             throw new Error((error as Error).message);
         }
     }
+
+    async getGoalById(accessToken: string, goalId: string): Promise<IGoalDTO> { 
+        try {
+            // Decode and validate the access token to extract the user ID associated with it.
+            const userId = decodeAndValidateToken(accessToken);
+            if (!userId) {
+                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
+            }
+
+            // Call the repository to retrieve the goal by its ID.
+            const goal = await this._goalRepository.getGoalById(goalId);
+            if (!goal) {
+                throw new NotFoundError(ErrorMessages.NO_GOALS_FOUND, StatusCodes.NOT_FOUND);
+            }
+
+            const daysLeftToTargetDate = Math.max(0, (new Date(goal.target_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+            const dailyContribution = goal.is_completed ? 0 : (goal.current_amount ?? 0) / daysLeftToTargetDate;
+
+            const monthsLeftToTargetDate = Math.max(0, (new Date(goal.target_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30));
+            const monthlyContribution = goal.is_completed ? 0 : (goal.current_amount ?? 0) / monthsLeftToTargetDate;
+            
+            const { _id, goal_name, goal_category, target_amount, initial_investment, current_amount, currency, target_date, contribution_frequency, priority_level, description, reminder_frequency, goal_type, tags, dependencies } = goal;
+            
+            return { _id, user_id: userId, goal_name, goal_category, target_amount, initial_investment, current_amount, currency, target_date, contribution_frequency, priority_level, description, reminder_frequency, goal_type, tags, dependencies, is_completed: goal.is_completed, created_by: goal.created_by, last_updated_by: goal.last_updated_by?.toString(), dailyContribution: dailyContribution || 0, monthlyContribution: monthlyContribution || 0 };
+        } catch (error) {
+            // Log and re-throw the error to propagate it to the caller.
+            console.error('Error retrieving goal by ID:', error);
+            throw new Error((error as Error).message);
+        }
+    }
 }
 
 export default GoalService;

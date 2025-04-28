@@ -13,6 +13,7 @@ interface IGoalService {
     goalsByCategory(accessToken: string): Promise<IGoalCategory>;  
     dailyContribution(accessToken: string): Promise<number>;
     monthlyContribution(accessToken: string): Promise<number>;
+    getGoalById(accessToken: string, goalId: string): Promise<IGoalDTO>;
 }
 
 export default IGoalService;

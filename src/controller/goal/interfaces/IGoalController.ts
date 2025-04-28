@@ -11,6 +11,7 @@ interface IGoalController {
     goalsByCategory(request: Request, response: Response): Promise<void>;
     dailyContribution(request: Request, response: Response): Promise<void>;
     monthlyContribution(request: Request, response: Response): Promise<void>;
+    getGoalById(request: Request, response: Response): Promise<void>;
 }
 
 export default IGoalController;

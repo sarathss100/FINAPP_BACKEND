@@ -149,6 +149,34 @@ class GoalManagementRepository implements IGoalManagementRepository {
             throw new Error((error as Error).message);
         }
     }
+
+    /**
+    * Retrieves a specific goal from the database based on its unique identifier.
+    * 
+    * @param {string} goalId - The unique identifier of the goal to retrieve.
+    * @returns {Promise<IGoalDTO>} - A promise resolving to an `IGoalDTO` object representing the retrieved goal.
+    * @throws {Error} - Throws an error if the database operation fails or no goal is found for the given `goalId`.
+    */
+    async getGoalById(goalId: string): Promise<IGoalDTO> {
+        try {
+            // Query the database to retrieve the goal associated with the given `goalId`.
+            const result = await GoalModel.findOne<IGoalDTO>({ _id: goalId });
+
+            // If no goal is found for the given `goalId`, throw an error.
+            if (!result) {
+                throw new Error('No goal found for the specified ID');
+            }
+
+            // Return the retrieved goal as an `IGoalDTO` object.
+           return result;
+        } catch (error) {
+            // Log the error for debugging purposes.
+            console.error('Error retrieving goal details:', error);
+
+            // Re-throw the error with a more descriptive message, ensuring the caller is informed of the issue.
+            throw new Error((error as Error).message);
+        }
+    }
 }
 
 export default GoalManagementRepository;

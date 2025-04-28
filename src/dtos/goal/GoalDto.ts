@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 // Define the Zod Schema for Goal DTO
 const goalDTOSchema = z.object({
+    _id: z.string().optional(),
     user_id: z.string().optional(),
     tenant_id: z.string().optional(),
     goal_name: z.string().min(3, 'Goal name must be at least 3 characters').max(255),
@@ -21,6 +22,8 @@ const goalDTOSchema = z.object({
     is_completed: z.boolean(),
     created_by: z.string().min(1, 'Created by user ID is required.').optional(),
     last_updated_by: z.string().optional(),
+    dailyContribution: z.number().optional(),
+    monthlyContribution: z.number().optional(),
 });
 
 // Infer the TS type from the Zod schema
