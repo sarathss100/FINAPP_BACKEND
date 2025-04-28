@@ -5,6 +5,7 @@ interface IProfile {
     lastName: string,
     phoneNumber: string,
     is2FA: boolean,
+    profilePictureUrl: string, 
 }
 
 export default IProfile;

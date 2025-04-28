@@ -74,7 +74,7 @@ class UserController implements IUserController {
             // Extract the file path 
             const userProfilePictureUrl = await this._userService.getUserProfilePictureUrl(accessToken);
 
-            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.USER_PROFILE_PICTURE_URL_FETCHED, { userProfilePictureUrl }); 
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.USER_PROFILE_PICTURE_URL_FETCHED, { profilePictureUrl: userProfilePictureUrl }); 
         } catch (error) {
             if (error instanceof AppError) {
                 sendErrorResponse(response, error.statusCode, error.message);

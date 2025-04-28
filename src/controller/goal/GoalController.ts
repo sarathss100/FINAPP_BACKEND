@@ -136,7 +136,7 @@ class GoalController implements IGoalController {
             // Call the service layer to get the user goals
             const userGoalDetails: IGoalDTO[] = await this._goalService.getUserGoals(accessToken);
 
-            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOALS_RETRIEVED, { userGoalDetails });
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOALS_RETRIEVED, { ...userGoalDetails });
         } catch (error) {
             if (error instanceof AppError) {
                 sendErrorResponse(response, error.statusCode, error.message);

@@ -11,7 +11,7 @@ class UserRepository extends UserBaseRespository implements IUserRepository {
     async findByUserId(userId: string): Promise<IProfile | null> {
         const user = await UserModel.findOne({ _id: userId });
         if (!user) return null;
-        return { userId: user.id, firstName: user.first_name, lastName: user.last_name, phoneNumber: user.phone_number, is2FA: user.is2FA };
+        return { userId: user.id, firstName: user.first_name, lastName: user.last_name, phoneNumber: user.phone_number, is2FA: user.is2FA, profilePictureUrl: user.profile_picture_url };
     }
 
     // Updates the profile picture URL for a specific user in the database.
