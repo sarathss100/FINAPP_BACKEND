@@ -10,7 +10,9 @@ interface IGoalService {
     getTotalActiveGoalAmount(accessToken: string): Promise<number>;
     findLongestTimePeriod(accessToken: string): Promise<string>;
     analyzeGoal(accessToken: string): Promise<ISmartAnalysisResult>;
-    goalsByCategory(accessToken: string): Promise<IGoalCategory>;   
+    goalsByCategory(accessToken: string): Promise<IGoalCategory>;  
+    dailyContribution(accessToken: string): Promise<number>;
+    monthlyContribution(accessToken: string): Promise<number>;
 }
 
 export default IGoalService;

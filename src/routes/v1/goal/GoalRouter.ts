@@ -17,5 +17,7 @@ router.get('/total-goal-amount', goalController.getTotalActiveGoalAmount.bind(go
 router.get('/longest-time-period', goalController.findLongestTimePeriod.bind(goalController));
 router.get('/analyze', goalController.analyzeGoal.bind(goalController));
 router.get('/by-category', goalController.goalsByCategory.bind(goalController));
+router.get('/daily-contribution', goalController.dailyContribution.bind(goalController));
+router.get('/monthly-contribution', goalController.monthlyContribution.bind(goalController));
 
 export default router;

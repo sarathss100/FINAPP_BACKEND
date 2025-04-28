@@ -9,6 +9,8 @@ interface IGoalController {
     findLongestTimePeriod(request: Request, response: Response): Promise<void>;
     analyzeGoal(request: Request, response: Response): Promise<void>;
     goalsByCategory(request: Request, response: Response): Promise<void>;
+    dailyContribution(request: Request, response: Response): Promise<void>;
+    monthlyContribution(request: Request, response: Response): Promise<void>;
 }
 
 export default IGoalController;

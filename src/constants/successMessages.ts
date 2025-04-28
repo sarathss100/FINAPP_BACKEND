@@ -30,6 +30,8 @@ export const SuccessMessages = {
     GOALS_LONGEST_TIME_REMAINING: 'Goal with the longest time remaining retrieved successfully.',
     GOALS_ANALYSIS_RESULT: 'Goal analysis result retrieved successfully.',
     GOAL_BY_CATEGORY: 'Goals categorized successfully.',
+    GOAL_DAILY_CONTRIBUTION: 'Daily contribution retrieved successfully.',
+    GOAL_MONTHLY_CONTRIBUTION: 'Monthly contribution retrieved successfully.',
 
     // Admin Success Messages
     FAQ_ADDED: 'FAQ added successfully.',
