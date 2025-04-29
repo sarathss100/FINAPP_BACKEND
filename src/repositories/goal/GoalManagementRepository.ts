@@ -1,6 +1,7 @@
 import { IGoalDTO } from 'dtos/goal/GoalDto';
 import IGoalManagementRepository from './interfaces/IGoalManagementRepository';
 import { GoalModel } from 'model/goal/model/GoalModel';
+import mongoose from 'mongoose';
 
 class GoalManagementRepository implements IGoalManagementRepository {
     /**
@@ -174,6 +175,47 @@ class GoalManagementRepository implements IGoalManagementRepository {
             console.error('Error retrieving goal details:', error);
 
             // Re-throw the error with a more descriptive message, ensuring the caller is informed of the issue.
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+    * Updates a goal by recording a new contribution and deducting the transaction amount from the current goal amount.
+    *
+    * @param {string} goalId - The unique identifier of the goal to update.
+    * @param {Object} transactionData - Data related to the transaction being applied to the goal.
+    * @param {number} transactionData.amount - The amount to deduct from the goal's current amount and record as a contribution.
+    * @param {string} [transactionData.transaction_id] - Optional transaction ID to associate with the contribution.
+    * @param {Date} [transactionData.date] - Optional date for the contribution (not currently used in this method).
+    * @returns {Promise<boolean>} - A promise resolving to `true` if the update was successful, otherwise `false`.
+    * @throws {Error} - Throws an error if the database operation fails.
+    */
+    async updateTransaction(
+        goalId: string,
+        transactionData: { amount: number; transaction_id?: string; date?: Date }
+    ): Promise<boolean> {
+        try {
+            const newContribution = {
+                transaction_id: transactionData.transaction_id
+                    ? new mongoose.Types.ObjectId(transactionData.transaction_id)
+                    : new mongoose.Types.ObjectId(),
+                amount: transactionData.amount
+            };
+
+            const result = await GoalModel.findOneAndUpdate(
+                { _id: goalId },
+                {
+                    $push: { contributions: newContribution },
+                    $inc: { current_amount: -transactionData.amount }
+                }, 
+                {
+                    new: true
+                }
+            );
+
+            return result ? true : false;
+        } catch (error) {
+            console.error('Error updating transaction:', error);
             throw new Error((error as Error).message);
         }
     }

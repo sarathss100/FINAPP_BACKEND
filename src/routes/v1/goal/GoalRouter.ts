@@ -20,5 +20,6 @@ router.get('/by-category', goalController.goalsByCategory.bind(goalController));
 router.get('/daily-contribution', goalController.dailyContribution.bind(goalController));
 router.get('/monthly-contribution', goalController.monthlyContribution.bind(goalController));
 router.get('/goal-detail', goalController.getGoalById.bind(goalController));
+router.post('/update-transaction', goalController.updateTransaction.bind(goalController));
 
 export default router;

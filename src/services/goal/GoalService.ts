@@ -156,7 +156,7 @@ class GoalService implements IGoalService {
 
             const totalActiveGoalAmount = goalDetails.reduce((sum, goal) => {
                 if (!goal.is_completed) {
-                    sum += goal.target_amount - goal.initial_investment;
+                    sum += (goal.current_amount ?? 0);
                 }
                 return sum;
             }, 0);
@@ -472,9 +472,9 @@ class GoalService implements IGoalService {
 
             const totalDailyContribution = goals.reduce((sum, goal) => {
                 if (!goal.is_completed) {
-                    const monthsRemaining = Math.max(0, (new Date(goal.target_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30));
-                    const requiredMonthlyContribution = monthsRemaining > 0 ? goal.target_amount / monthsRemaining : Infinity;
-                    return sum + requiredMonthlyContribution / 30; // Daily contribution
+                    const daysRemaining = Math.max(0, (new Date(goal.target_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                    const requiredDailyContribution = daysRemaining > 0 ? (goal.current_amount ?? 0) / daysRemaining : Infinity;
+                    return sum + requiredDailyContribution; // Daily contribution
                 }
                 return sum;
             }, 0);
@@ -504,7 +504,7 @@ class GoalService implements IGoalService {
             const totalMonthlyContribution = goals.reduce((sum, goal) => {
                 if (!goal.is_completed) {
                     const monthsRemaining = Math.max(0, (new Date(goal.target_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30));
-                    const requiredMonthlyContribution = monthsRemaining > 0 ? goal.target_amount / monthsRemaining : Infinity;
+                    const requiredMonthlyContribution = monthsRemaining > 0 ? (goal.current_amount ?? 0) / monthsRemaining : Infinity;
                     return sum + requiredMonthlyContribution; // Monthly contribution
                 }
                 return sum;
@@ -539,11 +539,29 @@ class GoalService implements IGoalService {
             const monthlyContribution = goal.is_completed ? 0 : (goal.current_amount ?? 0) / monthsLeftToTargetDate;
             
             const { _id, goal_name, goal_category, target_amount, initial_investment, current_amount, currency, target_date, contribution_frequency, priority_level, description, reminder_frequency, goal_type, tags, dependencies } = goal;
-            
             return { _id, user_id: userId, goal_name, goal_category, target_amount, initial_investment, current_amount, currency, target_date, contribution_frequency, priority_level, description, reminder_frequency, goal_type, tags, dependencies, is_completed: goal.is_completed, created_by: goal.created_by, last_updated_by: goal.last_updated_by?.toString(), dailyContribution: dailyContribution || 0, monthlyContribution: monthlyContribution || 0 };
         } catch (error) {
             // Log and re-throw the error to propagate it to the caller.
             console.error('Error retrieving goal by ID:', error);
+            throw new Error((error as Error).message);
+        }
+    }
+
+    async updateTransaction(accessToken: string, goalId: string, transactionData: { amount: number; transaction_id?: string; date?: Date }): Promise<boolean> {
+        try {
+            // Decode and validate the access token to extract the user ID associated with it.
+            const userId = decodeAndValidateToken(accessToken);
+            if (!userId) {
+                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
+            }
+
+            // Call the repository to update the goal contribution by its ID.
+            const isUpdated = await this._goalRepository.updateTransaction(goalId, transactionData);
+
+            return isUpdated;
+        } catch (error) {
+            // Log and re-throw the error to propagate it to the caller.
+            console.error('Error updating transaction ID:', error);
             throw new Error((error as Error).message);
         }
     }

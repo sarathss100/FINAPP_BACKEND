@@ -32,6 +32,7 @@ export const SuccessMessages = {
     GOAL_BY_CATEGORY: 'Goals categorized successfully.',
     GOAL_DAILY_CONTRIBUTION: 'Daily contribution retrieved successfully.',
     GOAL_MONTHLY_CONTRIBUTION: 'Monthly contribution retrieved successfully.',
+    GOAL_TRANSACTION_UPDATED: 'Goal Transaction Updated Successfully.',
 
     // Admin Success Messages
     FAQ_ADDED: 'FAQ added successfully.',
