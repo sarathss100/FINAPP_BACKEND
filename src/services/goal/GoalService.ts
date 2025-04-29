@@ -471,12 +471,9 @@ class GoalService implements IGoalService {
             }
 
             const totalDailyContribution = goals.reduce((sum, goal) => {
-                if (!goal.is_completed) {
-                    const daysRemaining = Math.max(0, (new Date(goal.target_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-                    const requiredDailyContribution = daysRemaining > 0 ? (goal.current_amount ?? 0) / daysRemaining : Infinity;
-                    return sum + requiredDailyContribution; // Daily contribution
-                }
-                return sum;
+                const daysRemaining = Math.max(0, Math.ceil((new Date(goal.target_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
+                const requiredDailyContribution = goal.is_completed ? 0 : (goal.current_amount ?? 0) / daysRemaining;
+                return sum + requiredDailyContribution;
             }, 0);
 
             return totalDailyContribution;
@@ -503,9 +500,9 @@ class GoalService implements IGoalService {
 
             const totalMonthlyContribution = goals.reduce((sum, goal) => {
                 if (!goal.is_completed) {
-                    const monthsRemaining = Math.max(0, (new Date(goal.target_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30));
+                    const monthsRemaining = Math.max(0, Math.ceil((new Date(goal.target_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30)));
                     const requiredMonthlyContribution = monthsRemaining > 0 ? (goal.current_amount ?? 0) / monthsRemaining : Infinity;
-                    return sum + requiredMonthlyContribution; // Monthly contribution
+                    return sum + requiredMonthlyContribution;
                 }
                 return sum;
             }, 0);
@@ -532,10 +529,10 @@ class GoalService implements IGoalService {
                 throw new NotFoundError(ErrorMessages.NO_GOALS_FOUND, StatusCodes.NOT_FOUND);
             }
 
-            const daysLeftToTargetDate = Math.max(0, (new Date(goal.target_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+            const daysLeftToTargetDate = Math.max(0, Math.ceil((new Date(goal.target_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
             const dailyContribution = goal.is_completed ? 0 : (goal.current_amount ?? 0) / daysLeftToTargetDate;
 
-            const monthsLeftToTargetDate = Math.max(0, (new Date(goal.target_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30));
+            const monthsLeftToTargetDate = Math.max(0, Math.ceil((new Date(goal.target_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30)));
             const monthlyContribution = goal.is_completed ? 0 : (goal.current_amount ?? 0) / monthsLeftToTargetDate;
             
             const { _id, goal_name, goal_category, target_amount, initial_investment, current_amount, currency, target_date, contribution_frequency, priority_level, description, reminder_frequency, goal_type, tags, dependencies } = goal;

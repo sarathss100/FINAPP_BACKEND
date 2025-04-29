@@ -195,25 +195,41 @@ class GoalManagementRepository implements IGoalManagementRepository {
         transactionData: { amount: number; transaction_id?: string; date?: Date }
     ): Promise<boolean> {
         try {
+            const goal = await GoalModel.findOne({ _id: goalId });
             const newContribution = {
                 transaction_id: transactionData.transaction_id
                     ? new mongoose.Types.ObjectId(transactionData.transaction_id)
                     : new mongoose.Types.ObjectId(),
                 amount: transactionData.amount
             };
+            
+            if (Number(goal?.current_amount) <= transactionData.amount) {
+                const result = await GoalModel.findOneAndUpdate(
+                    { _id: goalId },
+                    {
+                        $push: { contributions: newContribution },
+                        $inc: { current_amount: -transactionData.amount },
+                        $set: { is_completed: true }
+                    }, 
+                    {
+                        new: true
+                    }
+                );
+                return result ? true : false;
+            } else {
+                const result = await GoalModel.findOneAndUpdate(
+                    { _id: goalId },
+                    {
+                        $push: { contributions: newContribution },
+                        $inc: { current_amount: -transactionData.amount }
+                    }, 
+                    {
+                        new: true
+                    }
+                );
 
-            const result = await GoalModel.findOneAndUpdate(
-                { _id: goalId },
-                {
-                    $push: { contributions: newContribution },
-                    $inc: { current_amount: -transactionData.amount }
-                }, 
-                {
-                    new: true
-                }
-            );
-
-            return result ? true : false;
+                return result ? true : false;
+            }
         } catch (error) {
             console.error('Error updating transaction:', error);
             throw new Error((error as Error).message);
