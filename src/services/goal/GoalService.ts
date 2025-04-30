@@ -475,11 +475,9 @@ class GoalService implements IGoalService {
                 let requiredDailyContribution = 0;
                 if (daysRemaining >= 1) {
                     requiredDailyContribution = goal.is_completed ? 0 : (goal.current_amount ?? 0) / daysRemaining;
-                } 
+                }
                 return sum + requiredDailyContribution;
             }, 0);
-
-            console.log(`totalDailyContribution`, totalDailyContribution);
 
             return totalDailyContribution;
         } catch (error) {

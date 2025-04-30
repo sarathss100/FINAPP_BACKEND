@@ -61,7 +61,7 @@ class GoalController implements IGoalController {
                 throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
             }
 
-            const { goalId } = request.query;
+            const { goalId } = request.body;
             if (!goalId || typeof goalId !== 'string') {
                 throw new ValidationError(ErrorMessages.GOAL_ID_NOT_FOUND, StatusCodes.BAD_REQUEST);
             } 
@@ -69,7 +69,7 @@ class GoalController implements IGoalController {
             const partialGoalDTOSchema = goalDTOSchema.partial();
 
             // Validate the request body using the Zod schema
-            const parsedBody = partialGoalDTOSchema.safeParse(request.body);
+            const parsedBody = partialGoalDTOSchema.safeParse(request.body.goalData);
 
             if (!parsedBody.success) {
                 // If validation fails, extract the error details

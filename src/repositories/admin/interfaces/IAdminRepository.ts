@@ -1,4 +1,4 @@
-import IFaq from 'types/admin/IFaq';
+import { IFaq } from 'dtos/base/FaqDto';
 import IUserDetails from './IUserDetails';
 
 interface IAdminRepository {
