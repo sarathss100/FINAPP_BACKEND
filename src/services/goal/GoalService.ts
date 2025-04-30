@@ -472,9 +472,14 @@ class GoalService implements IGoalService {
 
             const totalDailyContribution = goals.reduce((sum, goal) => {
                 const daysRemaining = Math.max(0, Math.ceil((new Date(goal.target_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
-                const requiredDailyContribution = goal.is_completed ? 0 : (goal.current_amount ?? 0) / daysRemaining;
+                let requiredDailyContribution = 0;
+                if (daysRemaining >= 1) {
+                    requiredDailyContribution = goal.is_completed ? 0 : (goal.current_amount ?? 0) / daysRemaining;
+                } 
                 return sum + requiredDailyContribution;
             }, 0);
+
+            console.log(`totalDailyContribution`, totalDailyContribution);
 
             return totalDailyContribution;
         } catch (error) {
@@ -501,7 +506,10 @@ class GoalService implements IGoalService {
             const totalMonthlyContribution = goals.reduce((sum, goal) => {
                 if (!goal.is_completed) {
                     const monthsRemaining = Math.max(0, Math.ceil((new Date(goal.target_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30)));
-                    const requiredMonthlyContribution = monthsRemaining > 0 ? (goal.current_amount ?? 0) / monthsRemaining : Infinity;
+                    let requiredMonthlyContribution = 0;
+                    if (monthsRemaining >= 1) {
+                        requiredMonthlyContribution = monthsRemaining > 0 ? (goal.current_amount ?? 0) / monthsRemaining : Infinity;
+                    }
                     return sum + requiredMonthlyContribution;
                 }
                 return sum;
