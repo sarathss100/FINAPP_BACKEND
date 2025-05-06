@@ -1,7 +1,4 @@
-/**
- * A collection of success messages used throughout the application.
- * These messages are grouped by category for better organization and consistency.
- */
+
 export const SuccessMessages = {
     // Authentication Success Messages
     SIGNUP_SUCCESS: 'User account created successfully.',
@@ -33,6 +30,9 @@ export const SuccessMessages = {
     GOAL_DAILY_CONTRIBUTION: 'Daily contribution retrieved successfully.',
     GOAL_MONTHLY_CONTRIBUTION: 'Monthly contribution retrieved successfully.',
     GOAL_TRANSACTION_UPDATED: 'Goal Transaction Updated Successfully.',
+
+    // Transaction Success Messages
+    TRANSACTION_CREATED: 'Transaction created successfully.',
 
     // Admin Success Messages
     FAQ_ADDED: 'FAQ added successfully.',
