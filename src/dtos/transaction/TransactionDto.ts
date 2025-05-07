@@ -11,7 +11,7 @@ const LinkedEntityDTO = z.object({
 // Define the Zod Schema for Transaction DTO
 const transactionDTOSchema = z.object({
     _id: z.string().optional(),
-    user_id: z.string().min(1, 'User ID is required.'),
+    user_id: z.string().min(1, 'User ID is required.').optional(),
     tenant_id: z.string().min(1, 'Tenant ID must be Valid').optional(),
     account_id: z.string().min(1, 'Account ID is required'),
     type: z.enum(['REGULAR', 'TRANSFER', 'PAYMENT', 'ADJUSTMENT', 'FEE', 'REFUND', 'DEPOSIT', 'WITHDRAWAL', 'INTEREST', 'DIVIDEND', 'REWARD', 'BONUS', 'CASHBACK', 'REDEMPTION', 'CONVERSION', 'EXCHANGE', 'LOAN', 'BORROWING', 'LENDING', 'INVESTMENT', 'PURCHASE', 'SALE', 'EXTRACTION']),

@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import { AppError, AuthenticationError, ValidationError } from 'error/AppError';
 import { ErrorMessages } from 'constants/errorMessages';
 import { StatusCodes } from 'constants/statusCodes';
-import transactionDTOSchema from 'dtos/transaction/TransactionDto';
+import transactionDTOSchema, { ITransactionDTO } from 'dtos/transaction/TransactionDto';
 import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
 import { SuccessMessages } from 'constants/successMessages';
 
@@ -43,6 +43,26 @@ class TransactionController implements ITransactionController {
             const createdTransaction = await this._transactionService.createTransaction(accessToken, transactionData);
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.TRANSACTION_CREATED, { createdTransaction } );
+        } catch (error) {
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    async getUserTransactions(request: Request, response: Response): Promise<void> {
+        try {
+            const { accessToken } = request.cookies;
+            if (!accessToken) {
+                throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
+            }
+
+            // Call the service layer to get the user transactions
+            const userTransactionDetails: ITransactionDTO[] = await this._transactionService.getUserTransactions(accessToken);
+
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.TRANSACTION_RETRIEVED, { ...userTransactionDetails });
         } catch (error) {
             if (error instanceof AppError) {
                 sendErrorResponse(response, error.statusCode, error.message);

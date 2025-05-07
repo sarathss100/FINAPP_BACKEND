@@ -46,6 +46,34 @@ class TransactionRepository implements ITransactionRepository {
             throw new Error((error as Error).message);
         }
     }
+
+    /**
+     * Retrieves all transactions associated with a specific user from the database.
+     * 
+     * @param {string} userId - The unique identifier of the user whose transactions are being retrieved.
+     * @returns {Promise<ITransactionDTO[]>} - A promise resolving to an array of `ITransactionDTO` objects representing the user's transactions.
+     * @throws {Error} - Throws an error if the database operation fails or no transactions are found for the given user.
+     */
+    async getUserTransactions(userId: string): Promise<ITransactionDTO[]> {
+        try {
+            // Query the database to retrieve all transactions associated with the given `userId`.
+            const result = await TransactionModel.find<ITransactionDTO>({ user_id: userId });
+
+            // it means no transactions were found for the given user, and an error is thrown.
+            if (!result || result.length === 0) {
+                throw new Error('No transactions found for the specified user');
+            }
+
+            // Return the retrieved transactions as an array of `ITransactionDTO` objects.
+            return result;
+        } catch (error) {
+            // Log the error for debugging purposes.
+            console.error('Error retrieving transaction details:', error);
+
+            // Re-throw the error with a more descriptive message, ensuring the caller is informed of the issue.
+            throw new Error((error as Error).message);
+        }
+    }
 }
 
 export default TransactionRepository;
