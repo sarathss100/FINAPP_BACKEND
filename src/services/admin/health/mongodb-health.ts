@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import { IHealthCheck, IHealthStatus } from './interfaces/IHealth';
-import { connected } from 'process';
 
 export class MongoDbHealthCheckService implements IHealthCheck {
     async check(): Promise<IHealthStatus> {
