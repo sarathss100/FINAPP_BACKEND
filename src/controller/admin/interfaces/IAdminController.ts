@@ -5,6 +5,8 @@ interface IAdminController {
     toggleUserStatus(request: Request, response: Response): Promise<void>;
     addFaq(request: Request, response: Response): Promise<void>;
     getAllFaqs(request: Request, response: Response): Promise<void>;
+    getNewRegistrationCount(request: Request, response: Response): Promise<void>;
+    getHealthStatus(request: Request, response: Response): Promise<void>;
 }
 
 export default IAdminController;

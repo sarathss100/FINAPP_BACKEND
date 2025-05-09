@@ -27,6 +27,12 @@ class AdminRepository implements IAdminRepository {
         return false;
     }
 
+    // Fetches the count of new registrations from the database
+    async getNewRegistrationCount(): Promise<number> {
+        const count = await UserModel.countDocuments({ createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000 * 7) } });
+        return count;
+    };
+
     // Add a new FAQ entry to the list
     async addFaq(newFaq: IFaq): Promise<boolean> {
         const result = await FaqModel.insertOne({ question: newFaq.question, answer: newFaq.answer });

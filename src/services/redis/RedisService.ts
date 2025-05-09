@@ -9,6 +9,14 @@ const redisClient = new Redis({
 
 class RedisService {
     /**
+     * Get the Redis client instance.
+     * @returns {Redis} The Redis client instance.
+     */
+    getClient(): Redis {
+        return redisClient;
+    }
+
+    /**
      * Store a refresh token in Redis.
      * @param userId The ID of the user.
      * @param refreshToken The refresh token to store.

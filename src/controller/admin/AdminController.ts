@@ -21,7 +21,7 @@ class AdminController implements IAdminController {
             const usersDetails = await this._adminService.getAllUsers();
     
             if (usersDetails) {
-                sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, {...usersDetails});
+                sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { ...usersDetails });
             }
             
         } catch (error) {
@@ -46,7 +46,7 @@ class AdminController implements IAdminController {
             const isUpdated = await this._adminService.toggleUserStatus(userId, status);
     
             if (isUpdated) {
-                sendSuccessResponse(response, StatusCodes.OK,  SuccessMessages.OPERATION_SUCCESS);
+                sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS);
             } else {
                 sendErrorResponse(response, StatusCodes.BAD_REQUEST, ErrorMessages.STATUS_UPDATE_FAILED);
             }
@@ -75,7 +75,7 @@ class AdminController implements IAdminController {
             const isAdded = await this._adminService.addFaq({ question, answer });
     
             if (isAdded) {
-                sendSuccessResponse(response, StatusCodes.OK,  SuccessMessages.FAQ_ADDED);
+                sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.FAQ_ADDED);
             } else {
                 sendErrorResponse(response, StatusCodes.BAD_REQUEST, ErrorMessages.FAILED_TO_ADD_THE_FAQ);
             }
@@ -97,6 +97,45 @@ class AdminController implements IAdminController {
                 sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.FAQ_ADDED, { faqDetails });
             } else {
                 sendErrorResponse(response, StatusCodes.BAD_REQUEST, ErrorMessages.FAILED_TO_ADD_THE_FAQ);
+            }
+        } catch (error) {
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    async getNewRegistrationCount(request: Request, response: Response): Promise<void> {
+        try {
+            // Call the getNewRegistrationCount method from AuthService
+            const newRegistrationCount = await this._adminService.getNewRegistrationCount();
+    
+            if (newRegistrationCount !== undefined) {
+                sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { newRegistrationCount });
+            } else {
+                sendErrorResponse(response, StatusCodes.BAD_REQUEST, ErrorMessages.FAILED_TO_FETCH_REGISTRATION_COUNT);
+            }
+            
+        } catch (error) {
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    async getHealthStatus(request: Request, response: Response): Promise<void> {
+        try {
+            // Call the getHealthStatus method from AuthService
+            const healthStatus = await this._adminService.getHealthStatus();
+    
+            if (healthStatus) {
+                sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { healthStatus });
+            } else {
+                sendErrorResponse(response, StatusCodes.BAD_REQUEST, ErrorMessages.FAILED_TO_FETCH_HEALTH_STATUS);
             }
         } catch (error) {
             if (error instanceof AppError) {

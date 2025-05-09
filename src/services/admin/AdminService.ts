@@ -5,6 +5,12 @@ import { AppError, ServerError, ValidationError } from 'error/AppError';
 import { ErrorMessages } from 'constants/errorMessages';
 import { StatusCodes } from 'constants/statusCodes';
 import { IFaq } from 'dtos/base/FaqDto';
+import { IHealthStatus } from './health/interfaces/IHealth';
+import { CompositeHealthCheckService } from './health/composite-health';
+import { ExternalApiHealthCheckService } from './health/api-health';
+import { MongoDbHealthCheckService } from './health/mongodb-health';
+import { RedisHealthCheckService } from './health/redis-health';
+import { ServerHealthCheckService } from './health/server-health';
 
 class AdminService implements IAdminService {
     private _adminRepository: IAdminRepository;
@@ -145,6 +151,71 @@ class AdminService implements IAdminService {
 
             // Return the fetched FAQ details
             return faqDetails;
+        } catch (error) {
+            // Re-throw the error if it's an instance of AppError (custom application error)
+            if (error instanceof AppError) {
+                throw error;
+            } else {
+                // Re-throw unexpected errors for further handling
+                throw error;
+            }
+        }
+    }
+
+    /**
+     * Fetches the count of new registrations from the database.
+     * 
+     * @returns A promise that resolves to the count of new registrations (`number`).
+     * @throws {ServerError} If fetching the count fails in the repository.
+     * @throws {AppError} If any application-specific error occurs.
+     * @throws {Error} If an unexpected error occurs.
+     */
+    async getNewRegistrationCount(): Promise<number> {  
+        try {
+            // Call the repository method to fetch the count of new registrations
+            const count = await this._adminRepository.getNewRegistrationCount();
+
+            // Validate the result; throw an error if the count is not a number or the operation failed
+            if (typeof count !== 'number') {
+                throw new ServerError(ErrorMessages.FAILED_TO_FETCH_REGISTRATION_COUNT, StatusCodes.INTERNAL_SERVER_ERROR);
+            }
+
+            // Return the fetched count of new registrations
+            return count;
+        } catch (error) {
+            // Re-throw the error if it's an instance of AppError (custom application error)
+            if (error instanceof AppError) {
+                throw error;
+            } else {
+                // Re-throw unexpected errors for further handling
+                throw error;
+            }
+        }
+    }
+
+    /**
+     * Performs a composite health check by evaluating the health of multiple system components
+     * such as external APIs, MongoDB, Redis, and the server itself.
+     * 
+     * @returns A promise that resolves to a composite health check result (`IHealthCheck`).
+     * @throws {ServerError} If a repository or infrastructure error occurs during the health check.
+     * @throws {AppError} If an application-specific error occurs.
+     * @throws {Error} If an unexpected error occurs.
+     */
+    async getHealthStatus(): Promise<IHealthStatus> {  
+        try {
+            const response = new CompositeHealthCheckService([
+                new ExternalApiHealthCheckService('http://localhost:5000/'),
+                new MongoDbHealthCheckService(),
+                new RedisHealthCheckService(),
+                new ServerHealthCheckService(),
+            ]);
+
+            const healthCheckResult = await response.check();
+
+            console.log('Health check response:', healthCheckResult);
+
+            return healthCheckResult;
         } catch (error) {
             // Re-throw the error if it's an instance of AppError (custom application error)
             if (error instanceof AppError) {

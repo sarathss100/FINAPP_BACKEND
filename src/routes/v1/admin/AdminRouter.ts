@@ -13,5 +13,7 @@ router.get('/all-users', adminController.getAllUsers.bind(adminController));
 router.post('/toggle-user-status', adminController.toggleUserStatus.bind(adminController));
 router.post('/add-faq', adminController.addFaq.bind(adminController));
 router.get('/faq', adminController.getAllFaqs.bind(adminController));
+router.get('/new-registration-count', adminController.getNewRegistrationCount.bind(adminController));
+router.get('/health', adminController.getHealthStatus.bind(adminController));
 
 export default router;

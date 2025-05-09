@@ -8,6 +8,7 @@ interface IAdminRepository {
     updateFaq(faqId: string, updatedData: Partial<IFaq>): Promise<boolean>;
     deleteFaq(faqId: string): Promise<boolean>;
     getAllFaqs(): Promise<IFaq[] | null>;
+    getNewRegistrationCount(): Promise<number>;
 }
 
 export default IAdminRepository;
