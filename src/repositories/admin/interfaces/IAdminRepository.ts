@@ -1,5 +1,6 @@
 import { IFaq } from 'dtos/base/FaqDto';
 import IUserDetails from './IUserDetails';
+import { ISystemMetrics } from './ISystemMetrics';
 
 interface IAdminRepository {
     findAllUsers(): Promise<IUserDetails[] | null>;
@@ -9,6 +10,7 @@ interface IAdminRepository {
     deleteFaq(faqId: string): Promise<boolean>;
     getAllFaqs(): Promise<IFaq[] | null>;
     getNewRegistrationCount(): Promise<number>;
+    getSystemMetrics(): Promise<ISystemMetrics>;
 }
 
 export default IAdminRepository;

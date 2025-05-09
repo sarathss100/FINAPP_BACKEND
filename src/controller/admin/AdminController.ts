@@ -145,6 +145,25 @@ class AdminController implements IAdminController {
             }
         }
     }
+
+    async getSystemMetrics(request: Request, response: Response): Promise<void> {
+        try {
+            // Call the get System Metrics method from AuthService
+            const usageStatics = await this._adminService.getSystemMetrics();
+    
+            if (usageStatics) {
+                sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { usageStatics });
+            } else {
+                sendErrorResponse(response, StatusCodes.BAD_REQUEST, ErrorMessages.FAILED_TO_FETCH_HEALTH_STATUS);
+            }
+        } catch (error) {
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
 }
 
 export default AdminController;

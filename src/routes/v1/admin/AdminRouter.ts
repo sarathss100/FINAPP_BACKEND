@@ -15,5 +15,6 @@ router.post('/add-faq', adminController.addFaq.bind(adminController));
 router.get('/faq', adminController.getAllFaqs.bind(adminController));
 router.get('/new-registration-count', adminController.getNewRegistrationCount.bind(adminController));
 router.get('/health', adminController.getHealthStatus.bind(adminController));
+router.get('/system-metrics', adminController.getSystemMetrics.bind(adminController));
 
 export default router;

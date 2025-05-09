@@ -11,6 +11,7 @@ import { ExternalApiHealthCheckService } from './health/api-health';
 import { MongoDbHealthCheckService } from './health/mongodb-health';
 import { RedisHealthCheckService } from './health/redis-health';
 import { ServerHealthCheckService } from './health/server-health';
+import { ISystemMetrics } from 'repositories/admin/interfaces/ISystemMetrics';
 
 class AdminService implements IAdminService {
     private _adminRepository: IAdminRepository;
@@ -213,9 +214,32 @@ class AdminService implements IAdminService {
 
             const healthCheckResult = await response.check();
 
-            console.log('Health check response:', healthCheckResult);
-
             return healthCheckResult;
+        } catch (error) {
+            // Re-throw the error if it's an instance of AppError (custom application error)
+            if (error instanceof AppError) {
+                throw error;
+            } else {
+                // Re-throw unexpected errors for further handling
+                throw error;
+            }
+        }
+    }
+
+    /**
+     * Retrieves system metrics by querying the admin repository.
+     * This may include various performance or operational metrics from underlying systems.
+     *
+     * @returns A promise that resolves to the system metrics object (`ISystemMetrics`).
+     * @throws {ServerError} If a repository or infrastructure error occurs during the fetch.
+     * @throws {AppError} If an application-specific error is thrown by the repository.
+     * @throws {Error} If an unexpected error occurs.
+     */
+    async getSystemMetrics(): Promise<ISystemMetrics> {  
+        try {
+            const data = await this._adminRepository.getSystemMetrics();
+        
+            return data;
         } catch (error) {
             // Re-throw the error if it's an instance of AppError (custom application error)
             if (error instanceof AppError) {

@@ -3,6 +3,9 @@ import IAdminRepository from './interfaces/IAdminRepository';
 import IUserDetails from './interfaces/IUserDetails';
 import { FaqModel } from 'model/admin/model/FaqModel';
 import { IFaq } from 'dtos/base/FaqDto';
+import { ISystemMetrics } from './interfaces/ISystemMetrics';
+import osUtils from 'os-utils';
+import checkDiskSpace from 'check-disk-space';
 
 class AdminRepository implements IAdminRepository {
     // Retrieve all users from the database
@@ -32,6 +35,18 @@ class AdminRepository implements IAdminRepository {
         const count = await UserModel.countDocuments({ createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000 * 7) } });
         return count;
     };
+
+    // Fetches the system metrics 
+    async getSystemMetrics(): Promise<ISystemMetrics> {
+        const availableMem = osUtils.freememPercentage();
+        const ramUsage = (1 - availableMem) * 100;
+
+        // Disk usage 
+        const { free, size } = await checkDiskSpace(process.platform === 'win32' ? 'C:\\' : '/');
+        const diskUsage = ((size - free) / size) * 100;
+
+        return { ramUsage, diskUsage };
+    }
 
     // Add a new FAQ entry to the list
     async addFaq(newFaq: IFaq): Promise<boolean> {

@@ -7,6 +7,7 @@ interface IAdminController {
     getAllFaqs(request: Request, response: Response): Promise<void>;
     getNewRegistrationCount(request: Request, response: Response): Promise<void>;
     getHealthStatus(request: Request, response: Response): Promise<void>;
+    getSystemMetrics(request: Request, respons: Response): Promise<void>;
 }
 
 export default IAdminController;
