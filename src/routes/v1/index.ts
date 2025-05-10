@@ -15,7 +15,7 @@ v1Router.use('/public', publicRoutes);
 v1Router.use('/onemoney', webHookRoutes);
 v1Router.use('/api/onemoney', router);
 v1Router.use('/auth', authRoutes);
-v1Router.use('/user', authorizeRoles(UserRole.USER), userRoutes);
+v1Router.use('/user', authorizeRoles(UserRole.USER, UserRole.ADMIN), userRoutes);
 v1Router.use('/admin', authorizeRoles(UserRole.ADMIN), adminRoutes);
 v1Router.use('/goal', authorizeRoles(UserRole.USER), goalRoutes);
 v1Router.use('/transaction', authorizeRoles(UserRole.USER), transactionRoutes);
