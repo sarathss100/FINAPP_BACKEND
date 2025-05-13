@@ -49,6 +49,10 @@ export const ErrorMessages = {
     NO_GOALS_FOUND: 'No goals found. Please ensure goals exist in the system.',
     NO_INCOMPLETE_GOALS_FOUND: 'No incomplete goals found. Please ensure incomplete goals exist in the system.',
 
+    // Accounts Errors 
+    ACCOUNT_ID_NOT_FOUND: 'No account ID found. Please try again later or contact support',
+    FAILED_TO_DELETE_ACCOUNT: 'Failed to delete Account. Please try again later or contact support for assistance.',
+
     // Admin Errors
     FAILED_TO_ADD_THE_FAQ: 'Failed to add the FAQ. Please try again later or contact developer support.',
     NO_FAQ_FOUND: 'No FAQs are currently available. Please check back later or add a new FAQ.',

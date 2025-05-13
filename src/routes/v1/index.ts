@@ -6,6 +6,7 @@ import publicRoutes from './public/PublicRouter';
 import webHookRoutes from './onemoney/webhook.routes';
 import goalRoutes from './goal/GoalRouter';
 import transactionRoutes from './transaction/TransactionRouter';
+import accountsRoutes from './accounts/AccountsRouter';
 import router from './onemoney/api.routes';
 import { authorizeRoles } from 'middleware/authMiddleware'; 
 import { UserRole } from 'types/auth/roles';
@@ -19,5 +20,6 @@ v1Router.use('/user', authorizeRoles(UserRole.USER, UserRole.ADMIN), userRoutes)
 v1Router.use('/admin', authorizeRoles(UserRole.ADMIN), adminRoutes);
 v1Router.use('/goal', authorizeRoles(UserRole.USER), goalRoutes);
 v1Router.use('/transaction', authorizeRoles(UserRole.USER), transactionRoutes);
+v1Router.use('/accounts', authorizeRoles(UserRole.USER), accountsRoutes);
 
 export default v1Router;

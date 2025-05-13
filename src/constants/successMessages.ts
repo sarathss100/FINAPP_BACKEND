@@ -38,4 +38,9 @@ export const SuccessMessages = {
     // Admin Success Messages
     FAQ_ADDED: 'FAQ added successfully.',
     FAQ_FETCHED_SUCCESSFULLY: 'FAQs retrieved successfully.',
+
+    // Accounts Success Messages
+    ACCOUNT_ADDED: 'Account Added successfully',
+    USER_ACCOUNT_UPDATED: 'User account updated successfully.',
+    ACCOUNT_REMOVED: 'Account removed successfully.', 
 } as const;
