@@ -30,7 +30,7 @@ export const accountDTOSchema = z.object({
     interest_rate: z.number().min(0).max(100).optional(),
     monthly_payment: z.number().min(0).optional(),
     due_date: z.string().datetime({ offset: true }).transform(value => new Date(value)).optional(),
-    term_months: z.number().int().positive().optional(),
+    term_months: z.number().min(0).optional(),
 
     // Investment Account Fields 
     investment_platform: z.string().optional(),

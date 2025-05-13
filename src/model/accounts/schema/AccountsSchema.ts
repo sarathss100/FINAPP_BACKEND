@@ -7,24 +7,15 @@ export const AccountSchema = new Schema(
             ref: 'User',
             required: true
         },
-        tenant_id: {
-            type: Schema.Types.ObjectId,
-            ref: 'Tenant'
-        },
         account_name: {
             type: String,
             required: true
-        },
-        current_balance: {
-            type: Number,
-            default: 0
         },
         currency: {
             type: String,
             enum: ['INR'],
             default: 'INR'
         },
-        institution: String,
         description: String,
         is_active: {
             type: Boolean,
@@ -39,11 +30,20 @@ export const AccountSchema = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'User',
         },
+        account_type: {
+            type: String,
+            enum: ['Bank', 'Debt', 'Investment', 'Cash']
+        },
+        current_balance: {
+            type: Number,
+            default: 0
+        },
+        institution: String,
+        account_number: String,
         account_subtype: {
             type: String,
             enum: ['Current', 'Savings', 'FD', 'RD']
         },
-        account_number: String,
         loan_type: {
             type: String,
             enum: ['Mortgage', 'Student', 'Personal', 'Auto', 'Credit Card']

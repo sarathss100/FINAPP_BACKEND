@@ -43,4 +43,8 @@ export const SuccessMessages = {
     ACCOUNT_ADDED: 'Account Added successfully',
     USER_ACCOUNT_UPDATED: 'User account updated successfully.',
     ACCOUNT_REMOVED: 'Account removed successfully.', 
+    ACCOUNT_TOTAL_BALANCE: 'Account total balance retrieved successfully',
+    ACCOUNT_TOTAL_BANK_BALANCE: 'Account total balance balance retrieved successfully',
+    ACCOUNT_TOTAL_DEBT: 'Account total debt retrieved successfully',
+    ACCOUNT_TOTAL_INVESTMENT: 'Account total investment retrieved successfully',
 } as const;

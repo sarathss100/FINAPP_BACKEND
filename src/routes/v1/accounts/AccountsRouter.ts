@@ -13,5 +13,9 @@ router.post('/create', accountsController.addAccount.bind(accountsController));
 router.post('/update', accountsController.updateAccount.bind(accountsController));
 router.delete('/delete', accountsController.removeAccount.bind(accountsController));
 router.get('/details', accountsController.getUserAccounts.bind(accountsController));
+router.get('/total-balance', accountsController.getTotalBalance.bind(accountsController));
+router.get('/total-bank-balance', accountsController.getTotalBankBalance.bind(accountsController));
+router.get('/total-debt', accountsController.getTotalDebt.bind(accountsController));
+router.get('/total-investment', accountsController.getTotalInvestment.bind(accountsController));
 
 export default router;

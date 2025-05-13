@@ -138,6 +138,152 @@ class AccountsService implements IAccountsService {
             throw new Error((error as Error).message);
         }
     }
+
+    /**
+     * Retrieves all accounts associated with the authenticated user.
+     * 
+     * @param {string} accessToken - The access token used to authenticate the user and extract their ID.
+     * @returns {Promise<IAccountDTO[]>} - A promise resolving to an array of account objects associated with the user.
+     * @throws {AuthenticationError} - Throws an error if the access token is invalid or missing the user ID.
+     * @throws {Error} - Throws an error if the database operation fails.
+     */
+    async getTotalBalance(accessToken: string): Promise<number> {
+        try {
+            // Decode and validate the access token to extract the user ID associated with it.
+            const userId = decodeAndValidateToken(accessToken);
+            if (!userId) {
+                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
+            }
+
+            // Call the repository to retrieve the accounts associated with the extracted user ID.
+            const accountDetails = await this._accountRepository.getUserAccounts(userId);
+
+            const totalDebt = accountDetails.reduce((sum, account) => {
+                if (account.account_type === 'Debt') {
+                    sum += (account.current_balance ?? 0);
+                }
+                return sum;
+            }, 0);
+
+            const totalSavings = accountDetails.reduce((sum, account) => {
+                if (account.account_type !== 'Debt') {
+                    sum += (account.current_balance ?? 0);
+                }
+                return sum;
+            }, 0);
+
+
+            const totalBalance = totalSavings - totalDebt;
+
+            return totalBalance;
+        } catch (error) {
+            // Log and re-throw the error to propagate it to the caller.
+            console.error('Error retrieving totalBalance:', error);
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+     * Calculates the total balance of all bank accounts associated with the authenticated user.
+     * 
+     * @param {string} accessToken - The access token used to authenticate the user and extract their ID.
+     * @returns {Promise<number>} - A promise resolving to the total balance of all the user's bank accounts.
+     * @throws {AuthenticationError} - Throws an error if the access token is invalid or missing the user ID.
+     * @throws {Error} - Throws a generic error if the database operation fails or an unexpected error occurs.
+     */
+    async getTotalBankBalance(accessToken: string): Promise<number> {
+        try {
+            // Decode and validate the access token to extract the user ID associated with it.
+            const userId = decodeAndValidateToken(accessToken);
+            if (!userId) {
+                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
+            }
+
+            // Call the repository to retrieve the accounts associated with the extracted user ID.
+            const accountDetails = await this._accountRepository.getUserAccounts(userId);
+
+            const totalBankBalance = accountDetails.reduce((sum, account) => {
+                if (account.account_type === 'Bank') {
+                    sum += (account.current_balance ?? 0);
+                }
+                return sum;
+            }, 0);
+
+            return totalBankBalance;
+        } catch (error) {
+            // Log and re-throw the error to propagate it to the caller.
+            console.error('Error retrieving total Bank Balance:', error);
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+     * Calculates the total debt balance across all debt-type accounts associated with the authenticated user.
+     * 
+     * @param {string} accessToken - The access token used to authenticate the user and extract their ID.
+     * @returns {Promise<number>} - A promise resolving to the total debt balance of the user.
+     * @throws {AuthenticationError} - Throws an error if the access token is invalid or missing the user ID.
+     * @throws {Error} - Throws a generic error if the database operation fails or an unexpected error occurs.
+     */
+    async getTotalDebt(accessToken: string): Promise<number> {
+        try {
+            // Decode and validate the access token to extract the user ID associated with it.
+            const userId = decodeAndValidateToken(accessToken);
+            if (!userId) {
+                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
+            }
+        
+            // Call the repository to retrieve the accounts associated with the extracted user ID.
+            const accountDetails = await this._accountRepository.getUserAccounts(userId);
+        
+            const totalDebt = accountDetails.reduce((sum, account) => {
+                if (account.account_type === 'Debt') {
+                    sum += (account.current_balance ?? 0);
+                }
+                return sum;
+            }, 0);
+        
+            return totalDebt;
+        } catch (error) {
+            // Log and re-throw the error to propagate it to the caller.
+            console.error('Error retrieving total debt:', error);
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+ * Calculates the total investment balance across all investment-type accounts associated with the authenticated user.
+ * 
+ * @param {string} accessToken - The access token used to authenticate the user and extract their ID.
+ * @returns {Promise<number>} - A promise resolving to the total investment balance of the user.
+ * @throws {AuthenticationError} - Throws an error if the access token is invalid or missing the user ID.
+ * @throws {Error} - Throws a generic error if the database operation fails or an unexpected error occurs.
+ */
+async getTotalInvestment(accessToken: string): Promise<number> {
+    try {
+        // Decode and validate the access token to extract the user ID associated with it.
+        const userId = decodeAndValidateToken(accessToken);
+        if (!userId) {
+            throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
+        }
+
+        // Call the repository to retrieve the accounts associated with the extracted user ID.
+        const accountDetails = await this._accountRepository.getUserAccounts(userId);
+
+        const totalInvestment = accountDetails.reduce((sum, account) => {
+            if (account.account_type === 'Investment') {
+                sum += (account.current_balance ?? 0);
+            }
+            return sum;
+        }, 0);
+
+        return totalInvestment;
+    } catch (error) {
+        // Log and re-throw the error to propagate it to the caller.
+        console.error('Error retrieving total investment:', error);
+        throw new Error((error as Error).message);
+    }
+}
 }
 
 export default AccountsService;

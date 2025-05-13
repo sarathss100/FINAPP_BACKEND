@@ -24,7 +24,8 @@ class AccountManagementRepository implements IAccountsManagementRepository {
         try {
             const result = await AccountModel.create(accountData);
             const addedAccount: IAccountDTO = {
-                user_id: result?.user_id?.toString() || '',
+                _id: result?._id?.toString(),
+                user_id: result?.user_id?.toString(),
                 account_name: result.account_name,
                 currency: result.currency,
                 description: result.description,

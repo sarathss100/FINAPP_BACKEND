@@ -22,8 +22,18 @@ class AccountsController implements IAccountsController {
             if (!accessToken) {
                 throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
             }
+            const data = request.body;
+            const formData: Partial<IAccountDTO> = {};
 
-            const parsedBody = accountDTOSchema.safeParse(request.body);
+            for (const key in data) {
+                // Only include fields that aren't empty strings
+                if (data[key] !== '' && data[key] !== undefined) {
+                    formData[key as keyof IAccountDTO] = data[key];
+                }
+            }
+
+            // Now assert it to IAccountDTO only when passing it to Zod for validation
+            const parsedBody = accountDTOSchema.safeParse(formData);
 
             if (!parsedBody || !parsedBody.success) {
                 // If validation fails, extract the error details
@@ -60,15 +70,15 @@ class AccountsController implements IAccountsController {
                 throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
             }
 
-            const { _id } = request.body;
-            if (!_id || typeof _id !== 'string') {
+            const { accountId, accountData } = request.body;
+            if (!accountId || typeof accountId !== 'string') {
                 throw new ValidationError(ErrorMessages.ACCOUNT_ID_NOT_FOUND, StatusCodes.BAD_REQUEST);
             } 
 
             const partialaccountsDTOSchema = accountDTOSchema.partial();
 
             // Validate the request body using the Zod schema
-            const parsedBody = partialaccountsDTOSchema.safeParse(request.body);
+            const parsedBody = partialaccountsDTOSchema.safeParse(accountData);
 
             if (!parsedBody.success) {
                 // If validation fails, extract the error details
@@ -82,10 +92,10 @@ class AccountsController implements IAccountsController {
             }
 
             // Extract the validated data
-            const accountData = parsedBody.data;
+            const extractedAccountData = parsedBody.data;
             
             // Call the service layer to update the accounts
-            const updatedAccount = await this._accountsService.updateAccount(accessToken, _id, accountData);
+            const updatedAccount = await this._accountsService.updateAccount(accessToken, accountId, extractedAccountData);
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.USER_ACCOUNT_UPDATED, { updatedAccount } );
         } catch (error) {
@@ -136,6 +146,86 @@ class AccountsController implements IAccountsController {
             const userAccountDetails: IAccountDTO[] = await this._accountsService.getUserAccounts(accessToken);
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOALS_RETRIEVED, { ...userAccountDetails });
+        } catch (error) {
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    async getTotalBalance(request: Request, response: Response): Promise<void> {
+        try {
+            const { accessToken } = request.cookies;
+            if (!accessToken) {
+                throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
+            }
+
+            // Call the service layer to get the user total Balance
+            const totalBalance = await this._accountsService.getTotalBalance(accessToken);
+
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.ACCOUNT_TOTAL_BALANCE, { totalBalance });
+        } catch (error) {
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    async getTotalBankBalance(request: Request, response: Response): Promise<void> {
+        try {
+            const { accessToken } = request.cookies;
+            if (!accessToken) {
+                throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
+            }
+
+            // Call the service layer to get the user total Bank Balance
+            const totalBankBalance = await this._accountsService.getTotalBankBalance(accessToken);
+
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.ACCOUNT_TOTAL_BANK_BALANCE, { totalBankBalance });
+        } catch (error) {
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    async getTotalDebt(request: Request, response: Response): Promise<void> {
+        try {
+            const { accessToken } = request.cookies;
+            if (!accessToken) {
+                throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
+            }
+
+            // Call the service layer to get the user total Debt
+            const totalDebt = await this._accountsService.getTotalDebt(accessToken);
+
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.ACCOUNT_TOTAL_DEBT, { totalDebt });
+        } catch (error) {
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    async getTotalInvestment(request: Request, response: Response): Promise<void> {
+        try {
+            const { accessToken } = request.cookies;
+            if (!accessToken) {
+                throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
+            }
+
+            // Call the service layer to get the user total Investment
+            const totalInvestment = await this._accountsService.getTotalInvestment(accessToken);
+
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.ACCOUNT_TOTAL_INVESTMENT, { totalInvestment });
         } catch (error) {
             if (error instanceof AppError) {
                 sendErrorResponse(response, error.statusCode, error.message);
