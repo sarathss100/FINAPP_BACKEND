@@ -2,8 +2,8 @@ import { Schema } from 'mongoose';
 
 const TransactionSchema = new Schema({
     user_id: { type: Schema.Types.ObjectId, required: true },
-    tenant_id: { type: Schema.Types.ObjectId },
     account_id: { type: String, required: true },
+    transaction_type: { type: String, enum: ['INCOME', 'EXPENSE' ]},
     type: { type: String, enum: ['REGULAR', 'TRANSFER', 'PAYMENT', 'ADJUSTMENT', 'FEE', 'REFUND', 'DEPOSIT', 'WITHDRAWAL', 'INTEREST', 'DIVIDEND', 'REWARD', 'BONUS', 'CASHBACK', 'REDEMPTION', 'CONVERSION', 'EXCHANGE', 'LOAN', 'BORROWING', 'LENDING', 'INVESTMENT', 'PURCHASE', 'SALE', 'EXTRACTION'], required: true },
     category: { type: String, enum: ['FOOD', 'TRANSPORT', 'ENTERTAINMENT', 'HEALTH', 'EDUCATION', 'SHOPPING', 'TRAVEL', 'BILLS', 'SUBSCRIPTIONS', 'GIFTS', 'SAVINGS', 'INVESTMENTS', 'MISCELLANEOUS'], required: true },
     amount: { type: Number, required: true },

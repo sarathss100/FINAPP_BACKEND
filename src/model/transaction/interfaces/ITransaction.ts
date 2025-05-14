@@ -50,12 +50,12 @@ export type TransactionCategory = typeof TRANSACTION_CATEGORIES[number];
 interface ITransaction extends Document {
     _id: Types.ObjectId;
     user_id: Types.ObjectId;
-    tenat_id?: Types.ObjectId;
     account_id: Types.ObjectId;
+    transaction_type: 'INCOME' | 'EXPENSE',
     type: TransactionType;
     category: TransactionCategory;
     amount: number;
-    currency: 'USD' | 'EUR' | 'INR' | 'GBP';
+    currency: 'INR';
     date: Date;
     description: string;
     tags: string[];
@@ -67,7 +67,7 @@ interface ITransaction extends Document {
     related_account_id?: Types.ObjectId;
     linked_entities?: Array<{
         entity_id: Types.ObjectId;
-        entity_type: 'GOAL' | 'DEBT' | 'INVESTMENT' | 'INSURANCE' | 'TAX_GROUP' | 'LOAN' | 'CREDIT_CARD' | 'SAVINGS_ACCOUNT' | 'CHECKING_ACCOUNT' | 'MORTGAGE' | 'OTHER';
+        entity_type: 'GOAL' | 'DEBT' | 'INVESTMENT' | 'INSURANCE' | 'LOAN' | 'CREDIT_CARD' | 'SAVINGS_ACCOUNT' | 'MORTGAGE' | 'OTHER';
         amount: number;
         currency: string;
     }>;

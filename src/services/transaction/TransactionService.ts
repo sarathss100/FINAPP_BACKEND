@@ -38,7 +38,7 @@ class TransactionService implements ITransactionService {
             if (!userId) {
                 throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
             }
-
+ 
             const transactionData = { ...data, user_id: userId, };
 
             // Call the repository to create the transaction using the extracted user ID and provided transaction data.

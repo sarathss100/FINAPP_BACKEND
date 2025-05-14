@@ -16,15 +16,15 @@ class TransactionRepository implements ITransactionRepository {
     async createTransaction(data: ITransactionDTO): Promise<ITransactionDTO> { 
         try {
             const result = await TransactionModel.create(data);
-          const createdTransaction: ITransactionDTO = {
+            const createdTransaction: ITransactionDTO = {
                 _id: result._id.toString(),
                 user_id: result.user_id.toString(),
-                tenant_id: result.tenat_id?.toString(),
                 account_id: result.account_id.toString(),
+                transaction_type: result.transaction_type as 'INCOME' | 'EXPENSE',
                 type: result.type,
                 category: result.category,
                 amount: result.amount,    
-                currency: result.currency.toString() as 'USD' | 'EUR' | 'INR' | 'GBP',
+                currency: result.currency.toString() as 'INR',
                 date: result.date,
                 description: result.description,
                 tags: result.tags,
@@ -34,7 +34,7 @@ class TransactionRepository implements ITransactionRepository {
                     entity_id: entity.entity_id?.toString(),
                     entity_type: entity.entity_type,
                     amount: entity.amount,
-                    currency: entity.currency.toString() as 'USD' | 'EUR' | 'INR' | 'GBP',
+                    currency: entity.currency.toString() as 'INR',
                 })),
                 isDeleted: result.isDeleted || false,
                 deletedAt: result.deletedAt,

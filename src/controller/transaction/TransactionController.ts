@@ -18,7 +18,6 @@ class TransactionController implements ITransactionController {
     async createTransaction(request: Request, response: Response): Promise<void> {
         try {
             const { accessToken } = request.cookies;
-
             if (!accessToken) {
                 throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
             }
