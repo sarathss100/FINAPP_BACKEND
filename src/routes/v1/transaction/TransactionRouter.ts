@@ -10,5 +10,8 @@ const transactionController = new TransactionController(transactionService);
 
 router.post('/create', transactionController.createTransaction.bind(transactionController));
 router.get('/all', transactionController.getUserTransactions.bind(transactionController));
+router.get('/monthly-total-income', transactionController.getMonthlyTotalIncome.bind(transactionController));
+router.get('/monthly-total-expense', transactionController.getMonthlyTotalExpense.bind(transactionController));
+router.get('/category-wise-expense', transactionController.getCategoryWiseExpense.bind(transactionController));
 
 export default router;
