@@ -3,7 +3,7 @@ import ITransactionRepository from './interfaces/ITransactionRepository';
 import { TransactionModel } from 'model/transaction/model/TransactionModel';
 
 class TransactionRepository implements ITransactionRepository {
-  /**
+    /**
     * Creates a new transaction history in the database and returns the created transaction in ITransactionDTO format.
     * 
     * This method takes an input object (`transactionData`) containing transaction details, inserts it into the database using the `TransactionModel`,
@@ -24,6 +24,9 @@ class TransactionRepository implements ITransactionRepository {
                 type: result.type,
                 category: result.category,
                 amount: result.amount,    
+                credit_amount: result.credit_amount || 0,
+                debit_amount: result.debit_amount || 0,
+                closing_balance: result.closing_balance || 0,
                 currency: result.currency.toString() as 'INR',
                 date: result.date,
                 description: result.description,
@@ -44,6 +47,134 @@ class TransactionRepository implements ITransactionRepository {
             return createdTransaction;
         } catch (error) {
             throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+ * Creates multiple new transaction histories in the database in a single operation.
+ * 
+ * This method takes an array of transaction objects, performs a bulk insert using `insertMany`,
+ * and maps the results to the `ITransactionDTO` format. MongoDB ObjectIds are converted to strings
+ * for consistency in the DTOs.
+ * 
+ * @param {ITransactionDTO[]} dataArray - An array of input data representing transactions to be created.
+ * @returns {Promise<ITransactionDTO[]>} - A promise resolving to an array of created transactions in ITransactionDTO format.
+ * @throws {Error} - Throws an error if the database operation fails or if invalid data is provided.
+ */
+async createBulkTransactions(dataArray: ITransactionDTO[]): Promise<ITransactionDTO[]> {
+    try {
+        // Use insertMany for bulk insertion (more efficient than multiple create operations)
+        const results = await TransactionModel.insertMany(dataArray, { lean: true });
+        
+        // Map each result to the ITransactionDTO format
+        const createdTransactions: ITransactionDTO[] = results.map(result => ({
+            _id: result._id.toString(),
+            user_id: result?.user_id?.toString(),
+            account_id: result.account_id.toString(),
+            transaction_type: result.transaction_type as 'INCOME' | 'EXPENSE',
+            type: result.type,
+            category: result.category,
+            amount: result.amount,
+            credit_amount: result.credit_amount || 0,
+            debit_amount: result.debit_amount || 0,
+            closing_balance: result.closing_balance || 0,
+            currency: result.currency.toString() as 'INR',
+            date: result.date,
+            description: result.description,
+            tags: result.tags,
+            status: result.status,
+            transactionHash: result.transactionHash, // Include the hash in the returned data
+            related_account_id: result.related_account_id?.toString(),
+            linked_entities: result.linked_entities?.map((entity) => ({
+                entity_id: entity.entity_id?.toString(),
+                entity_type: entity.entity_type,
+                amount: entity.amount,
+                currency: entity?.currency?.toString() as 'INR',
+            })),
+            isDeleted: result.isDeleted || false,
+            deletedAt: result.deletedAt,
+            createdAt: result.createdAt,
+            updatedAt: result.updatedAt,
+        }));
+        
+        return createdTransactions;
+    } catch (error) {
+        console.error('Error in bulk transaction creation:', error);
+        throw new Error((error as Error).message);
+    }
+}
+
+    /**
+     * Retrieves all transactions associated with a specific user from the database.
+     * 
+     * @param {string} userId - The unique identifier of the user whose transactions are being retrieved.
+     * @returns {Promise<ITransactionDTO[]>} - A promise resolving to an array of `ITransactionDTO` objects representing the user's transactions.
+     * @throws {Error} - Throws an error if the database operation fails or no transactions are found for the given user.
+     */
+    async getExistingTransaction(userId: string, transactionHash: string): Promise<boolean> {
+        try {
+            // Query the database to retrieve all transactions associated with the given `userId`.
+            const result = await TransactionModel.findOne<ITransactionDTO>({ transactionHash });
+
+            // it means no transactions were found for the given user, and an error is thrown.
+            if (!result) {
+                return false;
+            }
+
+            // Return the retrieved transactions as an array of `ITransactionDTO` objects.
+            return true;
+        } catch (error) {
+            // Log the error for debugging purposes.
+            console.error('Error retrieving transaction details:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Retrieves all transactions associated with a specific user from the database.
+     * 
+     * @param {string} userId - The unique identifier of the user whose transactions are being retrieved.
+     * @returns {Promise<ITransactionDTO[]>} - A promise resolving to an array of `ITransactionDTO` objects representing the user's transactions.
+     * @throws {Error} - Throws an error if the database operation fails or no transactions are found for the given user.
+     */
+    async getExistingTransactions(allHashes: string[]): Promise<ITransactionDTO[] | undefined> {
+        try {
+            // Query the database to retrieve all transactions associated with the given `userId`.
+            const result = await TransactionModel.find({ transactionHash: { $in: allHashes }});
+
+            // Map the result to ITransactionDTO format
+            return result.map(transaction => ({
+                _id: transaction._id.toString(),
+                user_id: transaction.user_id.toString(),
+                account_id: transaction.account_id.toString(),
+                transaction_type: transaction.transaction_type,
+                type: transaction.type,
+                category: transaction.category,
+                amount: transaction.amount,
+                credit_amount: transaction.credit_amount || 0,
+                debit_amount: transaction.debit_amount || 0,
+                closing_balance: transaction.closing_balance || 0,
+                currency: transaction.currency as 'INR',
+                date: transaction.date,
+                description: transaction.description,
+                tags: transaction.tags,
+                status: transaction.status,
+                transactionHash: transaction.transactionHash,
+                related_account_id: transaction.related_account_id?.toString(),
+                linked_entities: transaction.linked_entities?.map(entity => ({
+                    entity_id: entity.entity_id?.toString(),
+                    entity_type: entity.entity_type,
+                    amount: entity.amount,
+                    currency: entity.currency as 'INR',
+                })),
+                isDeleted: transaction.isDeleted || false,
+                deletedAt: transaction.deletedAt,
+                createdAt: transaction.createdAt,
+                updatedAt: transaction.updatedAt,
+            }));
+        } catch (error) {
+            // Log the error for debugging purposes.
+            console.error('Error retrieving transaction details:', error);
         }
     }
 
@@ -85,7 +216,7 @@ class TransactionRepository implements ITransactionRepository {
     async getMonthlyTotalIncome(userId: string): Promise<{currentMonthTotal: number, previousMonthTotal: number }> {
         try {
             // Query the database to retrieve all transactions associated with the given `userId`.
-            const result = await TransactionModel.find<ITransactionDTO>({ user_id: userId, transaction_type: 'INCOME' });
+            const result = await TransactionModel.find({ user_id: userId, transaction_type: 'INCOME' });
 
             // it means no transactions were found for the given user, and an error is thrown.
             if (!result || result.length === 0) {

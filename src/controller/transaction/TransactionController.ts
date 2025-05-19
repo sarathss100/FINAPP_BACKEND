@@ -15,16 +15,90 @@ class TransactionController implements ITransactionController {
         this._transactionService = transactionService;
     }
 
-    async createTransaction(request: Request, response: Response): Promise<void> {
-        try {
-            const { accessToken } = request.cookies;
-            if (!accessToken) {
-                throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
+    // async createTransaction(request: Request, response: Response): Promise<void> {
+    //     try {
+    //         const { accessToken } = request.cookies;
+    //         if (!accessToken) {
+    //             throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
+    //         }
+
+    //         // Validate the request body using the Zod schema
+    //         const parsedBody = transactionDTOSchema.safeParse(request.body);
+    //         console.log(parsedBody);
+
+    //         if (!parsedBody.success) {
+    //             // If validation fails, extract the error details
+    //             const errors = parsedBody.error.errors.map(err => ({
+    //                 field: err.path.join('.'),
+    //                 message: err.message
+    //             }));
+    //             console.error(errors);
+    //             throw new ValidationError(ErrorMessages.INVALID_INPUT, StatusCodes.BAD_REQUEST);
+    //         }
+
+    //         // Extract the validated data
+    //         const transactionData = parsedBody.data;
+            
+    //         // Call the service layer to create the transaction
+    //         const createdTransaction = await this._transactionService.createTransaction(accessToken, transactionData);
+
+    //         sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.TRANSACTION_CREATED, { createdTransaction } );
+    //     } catch (error) {
+    //         if (error instanceof AppError) {
+    //             sendErrorResponse(response, error.statusCode, error.message);
+    //         } else {
+    //             sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+    //         }
+    //     }
+    // }
+
+    
+async createTransaction(request: Request, response: Response): Promise<void> {
+    try {
+        const { accessToken } = request.cookies;
+        if (!accessToken) {
+            throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
+        }
+
+        // Check if the request body is an array or a single object
+        const isArray = Array.isArray(request.body);
+        
+        if (isArray) {
+            // Handle array of transactions
+            const validatedTransactions = [];
+            const validationErrors = [];
+            
+            // Validate each transaction in the array
+            for (let i = 0; i < request.body.length; i++) {
+                const parsedTransaction = transactionDTOSchema.safeParse(request.body[i]);
+                
+                if (parsedTransaction.success) {
+                    validatedTransactions.push(parsedTransaction.data);
+                } else {
+                    // Collect validation errors for each failed transaction
+                    const errors = parsedTransaction.error.errors.map(err => ({
+                        transactionIndex: i,
+                        field: err.path.join('.'),
+                        message: err.message
+                    }));
+                    validationErrors.push(...errors);
+                }
             }
-
-            // Validate the request body using the Zod schema
+            
+            // If there are validation errors, return them
+            if (validationErrors.length > 0) {
+                console.error(validationErrors);
+                throw new ValidationError(ErrorMessages.INVALID_INPUT, StatusCodes.BAD_REQUEST);
+            }
+            
+            // Call the service layer to create multiple transactions
+            const createdTransactions = await this._transactionService.createTransaction(accessToken, validatedTransactions);
+            
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.TRANSACTION_CREATED, { addedTransactions: createdTransactions });
+        } else {
+            // Handle single transaction (original logic)
             const parsedBody = transactionDTOSchema.safeParse(request.body);
-
+            
             if (!parsedBody.success) {
                 // If validation fails, extract the error details
                 const errors = parsedBody.error.errors.map(err => ({
@@ -34,22 +108,23 @@ class TransactionController implements ITransactionController {
                 console.error(errors);
                 throw new ValidationError(ErrorMessages.INVALID_INPUT, StatusCodes.BAD_REQUEST);
             }
-
+            
             // Extract the validated data
             const transactionData = parsedBody.data;
             
             // Call the service layer to create the transaction
             const createdTransaction = await this._transactionService.createTransaction(accessToken, transactionData);
-
-            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.TRANSACTION_CREATED, { createdTransaction } );
-        } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.TRANSACTION_CREATED, { addedTransaction: createdTransaction });
+        }
+    } catch (error) {
+        if (error instanceof AppError) {
+            sendErrorResponse(response, error.statusCode, error.message);
+        } else {
+            sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
         }
     }
+}
 
     async getUserTransactions(request: Request, response: Response): Promise<void> {
         try {
@@ -122,6 +197,26 @@ class TransactionController implements ITransactionController {
             const categoryWiseExpenses = await this._transactionService.getCategoryWiseExpense(accessToken);
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.TRANSACTION_RETRIEVED, { categoryWiseExpenses });
+        } catch (error) {
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    async extractTransactionData(request: Request, response: Response): Promise<void> {
+        try {
+            const file = request.file; // Multer provides the file object 
+            if (!file) {
+                throw new ValidationError(ErrorMessages.STATEMENT_FILE_NOT_FOUND, StatusCodes.BAD_REQUEST);
+            }
+
+            // Call the service layer to extract the transaction data from the uploaded file
+            const extractedStatementData = await this._transactionService.extractTransactionData(file);
+
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.EXTRACTED_DATA, { extractedStatementData });
         } catch (error) {
             if (error instanceof AppError) {
                 sendErrorResponse(response, error.statusCode, error.message);

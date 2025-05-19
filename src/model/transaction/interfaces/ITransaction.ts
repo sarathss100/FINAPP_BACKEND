@@ -49,12 +49,15 @@ export type TransactionCategory = typeof TRANSACTION_CATEGORIES[number];
 
 interface ITransaction extends Document {
     _id: Types.ObjectId;
-    user_id: Types.ObjectId;
+    user_id: string;
     account_id: Types.ObjectId;
     transaction_type: 'INCOME' | 'EXPENSE',
     type: TransactionType;
     category: TransactionCategory;
     amount: number;
+    credit_amount?: number;
+    debit_amount?: number;
+    closing_balance?: number;
     currency: 'INR';
     date: Date;
     description: string;
@@ -65,6 +68,7 @@ interface ITransaction extends Document {
     deletedAt?: Date;
     isDeleted?: boolean;
     related_account_id?: Types.ObjectId;
+    transactionHash?: string;
     linked_entities?: Array<{
         entity_id: Types.ObjectId;
         entity_type: 'GOAL' | 'DEBT' | 'INVESTMENT' | 'INSURANCE' | 'LOAN' | 'CREDIT_CARD' | 'SAVINGS_ACCOUNT' | 'MORTGAGE' | 'OTHER';

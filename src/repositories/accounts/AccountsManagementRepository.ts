@@ -20,12 +20,49 @@ class AccountManagementRepository implements IAccountsManagementRepository {
      * - The database operation fails
      * - Invalid data is provided
      */
-    async addAccount(accountData: IAccountDTO): Promise<IAccountDTO> { 
+    async addAccount(accountData: IAccountDTO): Promise<IAccountDTO> {
         try {
+            // Check if an account with the same name and number already exists for this user
+            const existingAccount = await AccountModel.findOne({
+                account_name: accountData.account_name,
+                account_number: accountData.account_number,
+                user_id: accountData.user_id
+            });
+    
+            if (existingAccount) {
+                // Return the existing account instead of throwing error
+                return {
+                    _id: existingAccount._id?.toString(),
+                    user_id: existingAccount.user_id?.toString(),
+                    account_name: existingAccount.account_name,
+                    currency: existingAccount.currency,
+                    description: existingAccount.description,
+                    is_active: existingAccount.is_active,
+                    created_by: existingAccount.created_by.toString(),
+                    last_updated_by: existingAccount.last_updated_by?.toString(),
+                    account_type: existingAccount.account_type,
+                    current_balance: existingAccount.current_balance,
+                    institution: existingAccount.institution,
+                    account_number: existingAccount.account_number,
+                    account_subtype: existingAccount.account_subtype,
+                    loan_type: existingAccount.loan_type,
+                    interest_rate: existingAccount.interest_rate,
+                    monthly_payment: existingAccount.monthly_payment,
+                    due_date: existingAccount.due_date,
+                    term_months: existingAccount.term_months,
+                    investment_platform: existingAccount.investment_platform,
+                    portfolio_value: existingAccount.portfolio_value,
+                    location: existingAccount.location
+                };
+            }
+    
+            // No duplicate found, proceed to create a new account
             const result = await AccountModel.create(accountData);
+    
+            // Return the newly created account
             const addedAccount: IAccountDTO = {
-                _id: result?._id?.toString(),
-                user_id: result?.user_id?.toString(),
+                _id: result._id?.toString(),
+                user_id: result.user_id?.toString(),
                 account_name: result.account_name,
                 currency: result.currency,
                 description: result.description,
@@ -45,14 +82,14 @@ class AccountManagementRepository implements IAccountsManagementRepository {
                 investment_platform: result.investment_platform,
                 portfolio_value: result.portfolio_value,
                 location: result.location
-            }
-
+            };
+    
             return addedAccount;
+    
         } catch (error) {
             throw new Error((error as Error).message);
         }
     }
-
 
     /**
     * Updates an existing account in the database and returns the updated account in IAccountDTO format.

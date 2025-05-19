@@ -60,4 +60,7 @@ export const ErrorMessages = {
     FAILED_TO_FETCH_REGISTRATION_COUNT: 'Failed to fetch the new registration count. Please try again later or contact support.',
     FAILED_TO_FETCH_HEALTH_STATUS: 'Failed to fetch the health status. Please try again later or contact support.',
     FAILED_TO_FETCH_SYSTEM_METRICS: 'Failed to fetch the system metrics. Please try again later or contact support.',
+
+    // Transaction Errors 
+    STATEMENT_FILE_NOT_FOUND: 'The request is missing the statement data required to extract the transaction Data.',
 } as const;

@@ -34,6 +34,7 @@ export const SuccessMessages = {
     // Transaction Success Messages
     TRANSACTION_CREATED: 'Transaction created successfully.',
     TRANSACTION_RETRIEVED: 'Transaction retrieved successfully.',
+    EXTRACTED_DATA: 'Transaction data extracted successfully',
 
     // Admin Success Messages
     FAQ_ADDED: 'FAQ added successfully.',
