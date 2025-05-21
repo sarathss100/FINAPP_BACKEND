@@ -9,12 +9,12 @@ const adminRepository = new AdminRepository();
 const adminService = new AdminService(adminRepository);
 const adminController: IAdminController = new AdminController(adminService);
 
-router.get('/all-users', adminController.getAllUsers.bind(adminController));
-router.post('/toggle-user-status', adminController.toggleUserStatus.bind(adminController));
-router.post('/add-faq', adminController.addFaq.bind(adminController));
-router.get('/faq', adminController.getAllFaqs.bind(adminController));
-router.get('/new-registration-count', adminController.getNewRegistrationCount.bind(adminController));
+router.get('/users', adminController.getAllUsers.bind(adminController));
+router.post('/users/status', adminController.toggleUserStatus.bind(adminController));
+router.post('/faqs', adminController.addFaq.bind(adminController));
+router.get('/faqs', adminController.getAllFaqs.bind(adminController));
+router.get('/analytics/registrations', adminController.getNewRegistrationCount.bind(adminController));
 router.get('/health', adminController.getHealthStatus.bind(adminController));
-router.get('/system-metrics', adminController.getSystemMetrics.bind(adminController));
+router.get('/metrics', adminController.getSystemMetrics.bind(adminController));
 
 export default router;

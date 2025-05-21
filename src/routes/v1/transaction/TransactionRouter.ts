@@ -12,11 +12,16 @@ const transactionRepository = new TransactionRepository();
 const transactionService = new TransactionService(transactionRepository);
 const transactionController = new TransactionController(transactionService);
 
-router.post('/create', transactionController.createTransaction.bind(transactionController));
-router.get('/all', transactionController.getUserTransactions.bind(transactionController));
-router.get('/monthly-total-income', transactionController.getMonthlyTotalIncome.bind(transactionController));
-router.get('/monthly-total-expense', transactionController.getMonthlyTotalExpense.bind(transactionController));
-router.get('/category-wise-expense', transactionController.getCategoryWiseExpense.bind(transactionController));
-router.post('/statement-data', upload.single('file'), transactionController.extractTransactionData.bind(transactionController));
+// CRUD operations
+router.post('/', transactionController.createTransaction.bind(transactionController));
+router.get('/', transactionController.getUserTransactions.bind(transactionController));
+
+// Summary reports
+router.get('/summary/monthly/income', transactionController.getMonthlyTotalIncome.bind(transactionController));
+router.get('/summary/monthly/expense', transactionController.getMonthlyTotalExpense.bind(transactionController));
+router.get('/summary/category', transactionController.getCategoryWiseExpense.bind(transactionController));
+
+// Statement upload
+router.post('/statement', upload.single('file'), transactionController.extractTransactionData.bind(transactionController));
 
 export default router;

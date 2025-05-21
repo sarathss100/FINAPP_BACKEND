@@ -9,6 +9,10 @@ const goalRepository = new GoalManagementRepository();
 const goalService = new GoalService(goalRepository);
 const goalController: IGoalController = new GoalController(goalService);
 
+// Analysis & category
+router.get('/analyze', goalController.analyzeGoal.bind(goalController));
+router.get('/category', goalController.goalsByCategory.bind(goalController));
+
 // CRUD operations
 router.post('/', goalController.createGoal.bind(goalController));
 router.get('/', goalController.getUserGoals.bind(goalController));
@@ -19,10 +23,6 @@ router.delete('/:goalId', goalController.removeGoal.bind(goalController));
 // Summary routes 
 router.get('/summary/total', goalController.getTotalActiveGoalAmount.bind(goalController));
 router.get('/summary/longest-period', goalController.findLongestTimePeriod.bind(goalController));
-
-// Analysis & category
-router.get('/analyze', goalController.analyzeGoal.bind(goalController));
-router.get('/category', goalController.goalsByCategory.bind(goalController));
 
 // Contribution analysis 
 router.get('/contributions/daily', goalController.dailyContribution.bind(goalController));

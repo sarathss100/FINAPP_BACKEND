@@ -160,10 +160,9 @@ class GoalManagementRepository implements IGoalManagementRepository {
     */
     async getGoalById(goalId: string): Promise<IGoalDTO> {
         try {
+            console.log(goalId)
             // Query the database to retrieve the goal associated with the given `goalId`.
             const result = await GoalModel.findOne<IGoalDTO>({ _id: goalId });
-
-            console.log(`Goal Repository:`, result);
 
             // If no goal is found for the given `goalId`, throw an error.
             if (!result) {
