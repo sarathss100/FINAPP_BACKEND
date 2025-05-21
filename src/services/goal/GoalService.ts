@@ -169,7 +169,6 @@ class GoalService implements IGoalService {
         }
     }
 
-
     /**
     * Retrieves the longest target time period among incomplete goals associated with the authenticated user.
     * 

@@ -163,6 +163,8 @@ class GoalManagementRepository implements IGoalManagementRepository {
             // Query the database to retrieve the goal associated with the given `goalId`.
             const result = await GoalModel.findOne<IGoalDTO>({ _id: goalId });
 
+            console.log(`Goal Repository:`, result);
+
             // If no goal is found for the given `goalId`, throw an error.
             if (!result) {
                 throw new Error('No goal found for the specified ID');

@@ -70,8 +70,9 @@ class AccountsController implements IAccountsController {
                 throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
             }
 
-            const { accountId, accountData } = request.body;
-            if (!accountId || typeof accountId !== 'string') {
+            const { accountId } = request.params;
+            const { accountData } = request.body;
+            if (!accountId) {
                 throw new ValidationError(ErrorMessages.ACCOUNT_ID_NOT_FOUND, StatusCodes.BAD_REQUEST);
             } 
 
@@ -114,7 +115,7 @@ class AccountsController implements IAccountsController {
                 throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
             }
 
-            const { accountId } = request.query;
+            const { accountId } = request.params;
             if (!accountId || typeof accountId !== 'string') {
                 throw new ValidationError(ErrorMessages.ACCOUNT_ID_NOT_FOUND, StatusCodes.BAD_REQUEST);
             } 

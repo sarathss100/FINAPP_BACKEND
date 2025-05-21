@@ -9,17 +9,26 @@ const goalRepository = new GoalManagementRepository();
 const goalService = new GoalService(goalRepository);
 const goalController: IGoalController = new GoalController(goalService);
 
-router.post('/create', goalController.createGoal.bind(goalController));
-router.post('/update', goalController.updateGoal.bind(goalController));
-router.delete('/delete', goalController.removeGoal.bind(goalController));
-router.get('/details', goalController.getUserGoals.bind(goalController));
-router.get('/total-goal-amount', goalController.getTotalActiveGoalAmount.bind(goalController));
-router.get('/longest-time-period', goalController.findLongestTimePeriod.bind(goalController));
+// CRUD operations
+router.post('/', goalController.createGoal.bind(goalController));
+router.get('/', goalController.getUserGoals.bind(goalController));
+router.get('/:goalId', goalController.getGoalById.bind(goalController));
+router.put('/:goalId', goalController.updateGoal.bind(goalController));
+router.delete('/:goalId', goalController.removeGoal.bind(goalController));
+
+// Summary routes 
+router.get('/summary/total', goalController.getTotalActiveGoalAmount.bind(goalController));
+router.get('/summary/longest-period', goalController.findLongestTimePeriod.bind(goalController));
+
+// Analysis & category
 router.get('/analyze', goalController.analyzeGoal.bind(goalController));
-router.get('/by-category', goalController.goalsByCategory.bind(goalController));
-router.get('/daily-contribution', goalController.dailyContribution.bind(goalController));
-router.get('/monthly-contribution', goalController.monthlyContribution.bind(goalController));
-router.get('/goal-detail', goalController.getGoalById.bind(goalController));
-router.post('/update-transaction', goalController.updateTransaction.bind(goalController));
+router.get('/category', goalController.goalsByCategory.bind(goalController));
+
+// Contribution analysis 
+router.get('/contributions/daily', goalController.dailyContribution.bind(goalController));
+router.get('/contributions/monthly', goalController.monthlyContribution.bind(goalController));
+
+// Transaction management 
+router.post('/:goalId/transactions', goalController.updateTransaction.bind(goalController));
 
 export default router;

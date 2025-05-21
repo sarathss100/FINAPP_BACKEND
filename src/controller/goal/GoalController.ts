@@ -61,7 +61,7 @@ class GoalController implements IGoalController {
                 throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
             }
 
-            const { goalId } = request.body;
+            const { goalId } = request.params;
             if (!goalId || typeof goalId !== 'string') {
                 throw new ValidationError(ErrorMessages.GOAL_ID_NOT_FOUND, StatusCodes.BAD_REQUEST);
             } 
@@ -105,7 +105,7 @@ class GoalController implements IGoalController {
                 throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
             }
 
-            const { goalId } = request.query;
+            const { goalId } = request.params;
             if (!goalId || typeof goalId !== 'string') {
                 throw new ValidationError(ErrorMessages.GOAL_ID_NOT_FOUND, StatusCodes.BAD_REQUEST);
             } 
@@ -273,7 +273,7 @@ class GoalController implements IGoalController {
                 throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
             }
 
-            const { goalId } = request.query;
+            const { goalId } = request.params;
             
             if (!goalId || typeof goalId !== 'string') {
                 throw new ValidationError(ErrorMessages.GOAL_ID_NOT_FOUND, StatusCodes.BAD_REQUEST);

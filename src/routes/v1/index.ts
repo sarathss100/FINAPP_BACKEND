@@ -3,23 +3,25 @@ import authRoutes from './auth/AuthRouter';
 import userRoutes from './user/UserRouter';
 import adminRoutes from './admin/AdminRouter';
 import publicRoutes from './public/PublicRouter';
-import webHookRoutes from './onemoney/webhook.routes';
 import goalRoutes from './goal/GoalRouter';
 import transactionRoutes from './transaction/TransactionRouter';
 import accountsRoutes from './accounts/AccountsRouter';
-import router from './onemoney/api.routes';
+
 import { authorizeRoles } from 'middleware/authMiddleware'; 
 import { UserRole } from 'types/auth/roles';
-const v1Router = Router();
+const apiV1Router = Router();
 
-v1Router.use('/public', publicRoutes);
-v1Router.use('/onemoney', webHookRoutes);
-v1Router.use('/api/onemoney', router);
-v1Router.use('/auth', authRoutes);
-v1Router.use('/user', authorizeRoles(UserRole.USER, UserRole.ADMIN), userRoutes);
-v1Router.use('/admin', authorizeRoles(UserRole.ADMIN), adminRoutes);
-v1Router.use('/goal', authorizeRoles(UserRole.USER), goalRoutes);
-v1Router.use('/transaction', authorizeRoles(UserRole.USER), transactionRoutes);
-v1Router.use('/accounts', authorizeRoles(UserRole.USER), accountsRoutes);
+// Public routes
+apiV1Router.use('/public', publicRoutes);
+apiV1Router.use('/auth', authRoutes);
 
-export default v1Router;
+// Protected user routes 
+apiV1Router.use('/user', authorizeRoles(UserRole.USER, UserRole.ADMIN), userRoutes);
+apiV1Router.use('/goal', authorizeRoles(UserRole.USER), goalRoutes);
+apiV1Router.use('/transaction', authorizeRoles(UserRole.USER), transactionRoutes);
+apiV1Router.use('/accounts', authorizeRoles(UserRole.USER), accountsRoutes);
+
+// Admin-only routes
+apiV1Router.use('/admin', authorizeRoles(UserRole.ADMIN), adminRoutes);
+
+export default apiV1Router;
