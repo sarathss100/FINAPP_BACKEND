@@ -10,6 +10,7 @@ import * as XLSX from 'xlsx';
 import { extractTransactionTable } from 'utils/transaction/extractTransactionTable';
 import { normalizeTransactionObject } from 'utils/transaction/normalizeTransaction';
 import crypto from 'crypto';
+import { classifyTransaction } from 'utils/transaction/classifyTransaction';
 
 /**
  * Service class for managing transaction, including creating and retrieving transactions.
@@ -158,10 +159,14 @@ class TransactionService implements ITransactionService {
             const description = data.description || '';
             const transactionHash = this.generateHash(normalizedDate, description, data.amount);
             
+            const { category, type } = classifyTransaction(description);
+
             return {
                 ...data,
                 user_id: userId,
-                transactionHash
+                transactionHash,
+                category,
+                type
             };
         });
         
@@ -171,7 +176,7 @@ class TransactionService implements ITransactionService {
         // Find all existing transactions in a single query
         const existingTransactions = await this._transactionRepository.getExistingTransactions(allHashes) || [];
         
-        // Create a Set of existing hashes for O(1) lookup
+        // Create a Set of existing hashes
         const existingHashSet = new Set(existingTransactions.map(t => t.transactionHash));
         
         // Add existing transactions to results
@@ -181,7 +186,7 @@ class TransactionService implements ITransactionService {
         }
         
         // Filter out only new transactions that don't exist in the database
-        const newTransactions = transactionsWithHash.filter(t => !existingHashSet.has(t.transactionHash));
+         const newTransactions = transactionsWithHash.filter(t => !existingHashSet.has(t.transactionHash));
         
         if (newTransactions.length > 0) {
             // Bulk create all new transactions at once if there are any
@@ -191,7 +196,6 @@ class TransactionService implements ITransactionService {
         
         return results;
     }
-
 
     /**
      * Retrieves all transactions associated with the authenticated user.
