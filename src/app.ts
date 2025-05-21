@@ -7,7 +7,7 @@ import cors from 'cors';
 import corsOptions from 'utils/middleware/corsOptions';
 // import rateLimiter from 'utils/middleware/rateLimiter';
 import helmet from 'helmet';
-import apiRouter from 'routes/v1/onemoney/api.routes';
+// import apiRouter from 'routes/v1/onemoney/api.routes';
 
 const app = express();
 
@@ -19,7 +19,7 @@ app.use(loggingMiddleware);
 app.use(cors(corsOptions));
 app.use(helmet());
 // app.use(rateLimiter);
-app.use('/api/onemoney', apiRouter);
+// app.use('/api/onemoney', apiRouter);
 app.use('/api', router);
 
 // Server Health Check

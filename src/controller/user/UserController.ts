@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+ import { Request, Response } from 'express';
 import IUserService from 'services/user/interfaces/IUserService';
 import IUserController from './interfaces/IUserController';
 import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
@@ -87,7 +87,6 @@ class UserController implements IUserController {
     async toggleTwoFactorAuthentication(request: Request, response: Response): Promise<void> {
         try {
             const { accessToken } = request.cookies;
-
             if (!accessToken) {
                 throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
             }
