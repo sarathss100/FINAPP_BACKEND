@@ -9,7 +9,7 @@ const notificationDTOSchema = z.object({
     reminder_frequency: z.string(),
     next_reminder_date: z.string(),
     priority_level: z.string(),
-    target_Date: z.string(),
+    target_date: z.string(),
     createdAt: z.string().optional(),
     updatedAt: z.string().optional(),
 });

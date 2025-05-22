@@ -13,6 +13,7 @@
   "author": "Sarath S S",
   "license": "ISC",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@types/uuid": "^10.0.0",
     "axios": "^1.8.4",
     "bcrypt": "^5.1.1",

@@ -12,11 +12,11 @@ class NotificationManagementRepository implements INotificatonManagementReposito
                 isSeen: response.isSeen,
                 is_completed: response.is_completed,
                 reminder_frequency: response.reminder_frequency.toString(),
-                next_reminder_date: response.next_reminder_date.toString(),
+                next_reminder_date: response?.next_reminder_date?.toString() || '',
                 priority_level: response.priority_level,
-                target_Date: response.target_Date.toString(),
-                createdAt: response.createdAt?.toString(),
-                updatedAt: response.updatedAt?.toString(),
+                target_date: response?.target_date?.toString() || '',
+                createdAt: response?.createdAt?.toString(),
+                updatedAt: response?.updatedAt?.toString(),
             };
             return createdNotification;
         } catch (error) {

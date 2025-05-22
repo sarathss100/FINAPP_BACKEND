@@ -108,7 +108,15 @@ interface INotification extends Document {
     message: string;
     type: NotificationType;
     severity: SeverityLevel;
+    isSeen: boolean; 
+    is_completed: boolean;
+    reminder_frequency: 'Daily' | 'Weekly' | 'Monthly' | 'None';
+    next_reminder_date?: Date;
+    target_date: Date;
 
+    priority_level: 'Low' | 'Medium' | 'High';
+
+    
     bill_ref?: IBillReference;
     budget_ref?: IBudgetReference;
     goal_ref?: IGoalReference;
@@ -121,8 +129,8 @@ interface INotification extends Document {
     sent_at?: Date;
     metadata?: Record<string, unknown>;
 
-    created_at?: Date;
-    updated_at?: Date;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export default INotification;

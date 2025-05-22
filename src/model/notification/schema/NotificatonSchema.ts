@@ -33,7 +33,7 @@ const NotificaitonSchema = new Schema<INotification>(
             enum: ['Low', 'Medium', 'High'],
             default: 'Medium'
         },
-        target_Date: {
+        target_date: {
             type: Date,
             required: true,
         }
