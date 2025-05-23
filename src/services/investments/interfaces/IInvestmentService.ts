@@ -1,6 +1,7 @@
+import IStock from './IStock';
 
 interface IInvestmentService {
-    removeAccount(accountId: string): Promise<boolean>;
+    searchStocks(keyword: string): Promise<IStock[]>;
 }
 
 export default IInvestmentService;

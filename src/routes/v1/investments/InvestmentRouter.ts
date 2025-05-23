@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import InvestmentManagementRepository from 'repositories/investments/InvestmentManagementRepository';
-import InvestmentService from 'services/investments/AccountService';
+import InvestmentService from 'services/investments/InvestmentService';
 import InvestmentController from 'controller/investments/InvestmentController';
 import IInvestmentController from 'controller/investments/interfaces/IInvestmentController';
 
@@ -9,7 +9,7 @@ const investmentRepository = new InvestmentManagementRepository();
 const investmentService = new InvestmentService(investmentRepository);
 const investmentController: IInvestmentController = new InvestmentController(investmentService);
 
-router.delete('/:accountId', investmentController.removeAccount.bind(investmentController));
+router.get('/stock', investmentController.searchStocks.bind(investmentController));
 
 export default router;
 

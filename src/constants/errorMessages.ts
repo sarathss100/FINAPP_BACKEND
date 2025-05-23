@@ -63,4 +63,7 @@ export const ErrorMessages = {
 
     // Transaction Errors 
     STATEMENT_FILE_NOT_FOUND: 'The request is missing the statement data required to extract the transaction Data.',
+
+    // Investment Errors 
+    MISSING_QUERY_PARAMETER: 'Missing query parameter. Please provide a valid keyword to search for stocks.',
 } as const;

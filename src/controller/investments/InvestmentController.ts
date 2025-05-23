@@ -2,7 +2,7 @@ import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
 import { ErrorMessages } from 'constants/errorMessages';
 import { StatusCodes } from 'constants/statusCodes';
 import { Request, Response } from 'express';
-import { AppError, AuthenticationError, ServerError, ValidationError } from 'error/AppError';
+import { AppError, ValidationError } from 'error/AppError';
 import { SuccessMessages } from 'constants/successMessages';
 import IInvestmentService from 'services/investments/interfaces/IInvestmentService';
 import IInvestmentController from './interfaces/IInvestmentController';
@@ -14,25 +14,17 @@ class InvestmentController implements IInvestmentController {
         this._investmentService = investmentService;
     }
 
-    async removeAccount(request: Request, response: Response): Promise<void> {
+    async searchStocks(request: Request, response: Response): Promise<void> {
         try {
-            const { accessToken } = request.cookies;
-            if (!accessToken) {
-                throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
+            const { keyword } = request.query;
+            if (!keyword) {
+                throw new ValidationError(ErrorMessages.MISSING_QUERY_PARAMETER, StatusCodes.BAD_REQUEST);
             }
 
-            const { accountId } = request.params;
-            if (!accountId || typeof accountId !== 'string') {
-                throw new ValidationError(ErrorMessages.ACCOUNT_ID_NOT_FOUND, StatusCodes.BAD_REQUEST);
-            } 
+            // Call the service layer to fetch the stocks based on the keyword 
+            const stocks = await this._investmentService.searchStocks(keyword as string);
 
-            // Call the service layer to delete the account
-            const isRemoved = await this._investmentService.removeAccount(accountId);
-            if (!isRemoved) {
-                throw new ServerError(ErrorMessages.FAILED_TO_DELETE_ACCOUNT);
-            }
-
-            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.ACCOUNT_REMOVED);
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { stocks });
         } catch (error) {
             if (error instanceof AppError) {
                 sendErrorResponse(response, error.statusCode, error.message);
