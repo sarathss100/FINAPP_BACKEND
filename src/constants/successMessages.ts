@@ -48,4 +48,8 @@ export const SuccessMessages = {
     ACCOUNT_TOTAL_BANK_BALANCE: 'Account total balance balance retrieved successfully',
     ACCOUNT_TOTAL_DEBT: 'Account total debt retrieved successfully',
     ACCOUNT_TOTAL_INVESTMENT: 'Account total investment retrieved successfully',
+
+    // MutualFund Success Messages
+    NAV_SYNCHED: 'NAV Synched Successfully',
+    MUTUAL_FUND_SEARCH_SUCCESS: 'Mutual Funds found successfully.',
 } as const;

@@ -1,7 +1,8 @@
-
+import { IMutualFundDTO } from 'dtos/mutualfunds/MutualFundDTO';
 
 interface IMutualFundRepository {
-    createTransaction(): Promise<void>;
+    syncBulkMutualFund(dataArray: IMutualFundDTO[]): Promise<boolean>;
+    searchMutualFunds(query: string): Promise<IMutualFundDTO[]>;
 }
 
 export default IMutualFundRepository;

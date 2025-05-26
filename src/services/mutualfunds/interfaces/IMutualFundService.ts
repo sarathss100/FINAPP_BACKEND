@@ -1,6 +1,8 @@
+import { IMutualFundDTO } from 'dtos/mutualfunds/MutualFundDTO';
 
 interface IMutualFundService {
-    addAccount(accessToken: string): Promise<void>;
+    syncNavData(): Promise<boolean>;
+    searchMutualFunds(query: string): Promise<IMutualFundDTO[]>;
 }
 
 export default IMutualFundService;

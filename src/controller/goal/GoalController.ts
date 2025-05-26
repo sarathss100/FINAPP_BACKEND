@@ -268,7 +268,6 @@ class GoalController implements IGoalController {
 
     async getGoalById(request: Request, response: Response): Promise<void> {
         try {
-            console.log(`Request comes here`);
             const { accessToken } = request.cookies;
             if (!accessToken) {
                 throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);

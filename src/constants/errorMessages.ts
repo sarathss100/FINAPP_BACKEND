@@ -66,4 +66,9 @@ export const ErrorMessages = {
 
     // Investment Errors 
     MISSING_QUERY_PARAMETER: 'Missing query parameter. Please provide a valid keyword to search for stocks.',
+
+    // MutualFund Errors 
+    NAV_SYNC_FAILED: 'Failed to synchronize Mutual Fund NAV data to the database.',
+    FAILED_TO_FETCH_NAV_DATA: 'Failed to fetch the Mutual Fund NAV data from the external source',
+    MUTUAL_FUND_SEARCH_INVALID_QUERY: 'Please enter a valid search term for mutual fund lookup.',
 } as const;

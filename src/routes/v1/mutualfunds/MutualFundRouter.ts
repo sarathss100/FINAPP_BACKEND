@@ -9,6 +9,7 @@ const mutualFundService = new MutualFundService(mutualFundRepository);
 const mutualFundController = new MutualFundController(mutualFundService);
 
 // CRUD operations
-router.post('/', mutualFundController.createTransaction.bind(mutualFundController));
+router.get('/nav', mutualFundController.syncNavData.bind(mutualFundController));
+router.get('/search', mutualFundController.searchMutualFunds.bind(mutualFundController));
 
 export default router;

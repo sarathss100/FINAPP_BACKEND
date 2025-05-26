@@ -6,18 +6,12 @@ const MutualFundSchema = new Schema({
         required: true,
         unique: true,
     },
-    isin_div_payout_or_growth: {
-        type: String,
-    },
-    isin_div_reinvestment: {
-        type: String,
-    },
     scheme_name: {
         type: String,
         required: true,
     },
     net_asset_value: {
-        type: String,
+        type: Number,
         required: true,
     },
     date: {
@@ -31,3 +25,4 @@ const MutualFundSchema = new Schema({
 );
 
 export default MutualFundSchema;
+

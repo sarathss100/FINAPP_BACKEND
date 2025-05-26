@@ -8,6 +8,7 @@ import corsOptions from 'utils/middleware/corsOptions';
 // import rateLimiter from 'utils/middleware/rateLimiter';
 import helmet from 'helmet';
 // import apiRouter from 'routes/v1/onemoney/api.routes';
+import './cron/scheduler';
 
 const app = express();
 

@@ -1,93 +1,94 @@
 import { Request, Response } from 'express';
-import { AppError, AuthenticationError, ValidationError } from 'error/AppError';
+import { AppError, ServerError, ValidationError } from 'error/AppError';
 import { ErrorMessages } from 'constants/errorMessages';
 import { StatusCodes } from 'constants/statusCodes';
-import transactionDTOSchema from 'dtos/transaction/TransactionDto';
 import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
 import { SuccessMessages } from 'constants/successMessages';
 import IMutualFundController from './interfaces/IMutualFundController';
 import IMutualFundService from 'services/mutualfunds/interfaces/IMutualFundService';
 
+/**
+ * Controller class responsible for handling Mutual Fund-related HTTP requests.
+ */
 class MutualFundController implements IMutualFundController {
     private readonly _mutualFundService: IMutualFundService;
 
+    /**
+     * Initializes a new instance of the MutualFundController.
+     * @param mutualFundService - Service implementation for handling business logic.
+     */
     constructor(mutualFundService: IMutualFundService) {
         this._mutualFundService = mutualFundService;
     }
 
-    
-async createTransaction(request: Request, response: Response): Promise<void> {
-    try {
-        const { accessToken } = request.cookies;
-        if (!accessToken) {
-            throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
-        }
+    /**
+     * Synchronizes Mutual Fund Net Asset Value (NAV) data from an external source.
+     * Fetches the latest NAV values and updates the database.
+     *
+     * @param request - Express Request object.
+     * @param response - Express Response object.
+     * @returns A promise that resolves to void.
+     */
+    async syncNavData(request: Request, response: Response): Promise<void> {
+        try {
+            // Delegate NAV synchronization task to the service layer
+            const isNavDataSynched = await this._mutualFundService.syncNavData();
 
-        // Check if the request body is an array or a single object
-        const isArray = Array.isArray(request.body);
-        
-        if (isArray) {
-            // Handle array of transactions
-            const validatedTransactions = [];
-            const validationErrors = [];
-            
-            // Validate each transaction in the array
-            for (let i = 0; i < request.body.length; i++) {
-                const parsedTransaction = transactionDTOSchema.safeParse(request.body[i]);
-                
-                if (parsedTransaction.success) {
-                    validatedTransactions.push(parsedTransaction.data);
-                } else {
-                    // Collect validation errors for each failed transaction
-                    const errors = parsedTransaction.error.errors.map(err => ({
-                        transactionIndex: i,
-                        field: err.path.join('.'),
-                        message: err.message
-                    }));
-                    validationErrors.push(...errors);
-                }
+            // If synchronization fails at the service level, throw an error
+            if (!isNavDataSynched) {
+                throw new ServerError(ErrorMessages.NAV_SYNC_FAILED);
             }
-            
-            // If there are validation errors, return them
-            if (validationErrors.length > 0) {
-                console.error(validationErrors);
-                throw new ValidationError(ErrorMessages.INVALID_INPUT, StatusCodes.BAD_REQUEST);
+
+            // Send success response with result status
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.NAV_SYNCHED, {
+                isNavDataSynched,
+            });
+        } catch (error) {
+            // Handle known application errors with custom status and message
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                // Handle unexpected generic errors
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
             }
-            
-            // Call the service layer to create multiple transactions
-            // const createdTransactions = await this._mutualFundService.createTransaction(accessToken, validatedTransactions);
-            
-            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.TRANSACTION_CREATED);
-        } else {
-            // Handle single transaction (original logic)
-            const parsedBody = transactionDTOSchema.safeParse(request.body);
-            
-            if (!parsedBody.success) {
-                // If validation fails, extract the error details
-                const errors = parsedBody.error.errors.map(err => ({
-                    field: err.path.join('.'),
-                    message: err.message
-                }));
-                console.error(errors);
-                throw new ValidationError(ErrorMessages.INVALID_INPUT, StatusCodes.BAD_REQUEST);
-            }
-            
-            // Extract the validated data
-            // const transactionData = parsedBody.data;
-            
-            // Call the service layer to create the transaction
-            // const createdTransaction = await this._transactionService.createTransaction(accessToken, transactionData);
-            
-            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.TRANSACTION_CREATED);
-        }
-    } catch (error) {
-        if (error instanceof AppError) {
-            sendErrorResponse(response, error.statusCode, error.message);
-        } else {
-            sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
         }
     }
-}
+
+    /**
+     * Handles incoming requests to search for mutual funds by scheme name or code.
+     *
+     * Validates the query parameter and delegates the search operation to the service layer.
+     * Returns a list of matching mutual fund records to the client.
+     *
+     * @param {Request} request - Express Request object containing the search query.
+     * @param {Response} response - Express Response object used to send the response.
+     * @returns {Promise<void>} - A promise that resolves once the response is sent.
+     */
+    async searchMutualFunds(request: Request, response: Response): Promise<void> {
+        try {
+            const { keyword } = request.query;
+
+            if (!keyword || typeof keyword !== 'string') {
+                throw new ValidationError(ErrorMessages.MUTUAL_FUND_SEARCH_INVALID_QUERY, StatusCodes.BAD_REQUEST);
+            } 
+
+            // Delegate search task to the service layer
+            const mutualFunds = await this._mutualFundService.searchMutualFunds(keyword);
+
+            // Send success response with search results
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.MUTUAL_FUND_SEARCH_SUCCESS, {
+                mutualFunds,
+            });
+        } catch (error) {
+            // Handle known application errors with custom status and message
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                // Handle unexpected generic errors
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
 }
 
 export default MutualFundController;

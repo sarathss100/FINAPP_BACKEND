@@ -15,43 +15,6 @@ class TransactionController implements ITransactionController {
         this._transactionService = transactionService;
     }
 
-    // async createTransaction(request: Request, response: Response): Promise<void> {
-    //     try {
-    //         const { accessToken } = request.cookies;
-    //         if (!accessToken) {
-    //             throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
-    //         }
-
-    //         // Validate the request body using the Zod schema
-    //         const parsedBody = transactionDTOSchema.safeParse(request.body);
-    //         console.log(parsedBody);
-
-    //         if (!parsedBody.success) {
-    //             // If validation fails, extract the error details
-    //             const errors = parsedBody.error.errors.map(err => ({
-    //                 field: err.path.join('.'),
-    //                 message: err.message
-    //             }));
-    //             console.error(errors);
-    //             throw new ValidationError(ErrorMessages.INVALID_INPUT, StatusCodes.BAD_REQUEST);
-    //         }
-
-    //         // Extract the validated data
-    //         const transactionData = parsedBody.data;
-            
-    //         // Call the service layer to create the transaction
-    //         const createdTransaction = await this._transactionService.createTransaction(accessToken, transactionData);
-
-    //         sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.TRANSACTION_CREATED, { createdTransaction } );
-    //     } catch (error) {
-    //         if (error instanceof AppError) {
-    //             sendErrorResponse(response, error.statusCode, error.message);
-    //         } else {
-    //             sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-    //         }
-    //     }
-    // }
-
     
 async createTransaction(request: Request, response: Response): Promise<void> {
     try {
