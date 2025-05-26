@@ -33,7 +33,7 @@ class InvestmentService implements IInvestmentService {
     async searchStocks(keyword: string): Promise<IStock[]> {
         try {
             const apiKey = process.env.ALPHA_VANTAGE_API_KEY;
-            const url = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords= ${keyword}&apikey=${apiKey}`;
+            const url = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${keyword}&apikey=${apiKey}`;
             const response = await axios.get(url);
             
             if (response.status !== 200) { 

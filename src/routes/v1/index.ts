@@ -7,6 +7,7 @@ import goalRoutes from './goal/GoalRouter';
 import transactionRoutes from './transaction/TransactionRouter';
 import accountsRoutes from './accounts/AccountsRouter';
 import investmentRoutes from './investments/InvestmentRouter';
+import mutualFundRoutes from './mutualfunds/MutualFundRouter';
 
 import { authorizeRoles } from 'middleware/authMiddleware'; 
 import { UserRole } from 'types/auth/roles';
@@ -22,6 +23,7 @@ apiV1Router.use('/goal', authorizeRoles(UserRole.USER), goalRoutes);
 apiV1Router.use('/transaction', authorizeRoles(UserRole.USER), transactionRoutes);
 apiV1Router.use('/accounts', authorizeRoles(UserRole.USER), accountsRoutes);
 apiV1Router.use('/investment', authorizeRoles(UserRole.USER), investmentRoutes);
+apiV1Router.use('/mutualfund', authorizeRoles(UserRole.USER, UserRole.ADMIN), mutualFundRoutes);
 
 // Admin-only routes
 apiV1Router.use('/admin', authorizeRoles(UserRole.ADMIN), adminRoutes);
