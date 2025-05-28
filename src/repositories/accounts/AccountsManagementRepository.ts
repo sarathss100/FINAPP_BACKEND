@@ -85,7 +85,6 @@ class AccountManagementRepository implements IAccountsManagementRepository {
             };
     
             return addedAccount;
-    
         } catch (error) {
             throw new Error((error as Error).message);
         }

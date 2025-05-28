@@ -1,29 +1,50 @@
-import { InvestmentModel } from 'model/investments/model/InvestmentModel';
+import { StockModel, MutualFundModel, BondModel, BusinessModel, ParkingFundModel, EPFOModel, FixedDepositModel, GoldModel, PropertyModel } from 'model/investments/model/InvestmentModel';
 import IInvestmentManagementRepository from './interfaces/IInvestmentManagementRepository';
+import { InvestmentDTO } from 'dtos/investments/investmentDTO';
+import mongoose from 'mongoose';
+
+const modelMap = {
+    STOCK: StockModel,
+    MUTUAL_FUND: MutualFundModel,
+    BOND: BondModel,
+    PROPERTY: PropertyModel,
+    BUSINESS: BusinessModel,
+    FIXED_DEPOSIT: FixedDepositModel,
+    EPFO: EPFOModel,
+    GOLD: GoldModel,
+    PARKING_FUND: ParkingFundModel,
+};
 
 class InvestmentManagementRepository implements IInvestmentManagementRepository {
 
     /**
-    * Removes an existing account from the database.
-    * 
-    * @param {string} accountId - The unique identifier of the account to be removed.
-    * @returns {Promise<boolean>} - A promise resolving to `true` if the account was successfully removed.
-    * @throws {Error} - Throws an error if the database operation fails or the account is not found.
-    */
-    async removeAccount(accountId: string): Promise<boolean> {
+     * Creates a new investment in the database.
+     *
+     * @param {InvestmentDTO} investmentData - The validated investment data from the frontend.
+     * @param {string} userId - The ID of the user creating the investment.
+     * @returns {Promise<IInvestmentDocument>} - A promise resolving to the created investment document.
+     * @throws {Error} - Throws an error if the database operation fails.
+     */
+    async createInvestment(investmentData: InvestmentDTO, userId: string): Promise<InvestmentDTO> {
         try {
-            // Perform the deletion operation
-            const result = await InvestmentModel.findOneAndDelete({ _id: accountId }, { new: true });
+            const mongooseUserId = new mongoose.Types.ObjectId(userId);
+            const related_account = new mongoose.Types.ObjectId(investmentData.related_account);
 
-            // Handle case where no account is found
-            if (!result) {
-                throw new Error('Account not found');
-            }
+            const Model = modelMap[investmentData.type];
+            if (!Model) throw new Error('Invalid investment type');
 
-            return true;
+            const investmentDoc = await Model.create({
+                ...investmentData,
+                userId: mongooseUserId,
+                related_account 
+            });
+
+            const plainInvestment = investmentDoc.toObject()
+
+            return plainInvestment as unknown as InvestmentDTO;
         } catch (error) {
-            console.error('Error updating Account:', error);
-            throw new Error((error as Error).message);
+            console.error('Error creating investment:', error);
+            throw new Error(`Failed to create investment: ${(error as Error).message}`);
         }
     }
 }

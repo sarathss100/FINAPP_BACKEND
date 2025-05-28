@@ -1,6 +1,7 @@
+import { InvestmentDTO } from 'dtos/investments/investmentDTO';
 
 interface IInvestmentManagementRepository {
-    removeAccount(accountId: string): Promise<boolean>;
+    createInvestment(investmentData: InvestmentDTO, userId: string): Promise<InvestmentDTO>;
 }
 
 export default IInvestmentManagementRepository;

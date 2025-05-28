@@ -2,23 +2,24 @@ import mongoose, { Document } from 'mongoose';
 
 // Investment Types
 export enum InvestmentType {
-    STOCK = 'Stock',
-    MUTUAL_FUND = 'Mutual Fund',
-    BOND = 'Bond',
-    PROPERTY = 'Property',
-    BUSINESS = 'Business',
-    FIXED_DEPOSIT = 'Fixed Deposit',
+    STOCK = 'STOCK',
+    MUTUAL_FUND = 'MUTUAL_FUND',
+    BOND = 'BOND',
+    PROPERTY = 'PROPERTY',
+    BUSINESS = 'BUSINESS',
+    FIXED_DEPOSIT = 'FIXED_DEPOSIT',
     EPFO = 'EPFO',
-    GOLD = 'Gold',
-    PARKING_FUND = 'Parking Fund',
-    OTHER  = 'Other',
+    GOLD = 'GOLD',
+    PARKING_FUND = 'PARKING_FUND',
 }
+
 
 // Base Interface 
 interface IBaseInvestment {
     name: string;
     icon?: string;
     amount: number;
+    related_account?: mongoose.Types.ObjectId; 
     currency?: string;
     notes?: string;
     createdAt: Date;

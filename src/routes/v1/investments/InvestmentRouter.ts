@@ -9,6 +9,10 @@ const investmentRepository = new InvestmentManagementRepository();
 const investmentService = new InvestmentService(investmentRepository);
 const investmentController: IInvestmentController = new InvestmentController(investmentService);
 
+// CRUD 
+router.post('/', investmentController.createInvestment.bind(investmentController));
+
+// Search
 router.get('/stock', investmentController.searchStocks.bind(investmentController));
 
 export default router;

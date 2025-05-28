@@ -1,11 +1,12 @@
-// import { decodeAndValidateToken } from 'utils/auth/tokenUtils';
-// import { AuthenticationError } from 'error/AppError';
-// import { ErrorMessages } from 'constants/errorMessages';
-// import { StatusCodes } from 'constants/statusCodes';
 import IInvestmentService from './interfaces/IInvestmentService';
 import InvestmentManagementRepository from 'repositories/investments/InvestmentManagementRepository';
 import axios from 'axios';
 import IStock from './interfaces/IStock';
+import { InvestmentDTO } from 'dtos/investments/investmentDTO';
+import { decodeAndValidateToken } from 'utils/auth/tokenUtils';
+import { AuthenticationError } from 'error/AppError';
+import { ErrorMessages } from 'constants/errorMessages';
+import { StatusCodes } from 'constants/statusCodes';
 
 /**
  * Service class for managing accounts, including creating, updating, deleting, and retrieving accounts.
@@ -47,18 +48,35 @@ class InvestmentService implements IInvestmentService {
             throw new Error((error as Error).message);
         }
     }
+
+    /**
+     * Creates a new investment for the authenticated user.
+     *
+     * @param {string} accessToken - The JWT access token used to authenticate the user.
+     * @param {InvestmentDTO} investmentData - The validated data required to create an investment.
+     * @returns {Promise<InvestmentDTO>} A promise that resolves with the created investment object.
+     * @throws {AuthenticationError} If the access token is invalid or missing user information.
+     * @throws {Error} If an unexpected error occurs during the investment creation process.
+     */
+    async createInvestment(accessToken: string, investmentData: InvestmentDTO): Promise<InvestmentDTO> {
+        try {
+            // Decode and validate the access token to extract the user ID
+            const userId = decodeAndValidateToken(accessToken);
+            if (!userId) {
+                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
+            }
+
+            // Delegate to the repository to create the investment for the user
+            const investment = await this._investmentRepository.createInvestment(investmentData, userId);
+
+            return investment;
+        } catch (error) {
+            // Log and rethrow the error for upstream handling
+            console.error('Error creating investment:', error);
+            throw new Error((error as Error).message);
+        }
+    }
 }
 
 export default InvestmentService;
 
-
-
-// export class StockRepository {
-//   private apiKey = process.env.ALPHA_VANTAGE_API_KEY as string;
-
-//   public async searchStocks(keyword: string): Promise<any[]> {
-//     const url = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords= ${keyword}&apikey=${this.apiKey}`;
-//     const response = await axios.get(url);
-//     return response.data.bestMatches || [];
-//   }
-// }
