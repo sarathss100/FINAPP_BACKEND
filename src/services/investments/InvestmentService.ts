@@ -7,6 +7,8 @@ import { decodeAndValidateToken } from 'utils/auth/tokenUtils';
 import { AuthenticationError } from 'error/AppError';
 import { ErrorMessages } from 'constants/errorMessages';
 import { StatusCodes } from 'constants/statusCodes';
+import { detectCurrencyFromExchange } from 'utils/investments/stockcurrencyconverter/regionRegex';
+import { getExchangeRate } from 'utils/investments/stockcurrencyconverter/currencyConverter';
 
 /**
  * Service class for managing accounts, including creating, updating, deleting, and retrieving accounts.
@@ -65,6 +67,20 @@ class InvestmentService implements IInvestmentService {
             if (!userId) {
                 throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
             }
+
+            if (investmentData.type === 'STOCK') {
+                if (investmentData.symbol) {
+                    const apikey = process.env.ALPHA_VANTAGE_API_KEY;
+                    const stockDetails = await axios.get(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${investmentData.symbol}&apikey=${apikey}`);
+                    const amount = Number(stockDetails.data['Global Quote']['05. price']) || 1;
+                    const currencyDetected = detectCurrencyFromExchange(investmentData.symbol.split('.')[1] || 'NASDAQ');
+                    const amountForOneShare = await getExchangeRate(currencyDetected, 'INR', amount);
+                    investmentData.currentPricePerShare = amountForOneShare;
+                }
+            } else if (investmentData.type === 'GOLD') {
+                const goldDetails = await axios.get(`https://api.gold-api.com/price/XAU`);
+                investmentData.currentPricePerGram = goldDetails.data['price'];
+            } 
 
             // Delegate to the repository to create the investment for the user
             const investment = await this._investmentRepository.createInvestment(investmentData, userId);

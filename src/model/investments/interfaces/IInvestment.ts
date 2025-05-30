@@ -76,12 +76,9 @@ export interface IBusiness extends IBaseInvestment {
 }
 
 export interface IFixedDeposit extends IBaseInvestment {
-    bank: string;
-    account_number: string;
-    deposit_number: string;
     maturity_date: Date;
-    interest_rate: number;
-    maturity_amount?: number;
+    interest_rate: string;
+    maturity_amount: string;
 }
 
 export interface IEPFO extends IBaseInvestment {
@@ -104,7 +101,6 @@ export interface IGold extends IBaseInvestment {
 
 export interface IParkingFund extends IBaseInvestment {
     fundType: string;
-    linkedAccountId: mongoose.Types.ObjectId;
 }
 
 // Union Type for Details

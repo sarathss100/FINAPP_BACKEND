@@ -76,11 +76,8 @@ export type IBusinessDTO = z.infer<typeof BusinessDTOSchema>;
 
 export const FixedDepositDTOSchema = BaseInvestmentDTOSchema.extend({
     type: z.literal('FIXED_DEPOSIT'), 
-    bank: z.string().min(1, 'Bank is required'),
-    account_number: z.string().min(1, 'Account number is required'),
-    deposit_number: z.string().min(1, 'Deposit number is required'),
-    maturity_date: z.coerce.date(),
-    interest_rate: z.number().positive('Interest rate must be greater than zero'),
+    maturity_date: z.string(),
+    interest_rate: z.string().optional(),
     maturity_amount: z.number().optional()
 }).passthrough();
 
@@ -103,7 +100,7 @@ export const GoldDTOSchema = BaseInvestmentDTOSchema.extend({
     goldForm: z.string().min(1, 'Gold form is required'),
     goldType: z.string().min(1, 'Gold type is required'),
     weight: z.number().positive('Weight must be greater than zero'),
-    purchaseDate: z.date().refine(date => !isNaN(date.getTime()), 'Invalid date'),
+    purchaseDate: z.string(),
     purchasePricePerGram: z.number().positive('Purchase price per gram must be greater than zero'),
     currentPricePerGram: z.number().optional()
 }).passthrough();
@@ -113,7 +110,6 @@ export type IGoldDTO = z.infer<typeof GoldDTOSchema>;
 export const ParkingFundDTOSchema = BaseInvestmentDTOSchema.extend({
     type: z.literal('PARKING_FUND'), 
     fundType: z.string().min(1, 'Fund type is required'),
-    linkedAccountId: z.string().min(1, 'Linked account ID is required')
 }).passthrough();
 
 export type IParkingFundDTO = z.infer<typeof ParkingFundDTOSchema>;

@@ -51,58 +51,58 @@ class TransactionRepository implements ITransactionRepository {
     }
 
     /**
- * Creates multiple new transaction histories in the database in a single operation.
- * 
- * This method takes an array of transaction objects, performs a bulk insert using `insertMany`,
- * and maps the results to the `ITransactionDTO` format. MongoDB ObjectIds are converted to strings
- * for consistency in the DTOs.
- * 
- * @param {ITransactionDTO[]} dataArray - An array of input data representing transactions to be created.
- * @returns {Promise<ITransactionDTO[]>} - A promise resolving to an array of created transactions in ITransactionDTO format.
- * @throws {Error} - Throws an error if the database operation fails or if invalid data is provided.
- */
-async createBulkTransactions(dataArray: ITransactionDTO[]): Promise<ITransactionDTO[]> {
-    try {
-        // Use insertMany for bulk insertion (more efficient than multiple create operations)
-        const results = await TransactionModel.insertMany(dataArray, { lean: true });
-        
-        // Map each result to the ITransactionDTO format
-        const createdTransactions: ITransactionDTO[] = results.map(result => ({
-            _id: result._id.toString(),
-            user_id: result?.user_id?.toString(),
-            account_id: result.account_id.toString(),
-            transaction_type: result.transaction_type as 'INCOME' | 'EXPENSE',
-            type: result.type,
-            category: result.category,
-            amount: result.amount,
-            credit_amount: result.credit_amount || 0,
-            debit_amount: result.debit_amount || 0,
-            closing_balance: result.closing_balance || 0,
-            currency: result.currency.toString() as 'INR',
-            date: result.date,
-            description: result.description,
-            tags: result.tags,
-            status: result.status,
-            transactionHash: result.transactionHash, // Include the hash in the returned data
-            related_account_id: result.related_account_id?.toString(),
-            linked_entities: result.linked_entities?.map((entity) => ({
-                entity_id: entity.entity_id?.toString(),
-                entity_type: entity.entity_type,
-                amount: entity.amount,
-                currency: entity?.currency?.toString() as 'INR',
-            })),
-            isDeleted: result.isDeleted || false,
-            deletedAt: result.deletedAt,
-            createdAt: result.createdAt,
-            updatedAt: result.updatedAt,
-        }));
-        
-        return createdTransactions;
-    } catch (error) {
-        console.error('Error in bulk transaction creation:', error);
-        throw new Error((error as Error).message);
+     * Creates multiple new transaction histories in the database in a single operation.
+     * 
+     * This method takes an array of transaction objects, performs a bulk insert using `insertMany`,
+     * and maps the results to the `ITransactionDTO` format. MongoDB ObjectIds are converted to strings
+     * for consistency in the DTOs.
+     * 
+     * @param {ITransactionDTO[]} dataArray - An array of input data representing transactions to be created.
+     * @returns {Promise<ITransactionDTO[]>} - A promise resolving to an array of created transactions in ITransactionDTO format.
+     * @throws {Error} - Throws an error if the database operation fails or if invalid data is provided.
+     */
+    async createBulkTransactions(dataArray: ITransactionDTO[]): Promise<ITransactionDTO[]> {
+        try {
+            // Use insertMany for bulk insertion (more efficient than multiple create operations)
+            const results = await TransactionModel.insertMany(dataArray, { lean: true });
+
+            // Map each result to the ITransactionDTO format
+            const createdTransactions: ITransactionDTO[] = results.map(result => ({
+                _id: result._id.toString(),
+                user_id: result?.user_id?.toString(),
+                account_id: result.account_id.toString(),
+                transaction_type: result.transaction_type as 'INCOME' | 'EXPENSE',
+                type: result.type,
+                category: result.category,
+                amount: result.amount,
+                credit_amount: result.credit_amount || 0,
+                debit_amount: result.debit_amount || 0,
+                closing_balance: result.closing_balance || 0,
+                currency: result.currency.toString() as 'INR',
+                date: result.date,
+                description: result.description,
+                tags: result.tags,
+                status: result.status,
+                transactionHash: result.transactionHash, // Include the hash in the returned data
+                related_account_id: result.related_account_id?.toString(),
+                linked_entities: result.linked_entities?.map((entity) => ({
+                    entity_id: entity.entity_id?.toString(),
+                    entity_type: entity.entity_type,
+                    amount: entity.amount,
+                    currency: entity?.currency?.toString() as 'INR',
+                })),
+                isDeleted: result.isDeleted || false,
+                deletedAt: result.deletedAt,
+                createdAt: result.createdAt,
+                updatedAt: result.updatedAt,
+            }));
+
+            return createdTransactions;
+        } catch (error) {
+            console.error('Error in bulk transaction creation:', error);
+            throw new Error((error as Error).message);
+        }
     }
-}
 
     /**
      * Retrieves all transactions associated with a specific user from the database.
