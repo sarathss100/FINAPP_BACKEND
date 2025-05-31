@@ -52,4 +52,11 @@ export const SuccessMessages = {
     // MutualFund Success Messages
     NAV_SYNCHED: 'NAV Synched Successfully',
     MUTUAL_FUND_SEARCH_SUCCESS: 'Mutual Funds found successfully.',
+
+    // Insurance Success Messages
+    INSURANCE_DELETED_SUCCESSFULLY: 'Insurance deleted successfully',
+    INSURANCE_COVERAGE_RETRIEVED: 'Insurance Coverage Retrieved Successfully',
+    INSURANCES_RETRIEVED: 'Insurances Retrieved Successfully',
+    NEXT_PAYMENT_DATE_RETRIEVED: 'Closest Next Payment Date Retrieved Successfully',
+    PAYMENT_STATUS_UPDATED: 'Insurance Payment Status Updated Successfully',
 } as const;

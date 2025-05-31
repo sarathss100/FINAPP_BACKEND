@@ -6,5 +6,6 @@ export interface IInsurance extends Document {
     coverage: number;
     premium: number;
     next_payment_date: Date;
+    payment_status: string;
     status: string;
 }

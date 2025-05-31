@@ -71,4 +71,8 @@ export const ErrorMessages = {
     NAV_SYNC_FAILED: 'Failed to synchronize Mutual Fund NAV data to the database.',
     FAILED_TO_FETCH_NAV_DATA: 'Failed to fetch the Mutual Fund NAV data from the external source',
     MUTUAL_FUND_SEARCH_INVALID_QUERY: 'Please enter a valid search term for mutual fund lookup.',
+
+    // Insurance Errors 
+    FAILED_TO_REMOVE_INSURANCE: 'Failed to remove the insurance record. Please try again later.',
 } as const;
+
