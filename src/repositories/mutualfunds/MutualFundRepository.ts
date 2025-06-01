@@ -4,7 +4,6 @@ import { MutualFundModel } from 'model/mutualfunds/model/MutualFundModel';
 
 class MutualFundRepository implements IMutualFundRepository {
     private static _instance: MutualFundRepository;
-
     public constructor() { }
     
     public static get instance(): MutualFundRepository {

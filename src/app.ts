@@ -9,8 +9,10 @@ import corsOptions from 'utils/middleware/corsOptions';
 import helmet from 'helmet';
 // import apiRouter from 'routes/v1/onemoney/api.routes';
 import './cron/scheduler';
+import expireJob from './cron/expireInsurances';
 
 const app = express();
+expireJob.start();
 
 // Middleware
 app.use(express.json());

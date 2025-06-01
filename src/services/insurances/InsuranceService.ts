@@ -11,6 +11,7 @@ import { InsuranceDTO } from 'dtos/insurances/insuranceDTO';
  * Handles business logic and authentication before delegating database operations to the repository.
  */
 class InsuranceService implements IInsuranceService {
+    private static _instance: InsuranceService;
     private _insuranceRepository: InsuranceManagementRepository;
 
     /**
@@ -20,6 +21,14 @@ class InsuranceService implements IInsuranceService {
      */
     constructor(insuranceRepository: InsuranceManagementRepository) {
         this._insuranceRepository = insuranceRepository;
+    }
+
+    public static get instance(): InsuranceService {
+        if (!InsuranceService._instance) {
+            const repo = InsuranceManagementRepository.instance;
+            InsuranceService._instance = new InsuranceService(repo);
+        }
+        return InsuranceService._instance;
     }
 
     /**
@@ -193,6 +202,24 @@ class InsuranceService implements IInsuranceService {
             const isPaymentStatusUpdated = await this._insuranceRepository.markPaymentAsPaid(insuranceId);
         
             return isPaymentStatusUpdated;
+        } catch (error) {
+            // Log and rethrow the error for upstream handling
+            console.error('Error updating insurance payment status:', error);
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+     * Marks expired insurance policies by delegating the operation to the repository.
+     * This typically involves updating policies whose next payment date has passed and are still active.
+     *
+     * @returns {Promise<void>} A promise that resolves when the expiration operation is complete.
+     * @throws {Error} If an unexpected error occurs during the update operation.
+     */
+    async markExpired(): Promise<void> {
+        try {
+            // Delegate the update operation to the repository
+            await this._insuranceRepository.markExpiredInsurances();
         } catch (error) {
             // Log and rethrow the error for upstream handling
             console.error('Error updating insurance payment status:', error);

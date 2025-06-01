@@ -8,6 +8,7 @@ interface IInsuranceService {
     getAllInsurances(accessToken: string): Promise<InsuranceDTO[]>;
     getClosestNextPaymentDate(accessToken: string): Promise<InsuranceDTO | null>;
     markPaymentAsPaid(insuranceId: string): Promise<boolean>;
+    markExpired(): Promise<void>;
 }
 
 export default IInsuranceService;

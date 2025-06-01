@@ -4,6 +4,15 @@ import { InsuranceDTO } from 'dtos/insurances/insuranceDTO';
 import { InsuranceModel } from 'model/insurances/model/InsuranceModel';
 
 class InsuranceManagementRepository implements IInsuranceManagementRepository {
+    private static _instance: InsuranceManagementRepository;
+    public constructor() { }
+
+    public static get instance(): InsuranceManagementRepository {
+        if (!InsuranceManagementRepository._instance) {
+            InsuranceManagementRepository._instance = new InsuranceManagementRepository();
+        }
+        return InsuranceManagementRepository._instance;
+    }
 
     /**
      * Creates a new insurance record in the database.
@@ -207,20 +216,67 @@ class InsuranceManagementRepository implements IInsuranceManagementRepository {
     }
 
     /**
-     * Updates the payment status of an insurance policy to "paid".
+     * Updates the payment status of an insurance policy to "paid" and revises the next payment date to 365 days ahead.
      *
      * @param {string} insuranceId - The ID of the insurance policy to update.
-     * @returns {Promise<boolean>} A promise resolving to true if the payment status was successfully updated, false otherwise.
+     * @returns {Promise<boolean>} A promise resolving to true if the payment status and next payment date were successfully updated, false otherwise.
      * @throws {Error} Throws an error if the database operation fails.
      */
     async markPaymentAsPaid(insuranceId: string): Promise<boolean> {
         try {
+            // Fetch the current document to get the current next_payment_date
+            const insurance = await InsuranceModel.findById(insuranceId);
+            if (!insurance) {
+                throw new Error('Insurance policy not found');
+            }
+        
+            // Calculate next payment date: add 365 days to the current next_payment_date
+            const currentNextPaymentDate = insurance.next_payment_date;
+            const newNextPaymentDate = new Date(currentNextPaymentDate);
+            newNextPaymentDate.setDate(newNextPaymentDate.getDate() + 365);
+        
+            // Update both the payment status and the next payment date
             const result = await InsuranceModel.updateOne(
                 { _id: insuranceId },
-                { $set: { payment_status: "paid", status: "active" } }
+                {
+                    $set: {
+                        payment_status: "paid",
+                        status: "active",
+                        next_payment_date: newNextPaymentDate
+                    }
+                }
             );
-
+        
             return result.modifiedCount > 0 ? true : false;
+        } catch (error) {
+            console.error('Error updating insurance payment status:', error);
+            throw new Error(`Failed to update payment status: ${(error as Error).message}`);
+        }
+    }
+
+    /**
+     * Marks insurance policies as expired if their next payment date has passed and they are still marked as paid.
+     * Updates the payment status to "unpaid" and the policy status to "expired".
+     *
+     * @returns {Promise<void>} A promise that resolves when the update operation is complete.
+     * @throws {Error} Throws an error if the database operation fails.
+     */
+    async markExpiredInsurances(): Promise<void> {
+        try {
+            const today = new Date();
+            await InsuranceModel.updateMany(
+                {
+                    next_payment_date: { $lt: today },
+                    payment_status: 'paid',
+                    status: { $ne: 'expired' }
+                },
+                {
+                    $set: {
+                        payment_status: 'unpaid',
+                        status: 'expired'
+                    }
+                }
+            );
         } catch (error) {
             console.error('Error updating insurance payment status:', error);
             throw new Error(`Failed to update payment status: ${(error as Error).message}`);
