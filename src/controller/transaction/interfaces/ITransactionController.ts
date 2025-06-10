@@ -9,8 +9,11 @@ interface ITransactionController {
     getCategoryWiseExpense(request: Request, response: Response): Promise<void>;
     extractTransactionData(request: Request, response: Response): Promise<void>;
     getAllIncomeTransactionsByCategory(request: Request, response: Response): Promise<void>;
+    getAllExpenseTransactionsByCategory(request: Request, response: Response): Promise<void>;
     getMonthlyIncomeForChart(request: Request, response: Response): Promise<void>;
+    getMonthlyExpenseForChart(request: Request, response: Response): Promise<void>;
     getPaginatedIncomeTransactions(request: Request, response: Response): Promise<void>;
+    getPaginatedExpenseTransactions(request: Request, response: Response): Promise<void>;
 }
 
 export default ITransactionController;

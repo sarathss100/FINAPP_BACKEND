@@ -227,6 +227,61 @@ class TransactionRepository implements ITransactionRepository {
     }
 
     /**
+     * Retrieves expense transaction totals grouped by category for the current year for a specific user.
+     *
+     * This method filters all expense transactions for the current calendar year,
+     * groups them by their category, and calculates the total amount spent in each category.
+     *
+     * @param {string} userId - The unique identifier of the user whose expense totals are being retrieved.
+     * @returns {Promise<{ category: string, total: number }[]>}
+     *   A promise resolving to an array of objects where each object contains:
+     *   - `category`: the name of the transaction category
+     *   - `total`: the total amount spent in that category during the year
+     *
+     * @throws {Error} Throws an error if the database operation fails.
+     */
+    async getAllExpenseTransactionsByCategory(userId: string): Promise<{ category: string, total: number }[]> {
+        try {
+            const startOfYear = new Date(new Date().getFullYear(), 0, 1);
+            const endOfYear = new Date(new Date().getFullYear() + 1, 0, 1);
+        
+            const categoryTotals = await TransactionModel.aggregate([
+                {
+                    $match: {
+                        user_id: userId,
+                        transaction_type: 'EXPENSE',
+                        date: {
+                            $gte: startOfYear,
+                            $lt: endOfYear,
+                        }
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$category',
+                        total: { $sum: '$amount' }
+                    }
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        category: '$_id',
+                        total: 1
+                    }
+                },
+                {
+                    $sort: { category: 1 } // Sort alphabetically by category name
+                }
+            ]);
+        
+            return categoryTotals || [];
+        } catch (error) {
+            console.error('Error retrieving expense totals by category:', error);
+            return []; // Always return empty array on error
+        }
+    }
+
+    /**
      * Retrieves all transactions associated with a specific user from the database.
      * 
      * @param {string} userId - The unique identifier of the user whose transactions are being retrieved.
@@ -369,7 +424,7 @@ class TransactionRepository implements ITransactionRepository {
      * @returns {Promise<number>} A promise resolving to the total expense amount for the current month.
      * @throws {Error} Throws an error if the database operation fails or if no matching transactions are found.
      */
-    async getMonthlyTotalExpense(userId: string): Promise<number> {
+    async getMonthlyTotalExpense(userId: string): Promise<{ currentMonthExpenseTotal: number, previousMonthExpenseTotal: number }> {
         try {
             // Query the database for all EXPENSE transactions associated with the given user ID
             const result = await TransactionModel.find<ITransactionDTO>({
@@ -385,9 +440,14 @@ class TransactionRepository implements ITransactionRepository {
             // Get current date in UTC to determine the current month and year
             const now = new Date();
             const currentYear = now.getUTCFullYear();
-            const currentMonth = now.getUTCMonth(); // 0-indexed (Jan=0, ..., Dec=11)
+            const currentMonth = now.getUTCMonth(); 
+
+            // Previous month calculation
+            const previousMonth = currentMonth === 0 ? 11 : currentMonth - 11;
+            const previousYear = currentMonth === 0 ? currentYear - 1 : currentYear;
         
             let currentMonthExpenseTotal = 0;
+            let previousMonthExpenseTotal = 0;
         
             // Loop through each transaction to check if it belongs to the current month
             result.forEach(transaction => {
@@ -399,12 +459,13 @@ class TransactionRepository implements ITransactionRepository {
                 // Add to the total only if the transaction occurred in the current month
                 if (transactionYear === currentYear && transactionMonth === currentMonth) {
                     currentMonthExpenseTotal += transaction.amount;
+                } else if (transactionYear === previousYear && transactionMonth === previousMonth) {
+                    previousMonthExpenseTotal += transaction.amount;
                 }
             });
         
             // Return the calculated total expense for the current month
-            return currentMonthExpenseTotal;
-        
+            return { currentMonthExpenseTotal, previousMonthExpenseTotal };
         } catch (error) {
             // Log the error for debugging purposes
             console.error('Error calculating monthly expense total:', error);
@@ -555,6 +616,88 @@ class TransactionRepository implements ITransactionRepository {
     }
 
     /**
+     * Retrieves month-wise expense data for the current year for a specific user, suitable for charting.
+     * 
+     * This method:
+     * - Filters EXPENSE-type transactions for the given user and current year.
+     * - Groups transactions by month using MongoDB aggregation.
+     * - Sums the total amount per month.
+     * - Fills in missing months with zero to ensure all 12 months are included in the result.
+     *
+     * Useful for rendering charts that require consistent monthly data (e.g., bar charts or line graphs).
+     *
+     * @param {string} userId - The unique identifier of the user whose monthly expense data is being retrieved.
+     * @returns {Promise<{ month: string; amount: number }[]>}
+     *   A promise resolving to an array of objects where each object contains:
+     *   - `month`: The abbreviated month name (e.g., "Jan", "Feb").
+     *   - `amount`: The total expense amount for that month.
+     *   Returns data for all 12 months, even if some months have no recorded expenses.
+     *
+     * @throws {Error} If the database operation fails during aggregation or data processing.
+     */
+    async getMonthlyExpenseForChart(userId: string): Promise<{ month: string, amount: number }[]> {
+        try {
+            const startOfYear = new Date(new Date().getFullYear(), 0, 1);
+            const endOfYear = new Date(new Date().getFullYear() + 1, 0, 1);
+        
+            // Query the database to retrieve all expense transactions for the current year
+            const result = await TransactionModel.aggregate([
+                // Filter expense transactions for current year and user
+                {
+                    $match: { 
+                        user_id: userId,
+                        transaction_type: 'EXPENSE',
+                        date: {
+                            $gte: startOfYear,
+                            $lt: endOfYear,
+                        }
+                    }
+                },
+                // Extract month from date (1 to 12)
+                {
+                    $project: {
+                        month: { $month: "$date" },
+                        amount: 1
+                    }
+                },
+                // Group by month and sum amounts
+                {
+                    $group: {
+                        _id: "$month",
+                        totalAmount: { $sum: "$amount" }
+                    }
+                },
+                // Sort by month (ascending order)
+                {
+                    $sort: { _id: 1 }
+                }
+            ]);
+        
+            // Fill in missing months with 0
+            const monthNames = [
+                'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+            ];
+        
+            const monthlyData = Array.from({ length: 12 }, (_, i) => {
+                const found = result.find(r => r._id === i + 1);
+                return {
+                    month: monthNames[i],
+                    amount: found ? found.totalAmount : 0
+                };
+            });
+        
+            return monthlyData;
+        } catch (error) {
+            // Log the error for debugging purposes
+            console.error('Error retrieving monthly expense data:', error);
+        
+            // Re-throw the error with a descriptive message
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
      * Retrieves paginated income transactions for a specific user based on various filters.
      * 
      * This method supports:
@@ -683,6 +826,141 @@ class TransactionRepository implements ITransactionRepository {
             // Log the error for debugging purposes.
             console.error('Error retrieving transaction details:', error);
 
+            // Re-throw the error with a more descriptive message, ensuring the caller is informed of the issue.
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+     * Retrieves paginated expense transactions for a specific user based on various filters.
+     * 
+     * This method supports:
+     * - Filtering by time range (last day, week, current month/year)
+     * - Filtering by category
+     * - Search in description and tags
+     * - Pagination using page and limit parameters
+     *
+     * @param {string} userId - The unique identifier of the user whose expense transactions are being retrieved.
+     * @param {number} [page=1] - The page number for pagination (1-based index).
+     * @param {number} [limit=10] - Number of items per page.
+     * @param {'day'|'week'|'month'|'year'} [timeRange] - Optional time range filter to narrow down results.
+     * @param {string} [category] - Optional category filter to refine results.
+     * @param {string} [searchText] - Optional text to search within transaction description or tags (case-insensitive).
+     *
+     * @returns {Promise<{ data: ITransactionDTO[], total: number, currentPage: number, totalPages: number }>}
+     *   A promise resolving to an object containing:
+     *   - `data`: Paginated list of matched expense transactions.
+     *   - `total`: Total number of matching transactions across all pages.
+     *   - `currentPage`: Current page number being returned.
+     *   - `totalPages`: Total number of pages available based on the provided limit.
+     *
+     * @throws {Error}
+     *   If there's a failure during the database operation or aggregation pipeline execution,
+     *   an error will be thrown with a descriptive message.
+     */
+    async getPaginatedExpenseTransactions(
+        userId: string,
+        page: number = 1,
+        limit: number = 10,
+        timeRange?: 'day' | 'week' | 'month' | 'year',
+        category?: string,
+        searchText?: string,
+    ): Promise<{ data: ITransactionDTO[], total: number, currentPage: number, totalPages: number }> {
+        try {
+            const now = new Date();
+        
+            // Build dynamic date filter based on timeRange
+            let dateFilter = {};
+        
+            if (timeRange === 'day') {
+                const yesterday = new Date(now);
+                yesterday.setDate(yesterday.getDate() - 1);
+                dateFilter = {
+                    date: {
+                        $gte: yesterday,
+                        $lte: now,
+                    }
+                };
+            } else if (timeRange === 'week') {
+                const oneWeekAgo = new Date(now);
+                oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                dateFilter = {
+                    date: {
+                        $gte: oneWeekAgo,
+                        $lte: now
+                    }
+                };
+            } else if (timeRange === 'month') {
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                dateFilter = {
+                    date: {
+                        $gte: startOfMonth,
+                        $lte: endOfMonth,
+                    }
+                };
+            } else if (timeRange === 'year') {
+                const startOfYear = new Date(now.getFullYear(), 0, 1);
+                const endOfYear = new Date(now.getFullYear() + 1, 0, 0);
+                dateFilter = {
+                    date: {
+                        $gte: startOfYear,
+                        $lte: endOfYear,
+                    }
+                };
+            }
+        
+            const pipeline = [
+                {
+                    $match: {
+                        user_id: userId,
+                        transaction_type: 'EXPENSE',
+                        ...dateFilter,
+                        ...(category && { category }),
+                        ...(searchText && {
+                            $or: [
+                                { description: { $regex: searchText, $options: 'i' } },
+                                { tags: { $regex: searchText, $options: 'i' } },
+                            ]
+                        })
+                    }
+                },
+                {
+                    $sort: { date: -1 as 1 | -1 }
+                },
+                {
+                    $facet: {
+                        metadata: [{ $count: 'total' }],
+                        data: [
+                            { $skip: (page - 1) * limit },
+                            { $limit: limit }
+                        ]
+                    }
+                },
+                {
+                    $project: {
+                        data: 1,
+                        totalPages: {
+                            $ceil: { $divide: [{ $arrayElemAt: ['$metadata.total', 0] }, limit] }
+                        },
+                        currentPage: { $literal: page },
+                        total: { $arrayElemAt: ['$metadata.total', 0] }
+                    }
+                }
+            ];
+        
+            const result = await TransactionModel.aggregate(pipeline);
+        
+            return {
+                data: result[0]?.data || [],
+                total: result[0]?.total || 0,
+                currentPage: result[0]?.currentPage || 1,
+                totalPages: result[0]?.totalPages || 1,
+            };
+        } catch (error) {
+            // Log the error for debugging purposes.
+            console.error('Error retrieving transaction details:', error);
+        
             // Re-throw the error with a more descriptive message, ensuring the caller is informed of the issue.
             throw new Error((error as Error).message);
         }

@@ -315,6 +315,40 @@ class TransactionController implements ITransactionController {
   }
 
   /**
+   * Controller to retrieve all EXPENSE-type transactions grouped by category for the authenticated user.
+   *
+   * This method:
+   * - Extracts the access token from cookies to authenticate the user.
+   * - Validates that the access token exists and is valid.
+   * - Calls the service layer to fetch expense transactions grouped by category for the current year.
+   * - Sends a structured success response containing the categorized expense data.
+   *
+   * @param {Request} request - Express request object, expected to contain the access token in cookies.
+   * @param {Response} response - Express response object used to send the result or error.
+   * @returns {Promise<void>} - Sends JSON response with categorized expense transaction data or an error message.
+   *
+   * @throws {AuthenticationError} If the access token is missing or invalid.
+   * @throws {Error} For any internal server errors during the transaction retrieval process.
+   */
+  async getAllExpenseTransactionsByCategory(request: Request, response: Response): Promise<void> {
+    try {
+        const { accessToken } = request.cookies;
+        if (!accessToken) {
+            throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
+        }
+      
+        const transactions = await this._transactionService.getAllExpenseTransactionsByCategory(accessToken);
+        sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.EXTRACTED_DATA, { transactions });
+    } catch (error) {
+        if (error instanceof AppError) {
+            sendErrorResponse(response, error.statusCode, error.message);
+        } else {
+            sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+        }
+    }
+  }
+
+  /**
    * Controller to retrieve month-wise income data for the authenticated user.
    *
    * This method:
@@ -338,6 +372,40 @@ class TransactionController implements ITransactionController {
         }
       
         const transactions = await this._transactionService.getMonthlyIncomeForChart(accessToken);
+        sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.EXTRACTED_DATA, { transactions });
+    } catch (error) {
+        if (error instanceof AppError) {
+            sendErrorResponse(response, error.statusCode, error.message);
+        } else {
+            sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+        }
+    }
+  }
+
+  /**
+   * Controller to retrieve month-wise income data for the authenticated user.
+   *
+   * This method:
+   * - Extracts the access token from cookies to authenticate the user.
+   * - Fetches aggregated income data grouped by month using the transaction service.
+   * - Returns a structured success response containing chart-ready monthly income data (e.g., { month: "Jan", amount: 5000 }).
+   * - Ensures all 12 months are included, with zero values for months without income.
+   *
+   * @param {Request} request - Express request object, expected to contain the access token in cookies.
+   * @param {Response} response - Express response object used to send the result or error.
+   * @returns {Promise<void>} - Sends JSON response with monthly income data or an error message.
+   *
+   * @throws {AuthenticationError} If the access token is missing or invalid.
+   * @throws {Error} For any internal server errors during the data retrieval process.
+   */
+  async getMonthlyExpenseForChart(request: Request, response: Response): Promise<void> {
+    try {
+        const { accessToken } = request.cookies;
+        if (!accessToken) {
+            throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
+        }
+      
+        const transactions = await this._transactionService.getMonthlyExpenseForChart(accessToken);
         sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.EXTRACTED_DATA, { transactions });
     } catch (error) {
         if (error instanceof AppError) {
@@ -391,6 +459,52 @@ class TransactionController implements ITransactionController {
       } else {
         sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
       }
+    }
+  }
+
+  /**
+   * Controller to retrieve paginated expense transactions for the authenticated user.
+   *
+   * This method:
+   * - Extracts the access token from cookies to authenticate the user.
+   * - Parses pagination (`page`, `limit`) and filter parameters (`timeRange`, `category`, `searchText`) from the query string.
+   * - Fetches a paginated list of expense transactions using the transaction service.
+   * - Applies optional filters such as time range, category, and search text.
+   *
+   * @param {Request} request - Express request object containing cookies and query parameters.
+   * @param {Response} response - Express response object used to send the result or error.
+   * @returns {Promise<void>} - Sends JSON response with paginated expense transactions or an error message.
+   *
+   * @throws {AuthenticationError} If the access token is missing or invalid.
+   * @throws {Error} For any internal server errors during data retrieval.
+   */
+  async getPaginatedExpenseTransactions(request: Request, response: Response): Promise<void> {
+    try {
+        const { accessToken } = request.cookies;
+        if (!accessToken) {
+            throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
+        }
+      
+        const pageNum = request.query.page ? parseInt(request.query.page as string, 10) : 1;
+        const limitNum = request.query.limit ? parseInt(request.query.limit as string, 10) : 10;
+        const { timeRange, category, searchText } = request.query;
+      
+        const transactions = await this._transactionService.getPaginatedExpenseTransactions(
+            accessToken,
+            pageNum,
+            limitNum,
+            timeRange as 'day' | 'week' | 'month' | 'year',
+            category as string,
+            searchText as string
+        );
+      
+        sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.EXTRACTED_DATA, { transactions });
+    } catch (error) {
+        if (error instanceof AppError) {
+            sendErrorResponse(response, error.statusCode, error.message);
+        } else {
+            sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+        }
     }
   }
 }
