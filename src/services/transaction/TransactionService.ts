@@ -138,36 +138,35 @@ class TransactionService implements ITransactionService {
         }   
     }
 
-     /**
-     * Process multiple transactions with hash checking
-     * More efficient implementation that:
-     * 1. Pre-computes all hashes
-     * 2. Performs a single bulk database query for all existing hashes
-     * 3. Processes only the new transactions in batch
-     * 
-     * @param {string} userId - User ID from decoded token
-     * @param {ITransactionDTO[]} dataArray - Array of transaction data
-     * @returns {Promise<ITransactionDTO[]>} - Array of created transactions
-     */
-     private async processBulkTransactions(userId: string, dataArray: ITransactionDTO[]): Promise<ITransactionDTO[]> {
-        const results: ITransactionDTO[] = [];
-        
-        // Pre-compute hashes for all transactions and add userId
-        const transactionsWithHash = dataArray.map(data => {
-            // Normalize date format and handle potential undefined description
-            const normalizedDate = this.normalizeDate(data.date);
-            const description = data.description || '';
-            const transactionHash = this.generateHash(normalizedDate, description, data.amount);
-            
-            const { category, type } = classifyTransaction(description);
-
-            return {
-                ...data,
-                user_id: userId,
-                transactionHash,
-                category,
-                type
-            };
+    /**
+    * Process multiple transactions with hash checking
+    * More efficient implementation that:
+    * 1. Pre-computes all hashes
+    * 2. Performs a single bulk database query for all existing hashes
+    * 3. Processes only the new transactions in batch
+    * 
+    * @param {string} userId - User ID from decoded token
+    * @param {ITransactionDTO[]} dataArray - Array of transaction data
+    * @returns {Promise<ITransactionDTO[]>} - Array of created transactions
+    */
+    private async processBulkTransactions(userId: string, dataArray: ITransactionDTO[]): Promise<ITransactionDTO[]> {
+       const results: ITransactionDTO[] = [];
+       
+       // Pre-compute hashes for all transactions and add userId
+       const transactionsWithHash = dataArray.map(data => {
+           // Normalize date format and handle potential undefined description
+           const normalizedDate = this.normalizeDate(data.date);
+           const description = data.description || '';
+           const transactionHash = this.generateHash(normalizedDate, description, data.amount);
+           
+           const { category, type } = classifyTransaction(description);
+           return {
+               ...data,
+               user_id: userId,
+               transactionHash,
+               category,
+               type
+           };
         });
         
         // Extract all hashes for bulk query
@@ -263,6 +262,46 @@ class TransactionService implements ITransactionService {
             console.error('Error retrieving monthly transaction totals:', error);
 
             // Throw a generic error to avoid exposing sensitive internal details to the client.
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+     * Calculates and returns the total income for the latest week
+     * for the authenticated user based on their access token.
+     *
+     * This method ensures:
+     * - The user is authenticated via a valid JWT access token.
+     * - Only INCOME-type transactions are considered for the calculation.
+     * - The result represents the sum of all qualifying transactions from the most recent calendar week.
+     *
+     * @param {string} accessToken - The JWT access token used to authenticate the user and extract their ID.
+     * @returns {Promise<number>} 
+     *   A promise resolving to the total income for the latest week.
+     *
+     * @throws {AuthenticationError} If the access token is invalid or does not contain a valid user ID.
+     * @throws {Error} If there's an internal error during transaction retrieval or aggregation.
+     */
+    async getWeeklyTotalIncome(accessToken: string): Promise<number> {
+        try {
+            // Extract the authenticated user's ID from the provided access token.
+            const userId = decodeAndValidateToken(accessToken);
+        
+            if (!userId) {
+                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
+            }
+        
+            // Fetch the weekly income total from the repository layer.
+            const weeklyTotalIncome = await this._transactionRepository.getWeeklyTotalIncome(userId);
+        
+            // Return the calculated weekly income total.
+            return weeklyTotalIncome;
+        
+        } catch (error) {
+            // Log the error for debugging purposes
+            console.error('Error retrieving weekly income:', error);
+        
+            // Throw a generic error to avoid exposing sensitive internal details to the client
             throw new Error((error as Error).message);
         }
     }
@@ -444,6 +483,163 @@ class TransactionService implements ITransactionService {
 
         return result;
     };
+
+    /**
+     * Retrieves all INCOME-type transactions for the authenticated user 
+     * for the current year based on their access token.
+     *
+     * This method ensures:
+     * - The user is authenticated via a valid JWT access token.
+     * - Only INCOME-type transactions are retrieved.
+     * - Transactions are filtered to include only those from the current year.
+     *
+     * @param {string} accessToken - The JWT access token used to authenticate the user and extract their ID.
+     * @returns {Promise<ITransactionDTO[]>} 
+     *   A promise resolving to an array of `ITransactionDTO` objects representing the user's income transactions for the current year.
+     *   Returns an empty array if no transactions are found.
+     *
+     * @throws {AuthenticationError} If the access token is invalid or does not contain a valid user ID.
+     * @throws {Error} If there's an internal error during the transaction retrieval process.
+     */
+    async getAllIncomeTransactionsByCategory(accessToken: string): Promise<{category: string, total: number}[]> {
+        try {
+            // Extract the authenticated user's ID from the provided access token.
+            // Ensures only authenticated users can access their own financial data.
+            const userId = decodeAndValidateToken(accessToken);
+        
+            if (!userId) {
+                // If no user ID could be extracted from the token, authentication fails.
+                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
+            }
+        
+            // Delegate to the repository layer to fetch income transactions for the current year.
+            // This keeps the service layer clean and separates business logic from data access logic.
+            const transactions = await this._transactionRepository.getAllIncomeTransactionsByCategory(userId);
+        
+            // Return the retrieved transactions
+            return transactions;
+        } catch (error) {
+            // Log the error for internal debugging and monitoring purposes.
+            console.error('Error retrieving income transactions:', error);
+        
+            // Throw a generic error to avoid exposing sensitive internal details to the client.
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+     * Retrieves month-wise income data for the current year for the authenticated user.
+     * 
+     * This method:
+     * - Extracts the user ID from the provided JWT access token to authenticate the request.
+     * - Fetches month-wise income data using the transaction repository.
+     * - Returns an array of objects containing each month and its corresponding total income amount.
+     * - Ensures all 12 months are included, even if no income was recorded in some months.
+     *
+     * @param {string} accessToken - The JWT access token used to authenticate the user and extract their ID.
+     * @returns {Promise<{ month: string; amount: number }[]>}
+     *   A promise resolving to an array of objects where each object contains:
+     *   - `month`: The abbreviated name of the month (e.g., "Jan", "Feb").
+     *   - `amount`: The total income for that month.
+     *   Returns data for all 12 months, with `0` for months with no income.
+     *
+     * @throws {AuthenticationError} If the access token is invalid or does not contain a valid user ID.
+     * @throws {Error} If there's an internal error during the data retrieval process.
+     */
+    async getMonthlyIncomeForChart(accessToken: string): Promise<{ month: string, amount: number }[]> {
+        try {
+            // Extract the authenticated user's ID from the provided access token.
+            // Ensures only authenticated users can access their own financial data.
+            const userId = decodeAndValidateToken(accessToken);
+        
+            if (!userId) {
+                // If no user ID could be extracted from the token, authentication fails.
+                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
+            }
+        
+            // Delegate to the repository layer to fetch month-wise income data.
+            // This keeps the service layer clean and separates business logic from data access logic.
+            const transactions = await this._transactionRepository.getMonthlyIncomeForChart(userId);
+        
+            // Return the retrieved monthly income data
+            return transactions;
+        } catch (error) {
+            // Log the error for internal debugging and monitoring purposes.
+            console.error('Error retrieving income transactions:', error);
+        
+            // Throw a generic error to avoid exposing sensitive internal details to the client.
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+     * Retrieves paginated income transactions for the authenticated user based on various filters.
+     *
+     * This method:
+     * - Extracts the user ID from the provided JWT access token to authenticate the request.
+     * - Supports filtering by time range (last day, week, current month/year).
+     * - Allows filtering by category and smart_category.
+     * - Supports text search in description and tags.
+     * - Uses pagination to limit the number of results returned.
+     * - Delegates data fetching to the repository layer.
+     *
+     * @param {string} accessToken - The JWT access token used to authenticate the user and extract their ID.
+     * @param {number} [page=1] - The page number for pagination (default: 1).
+     * @param {number} [limit=10] - Number of items per page (default: 10).
+     * @param {'day'|'week'|'month'|'year'} [timeRange] - Optional time range filter.
+     * @param {string} [category] - Optional category filter.
+     * @param {string} [smartCategory] - Optional smart category filter.
+     * @param {string} [searchText] - Optional text to search in description or tags.
+     *
+     * @returns {Promise<{ data: ITransactionDTO[], total: number, currentPage: number, totalPages: number }>}
+     *   A promise resolving to an object containing:
+     *   - `data`: Paginated list of matched income transactions
+     *   - `total`: Total number of matching documents
+     *   - `currentPage`: Current page number
+     *   - `totalPages`: Total number of pages available
+     *
+     * @throws {AuthenticationError} If the access token is invalid or does not contain a valid user ID.
+     * @throws {Error} If there's an internal error during the data retrieval process.
+     */
+    async getPaginatedIncomeTransactions(
+        accessToken: string,
+        page: number,
+        limit: number,
+        timeRange?: 'day' | 'week' | 'month' | 'year',
+        category?: string,
+        searchText?: string,
+    ): Promise<{ data: ITransactionDTO[], total: number, currentPage: number, totalPages: number }> {
+        try {
+            // Extract the authenticated user's ID from the provided access token.
+            // Ensures only authenticated users can access their own financial data.
+            const userId = decodeAndValidateToken(accessToken);
+        
+            if (!userId) {
+                // If no user ID could be extracted from the token, authentication fails.
+                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
+            }
+        
+            // Delegate to the repository layer to fetch filtered and paginated income transactions.
+            // This keeps the service layer clean and separates business logic from data access logic.
+            const transactions = await this._transactionRepository.getPaginatedIncomeTransactions(
+                userId,
+                page,
+                limit,
+                timeRange,
+                category,
+                searchText
+            );
+        
+            // Return the retrieved transaction data
+            return transactions;
+        } catch (error) {
+            // Log the error for internal debugging and monitoring purposes.
+            console.error('Error retrieving income transactions:', error);
+        
+            // Throw a generic error to avoid exposing sensitive internal details to the client.
+            throw new Error((error as Error).message);
+        }
+    }
 }
 
 export default TransactionService;
