@@ -25,6 +25,14 @@ export const TRANSACTION_TYPES = [
     'PURCHASE',
     'SALE',
     'EXTRACTION',
+    'RENT',
+    'INCOME',
+    'EXPENSE',
+    'ENTERTAINMENT',
+    'EDUCATION',
+    'BILLS',
+    'SUBSCRIPTIONS',
+    'TRAVEL',
 ] as const;
 
 export type TransactionType = typeof TRANSACTION_TYPES[number];
@@ -43,9 +51,50 @@ export const TRANSACTION_CATEGORIES = [
     'SAVINGS',
     'INVESTMENTS',
     'MISCELLANEOUS',
+    'RENT',
 ] as const;
 
 export type TransactionCategory = typeof TRANSACTION_CATEGORIES[number];
+
+export const SMART_CATEGORIES = [
+    'SALARY', 
+    'FREELANCE',
+    'BUSINESS_INCOME', 
+    'INVESTMENT_RETURN',
+    'DIVIDEND',
+    'INTEREST',
+    'RENTAL_INCOME',
+    'GIFT_RECEIVED',
+    'BONUS',
+    'GOVERNMENT_BENEFIT',
+    'REFUND',
+    'OTHER_INCOME',
+    'FOOD', 
+    'RENT',
+    'UTILITY_BILL',
+    'MOBILE_RECHARGE', 
+    'INTERNET_BILL',
+    'TRANSPORT', 
+    'SHOPPING',
+    'HEALTH_MEDICAL', 
+    'EDUCATION',
+    'INSURANCE', 
+    'LOAN_PAYMENT', 
+    'EMI', 
+    'TAX', 
+    'SUBSCRIPTION', 
+    'GROCERIES', 
+    'DINING_OUT', 
+    'ENTERTAINMENT', 
+    'TRAVEL', 
+    'PERSONAL_CARE',
+    'HOME_IMPROVEMENT', 
+    'VEHICLE_EXPENSE', 
+    'GIFTS_DONATIONS', 
+    'FEES_CHARGES',
+    'MISCELLANEOUS',
+    'TRANSFER',
+] as const;
 
 interface ITransaction extends Document {
     _id: Types.ObjectId;
