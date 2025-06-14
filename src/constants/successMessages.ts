@@ -59,4 +59,7 @@ export const SuccessMessages = {
     INSURANCES_RETRIEVED: 'Insurances Retrieved Successfully',
     NEXT_PAYMENT_DATE_RETRIEVED: 'Closest Next Payment Date Retrieved Successfully',
     PAYMENT_STATUS_UPDATED: 'Insurance Payment Status Updated Successfully',
+
+    // Debts Success Messages 
+    DEBT_CREATED_SUCCESSFULLY: 'Debt Created Successfully',
 } as const;
