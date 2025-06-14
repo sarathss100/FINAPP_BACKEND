@@ -75,4 +75,3 @@ const calculateLoanBreakdown = async function ({
 
 export default calculateLoanBreakdown;
 
-// Calculate principal & interest for a specific month in 

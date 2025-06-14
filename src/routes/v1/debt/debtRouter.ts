@@ -10,10 +10,11 @@ const debtService = new DebtService(debtManagementRepository);
 const debtController: IDebtController = new DebtController(debtService);
 
 router.post('/', debtController.createDebt.bind(debtController));
+router.get('/', debtController.getDebtCategorized.bind(debtController));
 router.get('/total', debtController.getTotalDebt.bind(debtController));
 router.get('/summary', debtController.getTotalOutstandingDebt.bind(debtController));
 router.get('/monthly-payment', debtController.getTotalMonthlyPayment.bind(debtController));
 router.get('/tenure', debtController.getLongestTenure.bind(debtController));
+router.get('/simulation', debtController.getRepaymentStrategyComparison.bind(debtController));
 
 export default router;
-

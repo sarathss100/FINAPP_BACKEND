@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { IDebtDTO } from 'dtos/debt/DebtDto';
 import IDebtRepository from './interfaces/IDebtRepository';
 import { DebtModel } from 'model/debt/model/DebtModel';
+import { Debt } from 'utils/debt/simulateResult';
 
 /**
  * @class DebtManagementRepository
@@ -234,6 +235,84 @@ class DebtManagementRepository implements IDebtRepository {
         } catch (error) {
             console.error('Error fetching total monthly payment:', error);
             throw new Error(`Failed to calculate total monthly payment: ${(error as Error).message}`);
+        }
+    }
+
+    /**
+     * Retrieves debts categorized as either 'Good Debt' or 'Bad Debt' for the specified user.
+     *
+     * This function filters active (non-completed, non-deleted) debts associated with the given userId,
+     * and returns a list of debts filtered by the provided category:
+     * - 'Good Debt' (isGoodDebt: true)
+     * - 'Bad Debt' (isGoodDebt: false)
+     *
+     * @param {string} userId - The ID of the user whose debts are being categorized.
+     * @param {string} category - The category to filter by ('Good Debt' or 'Bad Debt').
+     * @returns {Promise<IDebtDTO[]>} A promise resolving to an array of categorized debt DTOs.
+     * @throws {Error} Throws an error if the database operation fails.
+     */
+    async getDebtCategorized(userId: string, category: string): Promise<IDebtDTO[]> {
+        try {
+            const isGoodDebt = category.toLowerCase() === 'good';
+        
+            const result = await DebtModel.aggregate([
+                {
+                    $match: {
+                        userId,
+                        isCompleted: false,
+                        isDeleted: false,
+                        isGoodDebt
+                    }
+                }
+            ]);
+        
+            return result || [];
+        
+        } catch (error) {
+            console.error('Error fetching categorized debts:', error);
+            throw new Error(`Failed to fetch categorized debts: ${(error as Error).message}`);
+        }
+    }
+
+    /**
+     * Retrieves all active (non-completed, non-deleted) debts for the specified user.
+     *
+     * This function fetches debts associated with the given userId,
+     * excluding completed or deleted records, and maps them to a simplified structure
+     * suitable for debt repayment strategy simulations (e.g., Avalanche vs Snowball).
+     *
+     * @param {string} userId - The ID of the user whose active debts are being retrieved.
+     * @returns {Promise<Debt[]>} A promise resolving to an array of simplified debt objects.
+     * @throws {Error} Throws an error if the database operation fails.
+     */
+    async getRepaymentStrategyComparison(userId: string): Promise<Debt[]> {
+        try {
+            const result = await DebtModel.aggregate([
+                {
+                    $match: {
+                        userId,
+                        isCompleted: false,
+                        isDeleted: false,
+                    }
+                }
+            ]);
+
+            // Map raw result to simplified Debt interface
+            const refinedData: Debt[] = result.map((debt: IDebtDTO) => ({
+                name: debt.debtName,
+                principal: debt.initialAmount,
+                currentBalance: debt.currentBalance ?? debt.initialAmount,
+                interestRate: debt.interestRate,
+                interestType: debt.interestType,
+                monthlyPayment: debt.monthlyPayment ?? 0,
+                tenureMonths: debt.tenureMonths
+            }));
+
+            return refinedData;
+
+        } catch (error) {
+            console.error('Error fetching and refining debts:', error);
+            throw new Error(`Failed to fetch debts for repayment strategy: ${(error as Error).message}`);
         }
     }
 }

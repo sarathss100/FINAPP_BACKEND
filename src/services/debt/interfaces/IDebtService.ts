@@ -1,4 +1,5 @@
 import { IDebtDTO } from 'dtos/debt/DebtDto';
+import { ComparisonResult } from 'utils/debt/simulateResult';
 
 interface IDebtService {
     createDebt(accessToken: string, debtData: IDebtDTO): Promise<IDebtDTO>;
@@ -6,6 +7,8 @@ interface IDebtService {
     getTotalOutstandingDebt(accessToken: string): Promise<number>;
     getTotalMonthlyPayment(accessToken: string): Promise<number>;
     getLongestTenure(accessToken: string): Promise<number>;
+    getDebtCategorized(accessToken: string, category: string): Promise<IDebtDTO[]>;
+    getRepaymentStrategyComparison(accessToken: string, extraAmount: number): Promise<ComparisonResult>;
 }
 
 export default IDebtService;

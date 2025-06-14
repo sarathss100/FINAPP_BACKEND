@@ -9,6 +9,7 @@ import IDebtRepository from 'repositories/debt/interfaces/IDebtRepository';
 import calculateLoanBreakdown from 'utils/debt/emiCalculator';
 import { calculateLoanClosingMonth, calculateNextDueDate } from 'utils/debt/dueDateCalculator';
 import { categorizeDebt } from 'utils/debt/debtCategorizer';
+import { compareStrategies, ComparisonResult } from 'utils/debt/simulateResult';
 
 /**
  * Service class for managing debt records.
@@ -207,6 +208,74 @@ class DebtService implements IDebtService {
         } catch (error) {
             // Log and rethrow the error for upstream handling
             console.error('Error fetching longest tenure:', error);
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+     * Retrieves debts categorized as either 'Good Debt' or 'Bad Debt' for the authenticated user.
+     *
+     * This function decodes the provided JWT access token to extract the user ID,
+     * then fetches all active (non-completed, non-deleted) debts associated with that user,
+     * filtered by the specified category ('Good Debt' or 'Bad Debt').
+     *
+     * @param {string} accessToken - The JWT access token used to authenticate and identify the user.
+     * @param {string} category - The category to filter debts by ('Good Debt' or 'Bad Debt').
+     * @returns {Promise<IDebtDTO[]>} A promise resolving to an array of debt DTOs matching the category.
+     * @throws {AuthenticationError} If the access token is invalid or missing user information.
+     * @throws {Error} If an unexpected error occurs while fetching the categorized debts.
+     */
+    async getDebtCategorized(accessToken: string, category: string): Promise<IDebtDTO[]> {
+        try {
+            // Decode and validate the access token to extract the user ID
+            const userId = decodeAndValidateToken(accessToken);
+            if (!userId) {
+                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
+            }
+        
+            // Delegate to the repository to fetch categorized debts
+            const debtDetails = await this._debtManagementRepository.getDebtCategorized(userId, category);
+        
+            return debtDetails;
+        } catch (error) {
+            // Log and rethrow the error for upstream handling
+            console.error('Error fetching categorized debts:', error);
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+     * Compares debt repayment strategies (e.g., Avalanche vs Snowball) for the authenticated user.
+     *
+     * This function decodes the provided JWT access token to extract the user ID,
+     * fetches all active (non-completed, non-deleted) debts associated with that user,
+     * and simulates both the Avalanche (highest interest first) and Snowball (lowest balance first)
+     * repayment methods to generate a structured comparison of total time, interest paid, and monthly payments.
+     *
+     * @param {string} accessToken - The JWT access token used to authenticate and identify the user.
+     * @param {number} extraAmount - The additional monthly amount to allocate toward debt repayment.
+     * @returns {Promise<ComparisonResult>} A promise resolving to an object containing results from both strategies.
+     * @throws {AuthenticationError} If the access token is invalid or missing user information.
+     * @throws {Error} If an unexpected error occurs during debt retrieval or simulation.
+     */
+    async getRepaymentStrategyComparison(accessToken: string, extraAmount: number): Promise<ComparisonResult> {
+        try {
+            // Decode and validate the access token to extract the user ID
+            const userId = decodeAndValidateToken(accessToken);
+            if (!userId) {
+                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
+            }
+        
+            // Delegate to the repository to fetch categorized debts
+            const debtDetails = await this._debtManagementRepository.getRepaymentStrategyComparison(userId);
+        
+            // Simulate Repayment and get the comparison result
+            const comparisonResult = await compareStrategies(debtDetails, extraAmount);
+        
+            return comparisonResult;
+        } catch (error) {
+            // Log and rethrow the error for upstream handling
+            console.error('Error fetching and comparing repayment strategies:', error);
             throw new Error((error as Error).message);
         }
     }
