@@ -279,6 +279,122 @@ class DebtService implements IDebtService {
             throw new Error((error as Error).message);
         }
     }
+
+    /**
+     * Retrieves all active debts associated with the authenticated user.
+     *
+     * This function decodes and validates the provided JWT access token to extract the user ID,
+     * then fetches all non-completed and non-deleted debts linked to that user.
+     *
+     * @param {string} accessToken - The JWT access token used to authenticate and identify the user.
+     * @returns {Promise<IDebtDTO[]>} A promise resolving to an array of debt data transfer objects.
+     * @throws {AuthenticationError} If the access token is invalid or missing user information.
+     * @throws {Error} If an unexpected error occurs during debt retrieval.
+     */
+    async getAllDebts(accessToken: string): Promise<IDebtDTO[]> {
+        try {
+            // Decode and validate the access token to extract the user ID
+            const userId = decodeAndValidateToken(accessToken);
+            if (!userId) {
+                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
+            }
+        
+            // Delegate to the repository to fetch categorized debts
+            const debtDetails = await this._debtManagementRepository.getAllDebts(userId);
+        
+            return debtDetails;
+        } catch (error) {
+            // Log and rethrow the error for upstream handling
+            console.error('Error fetching debts:', error);
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+     * Deletes a specific debt record by its ID.
+     *
+     * This function delegates the deletion operation to the underlying repository,
+     * which typically performs a soft delete (e.g., marking the debt as deleted).
+     *
+     * @param {string} debtId - The unique identifier of the debt to be deleted.
+     * @returns {Promise<boolean>} A promise resolving to `true` if the deletion was successful, or `false` otherwise.
+     * @throws {Error} If an error occurs during the deletion process.
+     */
+    async deleteDebt(debtId: string): Promise<boolean> {
+        try {
+            // Delegate to the repository to delete the debt
+            const isDeleted = await this._debtManagementRepository.deleteDebt(debtId);
+        
+            return isDeleted;
+        } catch (error) {
+            // Log and rethrow the error for upstream handling
+            console.error('Error deleting debt:', error);
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+     * Updates the expiry status for debts with a past nextDueDate.
+     *
+     * This function delegates the operation to the underlying repository,
+     * which identifies active debts whose due date has passed and marks them as expired.
+     *
+     * @returns {Promise<void>} A promise that resolves when the expiry update operation is complete.
+     * @throws {Error} If an error occurs during the expiry update process.
+     */
+    async updateExpiry(): Promise<void> {
+        try {
+            await this._debtManagementRepository.updateExpiry();
+        } catch (error) {
+            // Log and rethrow the error for upstream handling
+            console.error('Error updating debt expiry:', error);
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+     * Marks debts as completed if their end date has passed.
+     *
+     * This function delegates the operation to the underlying repository,
+     * which identifies active debts whose 'endDate' has passed and updates them
+     * to reflect a completed status (e.g., setting isCompleted: true, status: 'Completed').
+     *
+     * @returns {Promise<void>} A promise that resolves when the debt completion update is complete.
+     * @throws {Error} If an error occurs during the update process.
+     */
+    async markEndedDebtsAsCompleted(): Promise<void> {
+        try {
+            await this._debtManagementRepository.markEndedDebtsAsCompleted();
+        } catch (error) {
+            // Log and rethrow the error for upstream handling
+            console.error('Error updating ended debts as completed:', error);
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+     * Marks a specific debt as paid by updating its next due date and resetting the expired flag.
+     *
+     * This function delegates the operation to the underlying repository,
+     * which typically moves the debt's 'nextDueDate' to the next billing cycle
+     * and sets 'isExpired' to false.
+     *
+     * @param {string} debtId - The unique identifier of the debt to be marked as paid.
+     * @returns {Promise<boolean>} A promise resolving to `true` if the update was successful, or `false` otherwise.
+     * @throws {Error} If an error occurs during the update process.
+     */
+    async markAsPaid(debtId: string): Promise<boolean> {
+        try {
+            // Delegate to the repository to mark the debt as paid
+            const markAsPaid = await this._debtManagementRepository.markAsPaid(debtId);
+        
+            return markAsPaid;
+        } catch (error) {
+            // Log and rethrow the error for upstream handling
+            console.error('Error marking debt as paid:', error);
+            throw new Error((error as Error).message);
+        }
+    }
 }
 
 export default DebtService;

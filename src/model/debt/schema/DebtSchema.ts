@@ -28,6 +28,7 @@ export const DebtSchema = new Schema({
     isDeleted: { type: Boolean, default: false },
     isGoodDebt: { type: Boolean, default: false },
     isCompleted: { type: Boolean, default: false },
+    isExpired: { type: Boolean, default: false },
 }, { timestamps: true });
 
 export const DebtPaymentsSchema = new Schema({

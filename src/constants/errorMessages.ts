@@ -74,5 +74,8 @@ export const ErrorMessages = {
 
     // Insurance Errors 
     FAILED_TO_REMOVE_INSURANCE: 'Failed to remove the insurance record. Please try again later.',
+
+    // Debt Errors 
+    FAILED_TO_REMOVE_DEBT: 'Failed to remove the debt record. Please try again later.',
 } as const;
 

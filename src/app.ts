@@ -10,9 +10,13 @@ import helmet from 'helmet';
 // import apiRouter from 'routes/v1/onemoney/api.routes';
 import './cron/scheduler';
 import expireJob from './cron/expireInsurances';
+import markExpiryDebts from './cron/DebtMonthlyExpiry';
+import markDebtCompleted from './cron/markEndedDebtsAsCompleted.ts';
 
 const app = express();
 expireJob.start();
+markExpiryDebts.start();
+markDebtCompleted.start();
 
 // Middleware
 app.use(express.json());

@@ -8,6 +8,9 @@ interface IDebtController {
     getLongestTenure(request: Request, response: Response): Promise<void>;
     getDebtCategorized(request: Request, response: Response): Promise<void>;
     getRepaymentStrategyComparison(request: Request, response: Response): Promise<void>;
+    getAllDebts(request: Request, response: Response): Promise<void>;
+    deleteDebt(request: Request, response: Response): Promise<void>;
+    markAsPaid(request: Request, response: Response): Promise<void>;
 }
 
 export default IDebtController;

@@ -9,6 +9,11 @@ interface IDebtService {
     getLongestTenure(accessToken: string): Promise<number>;
     getDebtCategorized(accessToken: string, category: string): Promise<IDebtDTO[]>;
     getRepaymentStrategyComparison(accessToken: string, extraAmount: number): Promise<ComparisonResult>;
+    getAllDebts(accessToken: string): Promise<IDebtDTO[]>;
+    deleteDebt(debtId: string): Promise<boolean>;
+    updateExpiry(): Promise<void>;
+    markEndedDebtsAsCompleted(): Promise<void>;
+    markAsPaid(debtId: string): Promise<boolean>;
 }
 
 export default IDebtService;

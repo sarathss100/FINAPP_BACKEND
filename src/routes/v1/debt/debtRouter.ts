@@ -11,6 +11,9 @@ const debtController: IDebtController = new DebtController(debtService);
 
 router.post('/', debtController.createDebt.bind(debtController));
 router.get('/', debtController.getDebtCategorized.bind(debtController));
+router.get('/all', debtController.getAllDebts.bind(debtController));
+router.delete('/:id', debtController.deleteDebt.bind(debtController));
+router.patch('/:id', debtController.markAsPaid.bind(debtController));
 router.get('/total', debtController.getTotalDebt.bind(debtController));
 router.get('/summary', debtController.getTotalOutstandingDebt.bind(debtController));
 router.get('/monthly-payment', debtController.getTotalMonthlyPayment.bind(debtController));

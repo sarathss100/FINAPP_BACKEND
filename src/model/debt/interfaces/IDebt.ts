@@ -25,6 +25,7 @@ export interface IDebt extends Document {
     isDeleted: boolean;
     isGoodDebt: boolean;
     isCompleted: boolean;
+    isExpired: boolean;
 }
 
 export interface IDebtPayments extends Document {

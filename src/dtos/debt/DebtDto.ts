@@ -51,6 +51,7 @@ const debtDTOSchema = z.object({
     isDeleted: z.boolean().default(false),
     isGoodDebt: z.boolean().default(false),
     isCompleted: z.boolean().default(false),
+    isExpired: z.boolean().default(false),
 });
 
 // Infer the TS type from the Zod schema
