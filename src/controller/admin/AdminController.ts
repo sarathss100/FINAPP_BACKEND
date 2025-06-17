@@ -75,7 +75,26 @@ class AdminController implements IAdminController {
             const isAdded = await this._adminService.addFaq({ question, answer });
     
             if (isAdded) {
-                sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.FAQ_ADDED);
+                sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.FAQ_ADDED, { isAdded });
+            } else {
+                sendErrorResponse(response, StatusCodes.BAD_REQUEST, ErrorMessages.FAILED_TO_ADD_THE_FAQ);
+            }
+        } catch (error) {
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    async getAllFaqsForAdmin(request: Request, response: Response): Promise<void> {
+        try {
+            // Call the getall FAQ details in the adminService
+            const faqDetails = await this._adminService.getAllFaqsForAdmin();
+
+            if (faqDetails) {
+                sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.FAQ_ADDED, { faqDetails });
             } else {
                 sendErrorResponse(response, StatusCodes.BAD_REQUEST, ErrorMessages.FAILED_TO_ADD_THE_FAQ);
             }
@@ -98,6 +117,96 @@ class AdminController implements IAdminController {
             } else {
                 sendErrorResponse(response, StatusCodes.BAD_REQUEST, ErrorMessages.FAILED_TO_ADD_THE_FAQ);
             }
+        } catch (error) {
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    /**
+     * Controller to handle FAQ deletion via HTTP DELETE request.
+     *
+     * Extracts the FAQ ID from the request parameters, calls the service to delete the FAQ,
+     * and sends an appropriate success or error response.
+     *
+     * @param {Request} request - Express Request object containing the FAQ ID in `params.id`.
+     * @param {Response} response - Express Response object to send the response.
+     * @returns {Promise<void>} Sends response via Express; does not return a value.
+     */
+    async deleteFaq(request: Request, response: Response): Promise<void> {
+        try {
+            const faqId: string = request.params.id;
+
+            // Call the delete FAQ method in the admin service
+            const isRemoved = await this._adminService.deleteFaq(faqId);
+
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.FAQ_DELETED_SUCCESSFULLY, { isRemoved });
+        } catch (error) {
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    /**
+     * Controller to handle toggling the publish status of an FAQ via an HTTP PATCH request.
+     *
+     * Extracts the FAQ ID from the request parameters, calls the service to toggle the
+     * 'isPublished' status of the FAQ, and sends an appropriate success or error response.
+     *
+     * @param {Request} request - Express Request object containing the FAQ ID in `params.id`.
+     * @param {Response} response - Express Response object to send the response.
+     * @returns {Promise<void>} Sends response via Express; does not return a value.
+     */
+    async togglePublish(request: Request, response: Response): Promise<void> {
+        try {
+            const faqId: string = request.params.id;
+        
+            // Call the service method to toggle the publish status
+            const isToggled = await this._adminService.togglePublish(faqId);
+        
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.FAQ_UPDATED_SUCCESSFULLY, { isToggled });
+        } catch (error) {
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    /**
+     * Controller to handle updating an FAQ entry via an HTTP PATCH request.
+     *
+     * Extracts the FAQ ID from the request parameters and the update data from the request body.
+     * Validates the input using the FAQ schema, calls the service to update the FAQ,
+     * and sends an appropriate success or error response.
+     *
+     * @param {Request} request - Express Request object containing the FAQ ID in `params.id` and update data in `body`.
+     * @param {Response} response - Express Response object to send the response.
+     * @returns {Promise<void>} Sends response via Express; does not return a value.
+     */
+    async updateFaq(request: Request, response: Response): Promise<void> {
+        try {
+            console.log(`Request comes here`);
+            const faqId: string = request.params.id;
+        
+            // Validate the request body using zod
+            const parsedData = faqSchema.safeParse(request.body);
+        
+            if (!parsedData.success) {
+                throw new ValidationError(ErrorMessages.INVALID_INPUT, StatusCodes.BAD_REQUEST)
+            }
+        
+            // Call the service method to update the FAQ
+            const isUpdated = await this._adminService.updateFaq(faqId, { ...parsedData.data });
+        
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.FAQ_UPDATED_SUCCESSFULLY, { isUpdated });
         } catch (error) {
             if (error instanceof AppError) {
                 sendErrorResponse(response, error.statusCode, error.message);

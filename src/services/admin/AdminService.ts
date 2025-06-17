@@ -128,6 +128,49 @@ class AdminService implements IAdminService {
     }
 
     /**
+     * Fetches all FAQ entries from the database for administrative purposes.
+     *
+     * This method retrieves all FAQs using the admin repository. If no FAQs exist,
+     * it returns an empty array — not `null` — since that is typically preferred
+     * when working with collections in TypeScript.
+     *
+     * @returns {Promise<IFaq[]>} A promise that resolves to an array of FAQ entries (`IFaq[]`).
+     *                           Returns an empty array if no FAQs are found.
+     * 
+     * @throws {ServerError} If there's a failure during the database operation or repository call.
+     * @throws {AppError} If an application-specific error occurs (e.g., validation, business logic).
+     * @throws {Error} If an unexpected or unhandled error occurs.
+     */
+    async getAllFaqsForAdmin(): Promise<IFaq[]> {
+        try {
+            // Call the repository method to fetch all FAQ entries
+            const faqDetails = await this._adminRepository.getAllFaqsForAdmin();
+        
+            // Validate the result; throw an error if no FAQs were found or the operation failed
+            if (!faqDetails) {
+                throw new ServerError(ErrorMessages.FAILED_TO_FETCH_FAQS, StatusCodes.INTERNAL_SERVER_ERROR);
+            }
+        
+            // This condition will never be true because `faqDetails.length < 0` is invalid
+            // Arrays have length >= 0
+            if (faqDetails.length === 0) {
+                throw new ServerError(ErrorMessages.NO_FAQ_FOUND, StatusCodes.NOT_FOUND);
+            }
+        
+            // Return the fetched FAQ details
+            return faqDetails;
+        } catch (error) {
+            // Re-throw the error if it's an instance of AppError (custom application error)
+            if (error instanceof AppError) {
+                throw error;
+            } else {
+                // Re-throw unexpected errors for further handling
+                throw error;
+            }
+        }
+    }
+
+    /**
      * Fetches all FAQ entries from the database for the admin.
      * 
      * @returns A promise that resolves to an array of FAQ entries (`IFaq[]`) or `null` if no FAQs exist.
@@ -152,6 +195,108 @@ class AdminService implements IAdminService {
 
             // Return the fetched FAQ details
             return faqDetails;
+        } catch (error) {
+            // Re-throw the error if it's an instance of AppError (custom application error)
+            if (error instanceof AppError) {
+                throw error;
+            } else {
+                // Re-throw unexpected errors for further handling
+                throw error;
+            }
+        }
+    }
+
+    /**
+     * Deletes an FAQ entry by its unique identifier.
+     *
+     * This function calls the repository to delete an FAQ from the database using the provided `faqId`.
+     * Returns a boolean indicating whether the deletion was successful.
+     *
+     * @param {string} faqId - The unique identifier of the FAQ to be deleted.
+     * @returns {Promise<boolean>} A promise that resolves to `true` if the FAQ was successfully deleted,
+     *                             or `false` if the deletion failed (e.g., FAQ not found).
+     * 
+     * @throws {ServerError} If an internal server error occurs during the deletion process.
+     * @throws {AppError} If a known application-specific error occurs.
+     * @throws {Error} If an unexpected or unhandled error occurs.
+     */
+    async deleteFaq(faqId: string): Promise<boolean> {
+        try {
+            // Call the repository method to delete the FAQ by ID
+            const isRemoved = await this._adminRepository.deleteFaq(faqId);
+        
+            // Validate the result; throw an error if no FAQs were found or the operation failed
+            if (!isRemoved) {
+                throw new ServerError(ErrorMessages.FAILED_TO_DELETE_FAQ, StatusCodes.INTERNAL_SERVER_ERROR);
+            }
+        
+            // Return the deletion result
+            return isRemoved;
+        } catch (error) {
+            // Re-throw the error if it's an instance of AppError (custom application error)
+            if (error instanceof AppError) {
+                throw error;
+            } else {
+                // Re-throw unexpected errors for further handling
+                throw error;
+            }
+        }
+    }
+
+    /**
+     * Toggles the publish status (e.g., `isPublished`) of an FAQ identified by its ID.
+     *
+     * This function delegates the toggle operation to the repository layer and returns
+     * a boolean indicating whether the update was successful (i.e., if the FAQ exists and was updated).
+     *
+     * @param {string} faqId - The unique identifier of the FAQ whose publish status is to be toggled.
+     * @returns {Promise<boolean>} A promise that resolves to `true` if the FAQ was successfully toggled,
+     *                             or `false` if no matching FAQ was found or the update failed.
+     * 
+     * @throws {ServerError} If an internal server error occurs during the toggle process.
+     * @throws {AppError} If a known application-specific error occurs.
+     * @throws {Error} If an unexpected or unhandled error occurs.
+     */
+    async togglePublish(faqId: string): Promise<boolean> {
+        try {
+            // Call the repository method to toggle the publish status
+            const isToggled = await this._adminRepository.togglePublish(faqId);
+        
+            // Return the result from the repository
+            return isToggled;
+        } catch (error) {
+            // Re-throw the error if it's an instance of AppError (custom application error)
+            if (error instanceof AppError) {
+                throw error;
+            } else {
+                // Re-throw unexpected errors for further handling
+                throw error;
+            }
+        }
+    }
+
+    /**
+     * Updates an FAQ entry with the provided partial data.
+     *
+     * This function delegates the update operation to the repository layer and returns
+     * a boolean indicating whether the update was successful (i.e., if the FAQ exists and was modified).
+     *
+     * @param {string} faqId - The unique identifier of the FAQ to update.
+     * @param {Partial<IFaq>} updatedData - An object containing the fields to update.
+     * @returns {Promise<boolean>} A promise that resolves to `true` if the FAQ was successfully updated,
+     *                             or `false` if no matching FAQ was found or the update failed.
+     * 
+     * @throws {ServerError} If an internal server error occurs during the update process.
+     * @throws {AppError} If a known application-specific error occurs.
+     * @throws {Error} If an unexpected or unhandled error occurs.
+     */
+    async updateFaq(faqId: string, updatedData: Partial<IFaq>): Promise<boolean> {
+        try {
+            // Call the repository method to update the FAQ
+            const isUpdated = await this._adminRepository.updateFaq(faqId, updatedData);
+        
+            // Return the result from the repository
+            return isUpdated;
         } catch (error) {
             // Re-throw the error if it's an instance of AppError (custom application error)
             if (error instanceof AppError) {

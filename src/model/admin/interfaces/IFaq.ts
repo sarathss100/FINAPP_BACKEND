@@ -5,6 +5,7 @@ interface IFaq extends Document {
     question: string;
     answer: string;
     isDeleted: boolean;
+    isPublished?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
 }

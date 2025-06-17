@@ -11,6 +11,8 @@ interface IAdminRepository {
     getAllFaqs(): Promise<IFaq[] | null>;
     getNewRegistrationCount(): Promise<number>;
     getSystemMetrics(): Promise<ISystemMetrics>;
+    getAllFaqsForAdmin(): Promise<IFaq[]>;
+    togglePublish(faqId: string): Promise<boolean>;
 }
 
 export default IAdminRepository;

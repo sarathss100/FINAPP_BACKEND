@@ -64,4 +64,7 @@ export const SuccessMessages = {
     DEBT_CREATED_SUCCESSFULLY: 'Debt Created Successfully',
     REMOVED_DEBT: 'Debt Removed Successfully!',
     UPDATED_SUCCESSFULLY: 'Debt Updated Successfully!',
+
+    FAQ_DELETED_SUCCESSFULLY: 'Faq Removed Successfully!',
+    FAQ_UPDATED_SUCCESSFULLY: 'Faq Updated Successfully!',
 } as const;

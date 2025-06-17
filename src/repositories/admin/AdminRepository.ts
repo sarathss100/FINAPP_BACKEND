@@ -48,22 +48,148 @@ class AdminRepository implements IAdminRepository {
         return { ramUsage, diskUsage };
     }
 
-    // Add a new FAQ entry to the list
+    /**
+    * Adds a new FAQ entry to the database.
+    *
+    * This function inserts a new FAQ item containing a question and answer into the FaqModel.
+    * Returns true if the insertion was successful, false otherwise.
+    *
+    * @param {IFaq} newFaq - The FAQ object to be added. Must contain 'question' and 'answer'.
+    * @returns {Promise<boolean>} A promise that resolves to true if the FAQ was successfully added,
+    *                            or false otherwise.
+    * @throws {Error} If an error occurs during the database insertion, an error is thrown
+    *                 with a descriptive message indicating the failure.
+    */
     async addFaq(newFaq: IFaq): Promise<boolean> {
-        const result = await FaqModel.insertOne({ question: newFaq.question, answer: newFaq.answer });
-        return result ? true : false;
+        try {
+            const result = await FaqModel.insertOne({ question: newFaq.question, answer: newFaq.answer });
+
+            return result ? true : false;
+        } catch (error) {
+            // Log the raw error for debugging purposes
+            console.error('Error during FAQ addition:', error);
+        
+            // Throw a new, user-friendly error with context
+            throw new Error(`Failed to add FAQ: ${(error as Error).message}`);
+        }
     }
 
-    // Update FAQ entry to the list
-    async updateFaq(faqId: string, updatedData: Partial<IFaq>): Promise<boolean> {
-        console.log(faqId, updatedData);
-        return true;
+    /**
+     * Retrieves all FAQ entries from the database for administrative purposes.
+     *
+     * This function fetches all documents stored in the FaqModel and returns them
+     * as an array of IFaq objects. It is intended for use by admin interfaces or services.
+     *
+     * @returns {Promise<IFaq[]>} A promise that resolves to an array of FAQ objects.
+     * @throws {Error} If an error occurs during the database retrieval, an error is thrown
+     *                 with a descriptive message indicating the failure.
+     */
+    async getAllFaqsForAdmin(): Promise<IFaq[]> {
+        try {
+            const result = await FaqModel.find({ isDeleted: false }).sort({ updatedAt: -1 });
+        
+            return result;
+        } catch (error) {
+            // Log the raw error for debugging purposes
+            console.error('Error while fetching FAQs:', error);
+        
+            // Throw a new, user-friendly error with context
+            throw new Error(`Failed to retrieve FAQs: ${(error as Error).message}`);
+        }
     }
 
-    // Delete FAQ entry to the list
+    /**
+     * Deletes an FAQ entry by its ID.
+     *
+     * This function searches for an FAQ document in the database using the provided `faqId`
+     * and removes it. It returns true if the deletion was successful, false otherwise.
+     *
+     * @param {string} faqId - The unique identifier of the FAQ to delete.
+     * @returns {Promise<boolean>} A promise that resolves to true if the FAQ was successfully deleted,
+     *                             or false if no matching FAQ was found.
+     * @throws {Error} If an error occurs during the database operation, an error is thrown
+     *                 with a descriptive message indicating the failure.
+     */
     async deleteFaq(faqId: string): Promise<boolean> {
-        console.log(faqId);
-        return true;
+        try {
+            const result = await FaqModel.findOneAndUpdate({ _id: faqId }, { $set: { isDeleted: true, isPublished: false }});
+
+            return !!result; // Return true if a document was deleted, false otherwise
+        } catch (error) {
+            // Log the raw error for debugging purposes
+            console.error('Error while deleting FAQ:', error);
+        
+            // Throw a new, user-friendly error with context
+            throw new Error(`Failed to delete FAQ: ${(error as Error).message}`);
+        }
+    }
+
+    /**
+     * Toggles the 'isPublished' status of an FAQ entry by its ID.
+     *
+     * This function finds an FAQ by ID and flips the value of the 'isPublished' field.
+     * Returns true if the update was successful, false otherwise (e.g., FAQ not found).
+     *
+     * @param {string} faqId - The unique identifier of the FAQ to update.
+     * @returns {Promise<boolean>} A promise that resolves to true if the FAQ was successfully toggled,
+     *                             or false if no matching FAQ was found.
+     * @throws {Error} If an error occurs during the database operation, an error is thrown
+     *                 with a descriptive message indicating the failure.
+     */
+    async togglePublish(faqId: string): Promise<boolean> {
+        try {
+            // Find the FAQ by ID
+            const faq = await FaqModel.findById(faqId);
+        
+            if (!faq) {
+                return false; // FAQ not found
+            }
+        
+            // Toggle the 'isPublished' field
+            faq.isPublished = !faq.isPublished;
+        
+            // Save the updated document
+            const updatedFaq = await faq.save();
+        
+            return !!updatedFaq; // Return true if successfully saved
+        } catch (error) {
+            // Log the raw error for debugging purposes
+            console.error('Error while toggling FAQ publish status:', error);
+        
+            // Throw a new, user-friendly error with context
+            throw new Error(`Failed to toggle FAQ publish status: ${(error as Error).message}`);
+        }
+    }
+
+    /**
+     * Updates an FAQ entry with the provided data.
+     *
+     * This function finds an FAQ by its ID and updates the specified fields.
+     * It supports partial updates, so only the fields provided in `updatedData` will be modified.
+     *
+     * @param {string} faqId - The unique identifier of the FAQ to update.
+     * @param {Partial<IFaq>} updatedData - An object containing the fields to update (e.g., question, answer, isPublished).
+     * @returns {Promise<boolean>} A promise that resolves to true if the FAQ was successfully updated,
+     *                             or false if no matching FAQ was found.
+     * @throws {Error} If an error occurs during the database operation, an error is thrown
+     *                 with a descriptive message indicating the failure.
+     */
+    async updateFaq(faqId: string, updatedData: Partial<IFaq>): Promise<boolean> {
+        try {
+            // Update only the provided fields
+            const result = await FaqModel.updateOne(
+                { _id: faqId },
+                { $set: updatedData }
+            );
+        
+            return result.matchedCount === 1 && result.modifiedCount === 1;
+        } catch (error) {
+            // Log the raw error for debugging purposes
+            console.error('Error while updating FAQ:', error);
+        
+            // Throw a new, user-friendly error with context
+            throw new Error(`Failed to update FAQ: ${(error as Error).message}`);
+        }
     }
 
     // Fetches all FAQ entries from the database for admin
