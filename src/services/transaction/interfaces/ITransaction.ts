@@ -28,6 +28,15 @@ interface ITransactionService {
         category?: string,
         searchText?: string,
     ): Promise<{ data: ITransactionDTO[], total: number, currentPage: number, totalPages: number }>;
+    getPaginatedTransactions(
+        userId: string,
+        page: number,
+        limit: number,
+        timeRange?: 'day' | 'week' | 'month' | 'year',
+        category?: string,
+        transactionType?: string,
+        searchText?: string,
+    ): Promise<{ data: ITransactionDTO[], total: number, currentPage: number, totalPages: number }>;
 }
 
 export default ITransactionService;

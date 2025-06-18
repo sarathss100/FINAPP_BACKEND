@@ -28,6 +28,7 @@ router.get('/summary/income-by-month', transactionController.getMonthlyIncomeFor
 router.get('/summary/expense-by-month', transactionController.getMonthlyExpenseForChart.bind(transactionController));
 
 // Speicific transactions 
+router.get('/all', transactionController.getPaginatedTransactions.bind(transactionController));
 router.get('/income/transactions', transactionController.getAllIncomeTransactionsByCategory.bind(transactionController));
 router.get('/expense/transactions', transactionController.getAllExpenseTransactionsByCategory.bind(transactionController));
 

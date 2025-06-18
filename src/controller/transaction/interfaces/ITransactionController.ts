@@ -14,6 +14,7 @@ interface ITransactionController {
     getMonthlyExpenseForChart(request: Request, response: Response): Promise<void>;
     getPaginatedIncomeTransactions(request: Request, response: Response): Promise<void>;
     getPaginatedExpenseTransactions(request: Request, response: Response): Promise<void>;
+    getPaginatedTransactions(request: Request, response: Response): Promise<void>;
 }
 
 export default ITransactionController;

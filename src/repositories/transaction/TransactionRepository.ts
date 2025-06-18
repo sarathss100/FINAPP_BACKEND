@@ -965,6 +965,150 @@ class TransactionRepository implements ITransactionRepository {
             throw new Error((error as Error).message);
         }
     }
+
+    /**
+    * Retrieves paginated income or expense transactions for a specific user based on various filters.
+    * 
+    * This method supports:
+    * - Filtering by time range (last day, week, current month/year)
+    * - Filtering by category
+    * - Filtering by transaction type (Income/Expense)
+    * - Search in description and tags
+    * - Pagination using page and limit
+    *
+    * @param {string} userId - The unique identifier of the user whose transactions are being retrieved.
+    * @param {number} [page=1] - The page number for pagination.
+    * @param {number} [limit=10] - Number of items per page.
+    * @param {'day'|'week'|'month'|'year'} [timeRange] - Optional time range filter.
+    * @param {string} [category] - Optional category filter.
+    * @param {string} [transactionType] - Optional transaction type filter ('Income' or 'Expense').
+    * @param {string} [searchText] - Optional text to search in description or tags.
+    *
+    * @returns {Promise<{ data: ITransactionDTO[], total: number, currentPage: number, totalPages: number }>}
+    *   A promise resolving to:
+    *   - `data`: Paginated list of matched transactions
+    *   - `total`: Total number of matching documents
+    *   - `currentPage`: Current page number
+    *   - `totalPages`: Total number of pages available
+    *
+    * @throws {Error} - Throws an error if the database operation fails.
+    */
+    async getPaginatedTransactions(
+        userId: string,
+        page: number,
+        limit: number,
+        timeRange?: 'day' | 'week' | 'month' | 'year',
+        category?: string,
+        transactionType?: string,
+        searchText?: string,
+    ): Promise<{ data: ITransactionDTO[], total: number, currentPage: number, totalPages: number }> {
+        try {
+            const now = new Date();
+
+            // Build dynamic date filter based on timeRange
+            let dateFilter = {};
+
+            if (timeRange === 'day') {
+                const yesterday = new Date(now);
+                yesterday.setDate(yesterday.getDate() - 1);
+                dateFilter = {
+                    date: {
+                        $gte: yesterday,
+                        $lte: now,
+                    }
+                };
+            } else if (timeRange === 'week') {
+                const oneWeekAgo = new Date(now);
+                oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                dateFilter = {
+                    date: {
+                        $gte: oneWeekAgo,
+                        $lte: now
+                    }
+                };
+            } else if (timeRange === 'month') {
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                dateFilter = {
+                    date: {
+                        $gte: startOfMonth,
+                        $lte: endOfMonth,
+                    }
+                };
+            } else if (timeRange === 'year') {
+                const startOfYear = new Date(now.getFullYear(), 0, 1);
+                const endOfYear = new Date(now.getFullYear() + 1, 0, 0);
+                dateFilter = {
+                    date: {
+                        $gte: startOfYear,
+                        $lte: endOfYear,
+                    }
+                }
+            }
+
+
+            let transaction_type = '';
+            if (transactionType === 'INCOME') {
+                transaction_type = 'INCOME';
+            } else if (transactionType === 'EXPENSE') {
+                transaction_type = 'EXPENSE';
+            }
+
+            const pipeline = [
+                {
+                    $match: {
+                        user_id: userId,
+                        ...dateFilter,
+                        ...(transaction_type && { transaction_type }),
+                        ...(category && { category }),
+                        ...(searchText && {
+                            $or: [
+                                { description: { $regex: searchText, $options: 'i' } },
+                                { tags: { $regex: searchText, $options: 'i' } },
+                            ]
+                        })
+                    }
+                },
+                {
+                    $sort: { date: -1 as 1 | -1 }
+                },
+                {
+                    $facet: {
+                        metadata: [{ $count: 'total' }],
+                        data: [
+                            { $skip: (page - 1) * limit },
+                            { $limit: limit }
+                        ]
+                    }
+                },
+                {
+                    $project: {
+                        data: 1,
+                        totalPages: {
+                            $ceil: { $divide: [{ $arrayElemAt: ['$metadata.total', 0] }, limit] }
+                        },
+                        currentPage: { $literal: page },
+                        total: { $arrayElemAt: ['$metadata.total', 0] }
+                    }
+                }
+            ];
+
+            const result = await TransactionModel.aggregate(pipeline);
+
+            return {
+                data: result[0]?.data || [],
+                total: result[0]?.total || 0,
+                currentPage: result[0]?.currentPage || 1,
+                totalPages: result[0]?.totalPages || 1,
+            }
+        } catch (error) {
+            // Log the error for debugging purposes.
+            console.error('Error retrieving transaction details:', error);
+
+            // Re-throw the error with a more descriptive message, ensuring the caller is informed of the issue.
+            throw new Error((error as Error).message);
+        }
+    }
 }
 
 export default TransactionRepository;

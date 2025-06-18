@@ -800,6 +800,77 @@ class TransactionService implements ITransactionService {
             throw new Error((error as Error).message);
         }
     }
+
+    /**
+    * Retrieves paginated income or expense transactions for the authenticated user based on various filters.
+    *
+    * This method:
+    * - Extracts the user ID from the provided JWT access token to authenticate the request.
+    * - Supports filtering by time range (last day, week, current month/year).
+    * - Allows filtering by category and transaction type (Income/Expense).
+    * - Supports text search in description and tags.
+    * - Uses pagination to limit the number of results returned.
+    * - Delegates data fetching to the repository layer.
+    *
+    * @param {string} accessToken - The JWT access token used to authenticate the user and extract their ID.
+    * @param {number} [page=1] - The page number for pagination (default: 1).
+    * @param {number} [limit=10] - Number of items per page (default: 10).
+    * @param {'day'|'week'|'month'|'year'} [timeRange] - Optional time range filter.
+    * @param {string} [category] - Optional category filter.
+    * @param {string} [transactionType] - Optional transaction type filter ('Income' or 'Expense').
+    * @param {string} [searchText] - Optional text to search in description or tags.
+    *
+    * @returns {Promise<{ data: ITransactionDTO[], total: number, currentPage: number, totalPages: number }>}
+    *   A promise resolving to an object containing:
+    *   - `data`: Paginated list of matched transactions
+    *   - `total`: Total number of matching documents
+    *   - `currentPage`: Current page number
+    *   - `totalPages`: Total number of pages available
+    *
+    * @throws {AuthenticationError} If the access token is invalid or does not contain a valid user ID.
+    * @throws {Error} If there's an internal error during the data retrieval process.
+    */
+    async getPaginatedTransactions(
+        accessToken: string,
+        page: number,
+        limit: number,
+        timeRange?: 'day' | 'week' | 'month' | 'year',
+        category?: string,
+        transactionType?: string,
+        searchText?: string,
+    ): Promise<{ data: ITransactionDTO[], total: number, currentPage: number, totalPages: number }> {
+        try {
+            // Extract the authenticated user's ID from the provided access token.
+            // Ensures only authenticated users can access their own financial data.
+            const userId = decodeAndValidateToken(accessToken);
+        
+            if (!userId) {
+                // If no user ID could be extracted from the token, authentication fails.
+                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
+            }
+            
+            // Delegate to the repository layer to fetch filtered and paginated expense transactions.
+            // This keeps the service layer clean and separates business logic from data access logic.
+            const transactions = await this._transactionRepository.getPaginatedTransactions(
+                userId,
+                page,
+                limit,
+                timeRange,
+                category,
+                transactionType,
+                searchText
+            );
+        
+            // Return the retrieved transaction data
+            return transactions;
+        } catch (error) {
+            // Log the error for internal debugging and monitoring purposes.
+            console.error('Error retrieving expense transactions:', error);
+        
+            // Throw a generic error to avoid exposing sensitive internal details to the client.
+            throw new Error((error as Error).message);
+        }
+    }
 }
 
 export default TransactionService;
