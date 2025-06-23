@@ -10,6 +10,7 @@ const UserSchema = new Schema({
     isDeleted: { type: Boolean, default: false },
     status: { type: Boolean, default: true },
     profile_picture_url: { type: String, default: './user.png' },
+    profile_picture_id: { type: String, default: null },
 }, { timestamps: true });
 
 export default UserSchema;

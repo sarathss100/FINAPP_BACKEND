@@ -6,6 +6,7 @@ import { AuthenticationError, ServerError, ValidationError } from 'error/AppErro
 import { ErrorMessages } from 'constants/errorMessages';
 import { StatusCodes } from 'constants/statusCodes';
 import uploadToCloudinary from 'services/cloudinary/cloudinaryService';
+import generateUniqueId from 'utils/user/generateUniqueId';
 
 class UserService implements IUserService {
     private _userRepository: IUserRepository;
@@ -37,12 +38,17 @@ class UserService implements IUserService {
             // Upload the image to Cloudinary
             const cloudinaryUrl = await uploadToCloudinary(file.buffer, file.originalname);
 
+            // Generate unique image ID 
+            const imageId = generateUniqueId();
+
             // Save the Cloudinary URL in the database
-            const isProfilePictureUpdated = await this._userRepository.updateUserProfileImageUrl(userId, cloudinaryUrl);
+            const isProfilePictureUpdated = await this._userRepository.updateUserProfileImageData(userId, cloudinaryUrl, imageId);
 
             if (!isProfilePictureUpdated) throw new ServerError(ErrorMessages.FAILED_TO_UPLOAD_PROFILE_PICTURE, StatusCodes.INTERNAL_SERVER_ERROR);
 
-            return cloudinaryUrl; // Return the updated URL
+            // Return proxy URL instead of direct Cloudinary URL 
+            const proxyUrl = `${process.env.BASE_URL}/api/user/images/${imageId}`;
+            return proxyUrl;
         } catch (error) {
             throw new Error((error as Error).message);
         }
@@ -54,11 +60,47 @@ class UserService implements IUserService {
             const userId = decodeAndValidateToken(accessToken);
 
             // Extract the profile picture url from the database
-            const profilePictureUrl = await this._userRepository.getUserProfileImageUrl(userId);
+            const imageData = await this._userRepository.getUserProfileImageData(userId);
 
-            if (!profilePictureUrl) throw new ServerError(ErrorMessages.FAILED_TO_FETCH_PROFILE_PICTURE_URL, StatusCodes.INTERNAL_SERVER_ERROR);
+            if (!imageData) {
+                // Return proxy URL for default image 
+                return `${process.env.BASE_URL}/api/user/images/default`;
+            }
 
-            return profilePictureUrl; // Return the URL 
+            // Return proxy URL
+            const proxyUrl = `${process.env.BASE_URL}/api/user/images/${imageData.imageId}`;
+            return proxyUrl;
+        } catch (error) {
+            throw new Error((error as Error).message);
+        }
+    }
+
+    async getImageForProxy(imageId: string): Promise<Buffer | string> {
+        try {
+            let imageUrl: string;
+
+            if (imageId === 'default') {
+                // Handle default image
+                imageUrl = './user.png';
+                return imageUrl;
+            } else {
+                // Get actual Cloudinary URL from database 
+                const fetchedImageUrl = await this._userRepository.getImageUrlById(imageId);
+
+                if (!fetchedImageUrl) {
+                    throw new Error(`Image not found`);
+                }
+                imageUrl = fetchedImageUrl;
+            }
+
+            // Fetch image from Cloudinary
+            const response = await fetch(imageUrl);
+            if (!response.ok) {
+                throw new Error('Failed to fetch image');
+            }
+
+            const arrayBuffer = await response.arrayBuffer();
+            return Buffer.from(arrayBuffer);
         } catch (error) {
             throw new Error((error as Error).message);
         }

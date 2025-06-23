@@ -18,8 +18,10 @@ export enum InvestmentType {
 interface IBaseInvestment {
     name: string;
     icon?: string;
-    amount: number;
-    related_account?: mongoose.Types.ObjectId; 
+    initialAmount: number;
+    currentValue?: number;
+    totalProfitOrLoss?: number;
+    relatedAccount?: mongoose.Types.ObjectId; 
     currency?: string;
     notes?: string;
     createdAt: Date;
@@ -76,18 +78,18 @@ export interface IBusiness extends IBaseInvestment {
 }
 
 export interface IFixedDeposit extends IBaseInvestment {
-    maturity_date: Date;
-    interest_rate: string;
-    maturity_amount: string;
+    maturityDate: Date;
+    interestRate: string;
+    maturityAmount: string;
 }
 
 export interface IEPFO extends IBaseInvestment {
-    account_number: string;
-    epf_number: string;
-    employer_contribution: number;
-    employee_contribution: number;
-    interest_rate: number;
-    maturity_amount?: number;
+    accountNumber: string;
+    epfNumber: string;
+    employerContribution: number;
+    employeeContribution: number;
+    interestRate: number;
+    maturityAmount?: number;
 }
 
 export interface IGold extends IBaseInvestment {

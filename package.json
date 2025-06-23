@@ -16,7 +16,6 @@
     "@google/generative-ai": "^0.24.1",
     "@types/cron": "^2.0.1",
     "@types/moment": "^2.11.29",
-    "@types/uuid": "^10.0.0",
     "axios": "^1.8.4",
     "bcrypt": "^5.1.1",
     "check-disk-space": "^3.4.0",
@@ -43,6 +42,7 @@
     "papaparse": "^5.5.2",
     "redis": "^4.7.0",
     "tsconfig-paths": "^4.2.0",
+    "uuid": "^11.1.0",
     "winston": "^3.17.0",
     "xlsx": "^0.18.5",
     "zod": "^3.24.2"
@@ -58,6 +58,7 @@
     "@types/node": "^22.14.0",
     "@types/os-utils": "^0.0.4",
     "@types/papaparse": "^5.3.16",
+    "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.26.1",
     "@typescript-eslint/parser": "^8.26.1",
     "eslint": "^9.22.0",

@@ -15,15 +15,25 @@ class UserRepository extends UserBaseRespository implements IUserRepository {
     }
 
     // Updates the profile picture URL for a specific user in the database.
-    async updateUserProfileImageUrl(userId: string, imageUrl: string): Promise<boolean> {
-        const user = await UserModel.updateOne({ _id: userId }, { $set: { profile_picture_url: imageUrl } });
+    async updateUserProfileImageData(userId: string, imageUrl: string, imageId: string): Promise<boolean> {
+        const user = await UserModel.updateOne({ _id: userId }, { $set: { profile_picture_url: imageUrl, profile_picture_id: imageId } });
         return user.acknowledged;
     }
 
     // Retrieves the profile picture URL for a specific user in the database.
-    async getUserProfileImageUrl(userId: string): Promise<string> {
-        const user = await UserModel.findOne({ _id: userId }, { _id: 0, profile_picture_url: 1 });
-        return user?.profile_picture_url || './user.png';
+    async getUserProfileImageData(userId: string): Promise<{ imageUrl: string; imageId: string } | null> {
+        const user = await UserModel.findOne({ _id: userId }, { _id: 0, profile_picture_url: 1, profile_picture_id: 1 });
+        if (!user?.profile_picture_url) return null;
+        return { imageUrl: user.profile_picture_url, imageId: user.profile_picture_id };
+    }
+
+    // Get image URL by image ID (for proxy serving)
+    async getImageUrlById(imageId: string): Promise<string | null> {
+        const user = await UserModel.findOne(
+            { profile_picture_id: imageId },
+            { _id: 0, profile_picture_url: 1 }
+        );
+        return user?.profile_picture_url || null;
     }
 
     // Toggles the Two-Factor Authentication (2FA) status for a specific user in the database.

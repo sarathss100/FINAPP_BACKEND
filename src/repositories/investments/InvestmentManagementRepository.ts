@@ -28,7 +28,7 @@ class InvestmentManagementRepository implements IInvestmentManagementRepository 
     async createInvestment(investmentData: InvestmentDTO, userId: string): Promise<InvestmentDTO> {
         try {
             const mongooseUserId = new mongoose.Types.ObjectId(userId);
-            const related_account = new mongoose.Types.ObjectId(investmentData.related_account);
+            const relatedAccount = new mongoose.Types.ObjectId(investmentData.relatedAccount);
 
             const Model = modelMap[investmentData.type];
             if (!Model) throw new Error('Invalid investment type');
@@ -36,7 +36,7 @@ class InvestmentManagementRepository implements IInvestmentManagementRepository 
             const investmentDoc = await Model.create({
                 ...investmentData,
                 userId: mongooseUserId,
-                related_account 
+                relatedAccount 
             });
 
             const plainInvestment = investmentDoc.toObject()
