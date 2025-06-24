@@ -5,7 +5,7 @@ import { decodeAndValidateToken } from 'utils/auth/tokenUtils';
 import { AuthenticationError, ServerError, ValidationError } from 'error/AppError';
 import { ErrorMessages } from 'constants/errorMessages';
 import { StatusCodes } from 'constants/statusCodes';
-import uploadToCloudinary from 'services/cloudinary/cloudinaryService';
+import uploadToCloudinary, { deleteImage } from 'services/cloudinary/cloudinaryService';
 import generateUniqueId from 'utils/user/generateUniqueId';
 
 class UserService implements IUserService {
@@ -35,8 +35,19 @@ class UserService implements IUserService {
 
             if (!file || !file.buffer) throw new ValidationError(ErrorMessages.USER_PROFILE_PICTURE_MISSING_ERROR, StatusCodes.BAD_REQUEST);
 
+            // Get Current Cloudinary UserId 
+            const imageData = await this._userRepository.getUserProfileImageData(userId);
+            const currentCloudinaryUrl = imageData?.imageUrl;
+
+            if (currentCloudinaryUrl) {
+                // Delete the current profile picture 
+                await deleteImage(currentCloudinaryUrl);
+            }
+
             // Upload the image to Cloudinary
             const cloudinaryUrl = await uploadToCloudinary(file.buffer, file.originalname);
+
+            
 
             // Generate unique image ID 
             const imageId = generateUniqueId();
@@ -68,7 +79,7 @@ class UserService implements IUserService {
             }
 
             // Return proxy URL
-            const proxyUrl = `${process.env.BASE_URL}/api/user/images/${imageData.imageId}`;
+            const proxyUrl = `${process.env.BASE_URL}/api/v1/user/images/${imageData.imageId}`;
             return proxyUrl;
         } catch (error) {
             throw new Error((error as Error).message);
@@ -81,7 +92,7 @@ class UserService implements IUserService {
 
             if (imageId === 'default') {
                 // Handle default image
-                imageUrl = './user.png';
+                imageUrl = '';
                 return imageUrl;
             } else {
                 // Get actual Cloudinary URL from database 
@@ -90,6 +101,7 @@ class UserService implements IUserService {
                 if (!fetchedImageUrl) {
                     throw new Error(`Image not found`);
                 }
+                
                 imageUrl = fetchedImageUrl;
             }
 

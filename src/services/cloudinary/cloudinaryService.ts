@@ -43,3 +43,24 @@ const uploadToCloudinary = async function (fileBuffer: Buffer, originalname: str
 };
 
 export default uploadToCloudinary;
+
+const getPublicIdFromUrl = function (url: string): string {
+    const regex = /\/v\d+\/(.+)\.\w+$/;
+    const match = url.match(regex);
+    
+    if (!match || !match[1]) {
+        throw new Error('Invalid Cloudinary URL');
+    }
+
+    return match[1];
+}
+
+export const deleteImage = async function (url: string) {
+    try {
+        const publicId = getPublicIdFromUrl(url);
+        await cloudinaryV2.uploader.destroy(publicId);
+    } catch (error) {
+        console.error(`Error Deleting Current Profile Image from Cloudinary:`, error);
+        throw new ServerError(ErrorMessages.FAILED_TO_DELETE_PROFILE_PICTURE);
+    }
+} 

@@ -78,5 +78,6 @@ export const ErrorMessages = {
 
     // Debt Errors 
     FAILED_TO_REMOVE_DEBT: 'Failed to remove the debt record. Please try again later.',
+    FAILED_TO_DELETE_PROFILE_PICTURE: 'Failed to delete Profile Picture. Please try again later or contact support for assistance.',
 } as const;
 

@@ -18,5 +18,6 @@ router.get('/me/avatar', userController.getUserProfilePictureUrl.bind(userContro
 router.post('/me/avatar', upload.single('file'), userController.uploadProfilePicture.bind(userController));
 router.patch('/two-factor', userController.toggleTwoFactorAuthentication.bind(userController));
 router.delete('/me', userController.deleteUserAccount.bind(userController));
+router.get('/images/:imageId', userController.serveProfileImage.bind(userController));
 
 export default router;

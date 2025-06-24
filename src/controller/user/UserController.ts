@@ -6,6 +6,7 @@ import { StatusCodes } from 'constants/statusCodes';
 import { AppError, AuthenticationError, ServerError, ValidationError } from 'error/AppError';
 import { ErrorMessages } from 'constants/errorMessages';
 import { SuccessMessages } from 'constants/successMessages';
+import { fileTypeFromBuffer } from 'file-type';
 
 class UserController implements IUserController {
     private readonly _userService: IUserService;
@@ -93,15 +94,32 @@ class UserController implements IUserController {
             }
 
             // Get image buffer through service 
-            const imageBuffer = await this._userService.getImageForProxy(imageId);
+            let imageBuffer = await this._userService.getImageForProxy(imageId);
 
-            // Set headers 
-            response.setHeader('Content-Type', 'image/jpeg');
-            response.setHeader('Cache-Control', 'public, max-age=31536000');
-            response.setHeader('ETag', imageId);
+            // Ensure imageBuffer is a Buffer (not a string)
+            if (typeof imageBuffer === 'string') {
+                imageBuffer = Buffer.from(imageBuffer, 'base64');
+            }
 
-            // Send image buffer 
-            response.send(imageBuffer);
+            // Auto-detect MIME type and file extention
+            const detectedFileType = await fileTypeFromBuffer(imageBuffer as Buffer);
+
+            const mimeType = detectedFileType?.mime || 'application/octet-stream';
+            const fileExtension = detectedFileType?.ext || 'bin';
+
+            // loggin for unsupported formats 
+            if (!['png', 'jpg', 'jpeg', 'webp', 'gif'].includes(fileExtension)) {
+                console.warn(`Unsupported image format: ${fileExtension}`);
+            }
+
+            // Convert buffer to base64 string
+            const base64Image = imageBuffer.toString('base64');
+
+            sendSuccessResponse(response, StatusCodes.OK, 'Image fetched successfully', {
+                image: base64Image,
+                contentType: mimeType,
+                extension: fileExtension,
+            });
         } catch (error) {
             if (error instanceof AppError) {
                 sendErrorResponse(response, error.statusCode, error.message);
