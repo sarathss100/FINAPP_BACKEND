@@ -75,11 +75,16 @@ class InvestmentService implements IInvestmentService {
                     const amount = Number(stockDetails.data['Global Quote']['05. price']) || 1;
                     const currencyDetected = detectCurrencyFromExchange(investmentData.symbol.split('.')[1] || 'NASDAQ');
                     const amountForOneShare = await getExchangeRate(currencyDetected, 'INR', amount);
-                    investmentData.currentPricePerShare = amountForOneShare;
+                    investmentData.currentPricePerShare = amountForOneShare || 0;
+                    investmentData.currentValue = (amountForOneShare * investmentData.quantity) || 0;
+                    investmentData.totalProfitOrLoss = ((amountForOneShare * investmentData.quantity) - (investmentData.purchasePricePerShare * investmentData.quantity)) || 0;
                 }
             } else if (investmentData.type === 'GOLD') {
                 const goldDetails = await axios.get(`https://api.gold-api.com/price/XAU`);
-                investmentData.currentPricePerGram = goldDetails.data['price'];
+                const currentPricePerShare = goldDetails.data['price'] || 0;
+                investmentData.currentPricePerGram = currentPricePerShare;
+                investmentData.currentValue = currentPricePerShare * investmentData.weight || 0;
+                investmentData.totalProfitOrLoss = ((currentPricePerShare * investmentData.weight) - (investmentData.purchasePricePerGram * investmentData.weight)) || 0;
             } 
 
             // Delegate to the repository to create the investment for the user

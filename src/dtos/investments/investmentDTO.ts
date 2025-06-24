@@ -3,8 +3,10 @@ import { z } from 'zod';
 export const BaseInvestmentDTOSchema = z.object({
     name: z.string().min(1, { message: 'Name is required' }),
     icon: z.string().optional(),
-    amount: z.number({ invalid_type_error: 'Amount must be a number' }).positive('Amount must be greater than zero'),
-    related_account: z.string().optional(), 
+    initialAmount: z.number({ invalid_type_error: 'Amount must be a number' }).positive('Amount must be greater than zero'),
+    currentValue: z.number({ invalid_type_error: 'Amount must be a number' }).optional(),
+    totalProfitOrLoss: z.number({ invalid_type_error: 'Amount must be a number' }).optional(),
+    relatedAccount: z.string().optional(), 
     currency: z.string().optional().default('INR'),
     notes: z.string().optional(),
     createdAt: z.coerce.date().optional(),
@@ -76,21 +78,21 @@ export type IBusinessDTO = z.infer<typeof BusinessDTOSchema>;
 
 export const FixedDepositDTOSchema = BaseInvestmentDTOSchema.extend({
     type: z.literal('FIXED_DEPOSIT'), 
-    maturity_date: z.string(),
-    interest_rate: z.string().optional(),
-    maturity_amount: z.number().optional()
+    maturityDate: z.string(),
+    interestRate: z.string().optional(),
+    maturityAmount: z.number().optional()
 }).passthrough();
 
 export type IFixedDepositDTO = z.infer<typeof FixedDepositDTOSchema>;
 
 export const EPFODTOSchema = BaseInvestmentDTOSchema.extend({
     type: z.literal('EPFO'), 
-    account_number: z.string().min(1, 'Account number is required'),
-    epf_number: z.string().min(1, 'EPF number is required'),
-    employer_contribution: z.number().positive('Employer contribution must be greater than zero'),
-    employee_contribution: z.number().positive('Employee contribution must be greater than zero'),
-    interest_rate: z.number().positive('Interest rate must be greater than zero'),
-    maturity_amount: z.number().optional()
+    accountNumber: z.string().min(1, 'Account number is required'),
+    epfNumber: z.string().min(1, 'EPF number is required'),
+    employerContribution: z.number().positive('Employer contribution must be greater than zero'),
+    employeeContribution: z.number().positive('Employee contribution must be greater than zero'),
+    interestRate: z.number().positive('Interest rate must be greater than zero'),
+    maturityAmount: z.number().optional()
 }).passthrough();
 
 export type IEPFOdto = z.infer<typeof EPFODTOSchema>;

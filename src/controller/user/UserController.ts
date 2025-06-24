@@ -84,6 +84,33 @@ class UserController implements IUserController {
         }
     }
 
+    async serveProfileImage(request: Request, response: Response): Promise<void> {
+        try {
+            const { imageId } = request.params;
+
+            if (!imageId) {
+                throw new ValidationError('Image ID is required', StatusCodes.BAD_REQUEST);
+            }
+
+            // Get image buffer through service 
+            const imageBuffer = await this._userService.getImageForProxy(imageId);
+
+            // Set headers 
+            response.setHeader('Content-Type', 'image/jpeg');
+            response.setHeader('Cache-Control', 'public, max-age=31536000');
+            response.setHeader('ETag', imageId);
+
+            // Send image buffer 
+            response.send(imageBuffer);
+        } catch (error) {
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
     async toggleTwoFactorAuthentication(request: Request, response: Response): Promise<void> {
         try {
             const { accessToken } = request.cookies;

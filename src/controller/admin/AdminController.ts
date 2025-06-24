@@ -193,7 +193,7 @@ class AdminController implements IAdminController {
      */
     async updateFaq(request: Request, response: Response): Promise<void> {
         try {
-            console.log(`Request comes here`);
+            
             const faqId: string = request.params.id;
         
             // Validate the request body using zod

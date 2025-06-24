@@ -10,6 +10,7 @@ interface IUser extends Document {
     is2FA: boolean;
     isDeleted: boolean;
     profile_picture_url: string;
+    profile_picture_id: string;
     createdAt?: Date;
     updatedAt?: Date;
 }
