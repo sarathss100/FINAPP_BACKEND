@@ -27,6 +27,14 @@ class RedisService {
     } 
 
     /**
+     * Retriev a refresb token from Redis.
+     * @param userId The ID of the user.
+     * @returns {Promise<string | null>} The refresh token or null if not found.
+     */
+    async getRefreshToken(userId: string): Promise<string | null> {
+        return await redisClient.get(`refresh_token:${userId}`);
+    }
+    /**
      * Delete a refresh token from redis 
      * @param userId The ID of the user.
      */

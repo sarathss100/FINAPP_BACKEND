@@ -31,7 +31,6 @@ class AuthController implements IAuthController {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production' ? true : false,
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-                maxAge: 15 * 60 * 1000,
             });
 
             // Set the user ID, role and LoggedIn state as an HTTP-only cookie
@@ -39,7 +38,6 @@ class AuthController implements IAuthController {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production' ? true : false,
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-                maxAge: 15 * 60 * 1000,
             });
 
             // Send a success response
@@ -101,7 +99,6 @@ class AuthController implements IAuthController {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production' ? true : false,
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-                maxAge: 15 * 60 * 1000,
             });
 
             // Cookie for user metadata 
@@ -109,7 +106,6 @@ class AuthController implements IAuthController {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production' ? true : false,
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-                maxAge: 15 * 60 * 1000,
             });
 
             // Send a success response

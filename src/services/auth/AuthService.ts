@@ -24,7 +24,7 @@ class AuthService implements IAuthService {
     async signup(signupData: SignupDto): Promise<IAuthServiceUser & { accessToken: string }> {
         try {
             // Validate signup data
-            SignupSchema.parse(signupData);
+            SignupSchema.parse(signupData); 
 
             const existingUser = await this._authRepository.findByPhoneNumber(signupData.phone_number);
             if (existingUser) {

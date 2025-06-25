@@ -43,6 +43,7 @@ export const ErrorMessages = {
     TOKEN_GENERATION_ERROR: 'An error occurred while generating authentication tokens. Please try again later.',
     INVALID_INPUT: 'Invalid input. Please provide valid data.',
     GOAL_ID_NOT_FOUND: 'No goal ID found. Please try again later or contact support',
+    REFRESH_TOKEN_FAILED: 'An error occurred while verify tokens. Please try again later.',
 
     // Goal Errors
     FAILED_TO_DELETE_GOAL: 'Failed to delete Goal. Please try again later or contact support for assistance.',
