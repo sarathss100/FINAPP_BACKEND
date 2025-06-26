@@ -81,6 +81,31 @@ class MutualFundService implements IMutualFundService {
                 : new Error((error as Error).message || 'Unknown error occurred');
         }
     }
+
+    /**
+     * Retrieves detailed information about a specific mutual fund by its scheme code.
+     *
+     * This method delegates the data-fetching operation to the repository layer,
+     * which retrieves a single mutual fund record by matching the provided `schemeCode`.
+     *
+     * @param {string} schemeCode - The unique identifier (scheme code) of the mutual fund.
+     * @returns {Promise<IMutualFundDTO>} - A promise resolving to the matching mutual fund DTO.
+     * @throws {Error} - Throws an error if no mutual fund is found or if the repository layer encounters an issue.
+     */
+    async getMutualFundDetails(schemeCode: string): Promise<IMutualFundDTO> {
+        try {
+            // Call the repository to fetch mutual fund details by scheme code.
+            const mutualFundDetails = await this._mutualFundRepository.getMutualFundDetails(schemeCode);
+            
+            return mutualFundDetails;
+        } catch (error) {
+            // Log and re-throw the error to propagate it to the caller with proper typing.
+            console.error('Error during mutual fund detail retrieval:', error);
+            throw error instanceof Error
+                ? error
+                : new Error((error as Error).message || 'Unknown error occurred');
+        }
+    }
 }
 
 export default MutualFundService;

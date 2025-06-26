@@ -85,7 +85,10 @@ class InvestmentService implements IInvestmentService {
                 investmentData.currentPricePerGram = currentPricePerShare;
                 investmentData.currentValue = currentPricePerShare * investmentData.weight || 0;
                 investmentData.totalProfitOrLoss = ((currentPricePerShare * investmentData.weight) - (investmentData.purchasePricePerGram * investmentData.weight)) || 0;
-            } 
+            } else if (investmentData.type === 'MUTUAL_FUND') {
+                console.log(investmentData);
+                // const mutualFundDetails = awati axios.get('')
+            }
 
             // Delegate to the repository to create the investment for the user
             const investment = await this._investmentRepository.createInvestment(investmentData, userId);

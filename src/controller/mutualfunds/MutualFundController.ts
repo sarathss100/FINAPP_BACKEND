@@ -89,6 +89,48 @@ class MutualFundController implements IMutualFundController {
             }
         }
     }
+
+    /**
+     * Handles incoming requests to retrieve mutual fund details by scheme code.
+     *
+     * Validates the 'schemCode' query parameter from the request, delegates the data-fetching
+     * operation to the service layer, and sends the response to the client.
+     *
+     * @param {Request} request - Express Request object containing the incoming HTTP request.
+     * @param {Response} response - Express Response object used to send the response.
+     * @returns {Promise<void>} - A promise that resolves once the response is sent.
+     */
+    async getMutualFundDetails(request: Request, response: Response): Promise<void> {
+        try {
+            const { schemCode } = request.query;
+
+            if (!schemCode || typeof schemCode !== 'string') {
+                throw new ValidationError(
+                    ErrorMessages.MUTUAL_FUND_SEARCH_INVALID_QUERY,
+                    StatusCodes.BAD_REQUEST
+                );
+            }
+
+            // Delegate task to the service layer to fetch mutual fund details by scheme code
+            const mutualFunds = await this._mutualFundService.getMutualFundDetails(schemCode);
+
+            // Send success response with the retrieved mutual fund data
+            sendSuccessResponse(
+                response,
+                StatusCodes.OK,
+                SuccessMessages.MUTUAL_FUND_SEARCH_SUCCESS,
+                { mutualFunds }
+            );
+        } catch (error) {
+            // Handle known application errors with custom status and message
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                // Handle unexpected generic errors
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
 }
 
 export default MutualFundController;

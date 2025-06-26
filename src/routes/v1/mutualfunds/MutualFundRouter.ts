@@ -11,5 +11,6 @@ const mutualFundController = new MutualFundController(mutualFundService);
 // CRUD operations
 router.get('/nav', mutualFundController.syncNavData.bind(mutualFundController));
 router.get('/search', mutualFundController.searchMutualFunds.bind(mutualFundController));
+router.get('/', mutualFundController.getMutualFundDetails.bind(mutualFundController));
 
 export default router;

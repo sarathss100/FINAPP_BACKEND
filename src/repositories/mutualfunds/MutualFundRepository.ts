@@ -80,6 +80,35 @@ class MutualFundRepository implements IMutualFundRepository {
             throw new Error((error as Error).message);
         }
     }
+
+    /**
+    * Retrieves detailed information about a specific mutual fund by its scheme code.
+    *
+    * This method fetches a single mutual fund record from the database by matching
+    * the provided `schemeCode`. If no matching record is found, an error is thrown.
+    *
+    * @param {string} schemeCode - The unique identifier (scheme code) of the mutual fund.
+    * @returns {Promise<IMutualFundDTO>} - A promise resolving to the matching mutual fund DTO.
+    * @throws {Error} - Throws an error if the mutual fund is not found or if a database error occurs.
+    */
+    async getMutualFundDetails(schemeCode: string): Promise<IMutualFundDTO> { 
+        try {
+            const result = await MutualFundModel.findOne({ scheme_code: schemeCode }).lean();
+            if (!result) {
+                throw new Error('Mutual fund not found');
+            }
+            const mutualFundDetails = {
+                scheme_code: result.scheme_code,
+                scheme_name: result.scheme_name,
+                net_asset_value: result.net_asset_value,
+                date: result.date,
+            };
+            
+            return mutualFundDetails;
+        } catch (error) {
+            throw new Error((error as Error).message);
+        }
+    }
 }
 
 export default MutualFundRepository;
