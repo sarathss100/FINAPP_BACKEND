@@ -79,7 +79,7 @@ export type IBusinessDTO = z.infer<typeof BusinessDTOSchema>;
 export const FixedDepositDTOSchema = BaseInvestmentDTOSchema.extend({
     type: z.literal('FIXED_DEPOSIT'), 
     maturityDate: z.string(),
-    interestRate: z.string().optional(),
+    interestRate: z.number().optional(),
     maturityAmount: z.number().optional()
 }).passthrough();
 

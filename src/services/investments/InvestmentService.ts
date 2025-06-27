@@ -9,6 +9,8 @@ import { ErrorMessages } from 'constants/errorMessages';
 import { StatusCodes } from 'constants/statusCodes';
 import { detectCurrencyFromExchange } from 'utils/investments/stockcurrencyconverter/regionRegex';
 import { getExchangeRate } from 'utils/investments/stockcurrencyconverter/currencyConverter';
+import getMutualFundDetails from 'utils/mutualfunds/getMutualFundDetails';
+import calculateBondProfitOrLoss from 'utils/investments/stockcurrencyconverter/calculateBondProfitOrLoss';
 
 /**
  * Service class for managing accounts, including creating, updating, deleting, and retrieving accounts.
@@ -86,8 +88,26 @@ class InvestmentService implements IInvestmentService {
                 investmentData.currentValue = currentPricePerShare * investmentData.weight || 0;
                 investmentData.totalProfitOrLoss = ((currentPricePerShare * investmentData.weight) - (investmentData.purchasePricePerGram * investmentData.weight)) || 0;
             } else if (investmentData.type === 'MUTUAL_FUND') {
-                console.log(investmentData);
-                // const mutualFundDetails = awati axios.get('')
+                const schemeCode = investmentData.schemeCode;
+                const mutualFundDetails = await getMutualFundDetails(schemeCode);
+                investmentData.initialAmount = investmentData.units * investmentData.purchasedNav;
+                investmentData.currentValue = investmentData.units * mutualFundDetails.net_asset_value;
+                investmentData.totalProfitOrLoss = ((investmentData.units * mutualFundDetails.net_asset_value) - (investmentData.units * (investmentData.currentNav || 1)));
+            } else if (investmentData.type === 'BOND') {
+                const { currentValue, totalProfitOrLoss } = calculateBondProfitOrLoss(investmentData);
+                investmentData.currentValue = currentValue;
+                investmentData.totalProfitOrLoss = totalProfitOrLoss;
+            } else if (investmentData.type === 'PROPERTY') {
+                investmentData.totalProfitOrLoss = investmentData.currentValue ? (investmentData.currentValue - investmentData.initialAmount) : investmentData.initialAmount;
+            } else if (investmentData.type === 'BUSINESS') {
+                investmentData.currentValue = investmentData.currentValuation;
+                investmentData.totalProfitOrLoss = investmentData.currentValuation ? (investmentData.currentValuation  - investmentData.initialAmount) : investmentData.initialAmount;
+            } else if (investmentData.type === 'FIXED_DEPOSIT') {
+                investmentData.currentValue = investmentData.initialAmount;
+                investmentData.totalProfitOrLoss = investmentData.maturityAmount ?  (investmentData.maturityAmount - investmentData.initialAmount) : investmentData.initialAmount;
+            } else if (investmentData.type === 'EPFO') {
+                investmentData.currentValue = investmentData.initialAmount;
+                investmentData.totalProfitOrLoss = 0
             }
 
             // Delegate to the repository to create the investment for the user
