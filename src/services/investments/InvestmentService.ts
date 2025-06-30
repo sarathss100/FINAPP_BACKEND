@@ -278,6 +278,31 @@ class InvestmentService implements IInvestmentService {
             throw new Error((error as Error).message);
         }
     }
+
+    /**
+     * Fetches the current total value of all investments for the authenticated user.
+     *
+     * @param {string} accessToken - The JWT access token used to authenticate the user.
+     * @returns {Promise<number>} A promise resolving to the current total value of all investments.
+     * @throws {AuthenticationError} If the access token is invalid or missing user information.
+     * @throws {Error} If there's a failure during database query or summation.
+     */
+    async currentTotalValue(accessToken: string): Promise<number> {
+        try {
+            // Decode and validate the access token to extract the user ID
+            const userId = decodeAndValidateToken(accessToken);
+            if (!userId) {
+                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
+            }
+
+            const currentTotalValue = await this._investmentRepository.currentTotalValue(userId);
+            return currentTotalValue;
+        } catch (error) {
+            // Log and rethrow the error for upstream handling
+            console.error('Failed to fetch current total value:', error);
+            throw new Error((error as Error).message);
+        }
+    }
 }
 
 export default InvestmentService;

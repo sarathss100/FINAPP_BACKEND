@@ -140,6 +140,33 @@ class InvestmentController implements IInvestmentController {
             }
         }
     }
+
+    /**
+     * @method currentTotalValue
+     * @description Handles incoming requests to fetch the current total value of all investments for the authenticated user.
+     * Extracts the access token from cookies, authenticates the user, and delegates the calculation to the service layer.
+     *
+     * @param {Request} request - Express request object containing cookies and body data.
+     * @param {Response} response - Express response object used to send the HTTP response.
+     * @returns {Promise<void>}
+     */
+    async currentTotalValue(request: Request, response: Response): Promise<void> {
+        try {
+            const { accessToken } = request.cookies;
+
+            // Call the service to get current total value
+            const currentTotalValue = await this._investmentService.currentTotalValue(accessToken);
+
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { currentTotalValue });
+        } catch (error) {
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                console.error('Unexpected error:', error);
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
 }
 
 export default InvestmentController;
