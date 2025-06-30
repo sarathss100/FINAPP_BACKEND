@@ -13,6 +13,7 @@ import markExpiryDebts from './cron/DebtMonthlyExpiry';
 import markDebtCompleted from './cron/markEndedDebtsAsCompleted.ts';
 import updateStockPrice from 'cron/updateStockPrices';
 import updateMutualFundPrice from 'cron/updateMutualFundPrices';
+import updateBondPricesCron from 'cron/updateBondPrices';
 
 const app = express();
 expireJob.start();
@@ -20,6 +21,7 @@ markExpiryDebts.start();
 markDebtCompleted.start();
 updateStockPrice.start();
 updateMutualFundPrice.start();
+updateBondPricesCron.start();
 
 // Middleware
 app.use(express.json());

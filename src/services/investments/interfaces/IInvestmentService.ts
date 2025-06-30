@@ -7,6 +7,7 @@ interface IInvestmentService {
     updateStockPrice(): Promise<void>;
     updateMutualFundPrice(): Promise<void>;
     updateGoldPrice(): Promise<void>;
+    updateBondPrice(): Promise<void>;
 }
 
 export default IInvestmentService;

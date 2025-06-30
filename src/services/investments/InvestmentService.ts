@@ -14,6 +14,7 @@ import calculateBondProfitOrLoss from 'utils/investments/stockcurrencyconverter/
 import { updateStockPrices } from 'utils/investments/stockcurrencyconverter/updateStockPricesJob';
 import { updateMutualFundPrices } from 'utils/investments/stockcurrencyconverter/updateMutualFundPrices';
 import { updateGoldPrices } from 'utils/investments/stockcurrencyconverter/updateGoldPrices';
+import { updateBondPrices } from 'utils/investments/stockcurrencyconverter/updateBondPrices';
 
 /**
  * Service class for managing accounts, including creating, updating, deleting, and retrieving accounts.
@@ -219,6 +220,36 @@ class InvestmentService implements IInvestmentService {
         } catch (error) {
             // Log and rethrow the error for upstream handling
             console.error('Failed to update the gold prices:', error);
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+     * Recalculates current value and profit/loss for all BOND-type investments 
+     * and performs a bulk update in the database.
+     *
+     * @returns {Promise<void>}
+     * @throws {Error} If there's a failure during calculation or DB update
+     */
+    async updateBondPrice(): Promise<void> {
+        try {
+            // Get all bond investments from DB
+            const allBondInvestments = await this._investmentRepository.getInvestments('BOND');
+
+            // Recalculate bond values
+            const updatedInvestments = await updateBondPrices(allBondInvestments);
+
+            // Bulk update all at once
+            if (updatedInvestments.length > 0) {
+                await this._investmentRepository.updateInvestmentBulk(updatedInvestments);
+                console.log(`Updated ${updatedInvestments.length} bond investments in bulk`);
+            } else {
+                console.log(`No bond investments were updated.`);
+            }
+
+        } catch (error) {
+            // Log and rethrow the error for upstream handling
+            console.error('Failed to update the bond values:', error);
             throw new Error((error as Error).message);
         }
     }
