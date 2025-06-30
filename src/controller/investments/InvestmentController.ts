@@ -113,6 +113,33 @@ class InvestmentController implements IInvestmentController {
             }
         }
     }
+
+    /**
+     * @method totalInvestedAmount
+     * @description Handles incoming requests to fetch the total initial investment amount for the authenticated user.
+     * Extracts the access token from cookies, authenticates the user, and delegates the calculation to the service layer.
+     *
+     * @param {Request} request - Express request object containing cookies and body data.
+     * @param {Response} response - Express response object used to send the HTTP response.
+     * @returns {Promise<void>}
+     */
+    async totalInvestedAmount(request: Request, response: Response): Promise<void> {
+        try {
+            const { accessToken } = request.cookies;
+
+            // Call the service to get total investment amount
+            const totalInvestedAmount = await this._investmentService.totalInvestment(accessToken);
+
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { totalInvestedAmount });
+        } catch (error) {
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                console.error('Unexpected error:', error);
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
 }
 
 export default InvestmentController;

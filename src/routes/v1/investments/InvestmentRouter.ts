@@ -11,6 +11,7 @@ const investmentController: IInvestmentController = new InvestmentController(inv
 
 // CRUD 
 router.post('/', investmentController.createInvestment.bind(investmentController));
+router.get('/summary/total-invested', investmentController.totalInvestedAmount.bind(investmentController));
 
 // Search
 router.get('/stock', investmentController.searchStocks.bind(investmentController));

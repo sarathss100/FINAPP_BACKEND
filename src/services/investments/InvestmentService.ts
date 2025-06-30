@@ -21,7 +21,7 @@ import { updateBondPrices } from 'utils/investments/stockcurrencyconverter/updat
  * This class interacts with the account repository to perform database operations.
  */
 class InvestmentService implements IInvestmentService {
-    private static _instance: IInvestmentService;
+    private static _instance: InvestmentService;
     private _investmentRepository: InvestmentManagementRepository;
 
     /**
@@ -33,7 +33,7 @@ class InvestmentService implements IInvestmentService {
         this._investmentRepository = investmentRepository;
     }
 
-    public static get instance(): IInvestmentService {
+    public static get instance(): InvestmentService {
         if (!InvestmentService._instance) {
             const repo = InvestmentManagementRepository.instance;
             InvestmentService._instance = new InvestmentService(repo);
@@ -250,6 +250,31 @@ class InvestmentService implements IInvestmentService {
         } catch (error) {
             // Log and rethrow the error for upstream handling
             console.error('Failed to update the bond values:', error);
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+     * Fetches the total initial investment amount for the authenticated user across all investment types.
+     *
+     * @param {string} accessToken - The JWT access token used to authenticate the user.
+     * @returns {Promise<number>} A promise resolving to the total initial investment amount.
+     * @throws {AuthenticationError} If the access token is invalid or missing user information.
+     * @throws {Error} If there's a failure during database query or summation.
+     */
+    async totalInvestment(accessToken: string): Promise<number> {
+        try {
+            // Decode and validate the access token to extract the user ID
+            const userId = decodeAndValidateToken(accessToken);
+            if (!userId) {
+                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
+            }
+
+            const totalInvestedAmount = await this._investmentRepository.totalInvestment(userId);
+            return totalInvestedAmount;
+        } catch (error) {
+            // Log and rethrow the error for upstream handling
+            console.error('Failed to fetch total investment:', error);
             throw new Error((error as Error).message);
         }
     }

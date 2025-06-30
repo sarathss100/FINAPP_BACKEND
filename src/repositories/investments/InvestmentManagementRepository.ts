@@ -124,6 +124,38 @@ class InvestmentManagementRepository implements IInvestmentManagementRepository 
             throw new Error(`Failed to fetch investments: ${(error as Error).message}`);
         }
     }
+
+    /**
+     * Calculates the total initial investment amount across all investment types for a given user.
+     *
+     * @param {string} userId - The ID of the user whose investments are to be summed.
+     * @returns {Promise<number>} A promise resolving to the total initial investment amount.
+     * @throws {Error} If there's a failure during database query or summation.
+     */
+    async totalInvestment(userId: string): Promise<number> {
+        try {
+            let total = 0;
+            for (const Model of Object.values(modelMap)) {
+                const result = await Model.aggregate([
+                    { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+                    {
+                        $group: {
+                            _id: null,
+                            totalInitialAmount: { $sum: '$initialAmount' }
+                        }
+                    }
+                ]);
+
+                total += result[0]?.totalInitialAmount || 0;
+            }
+
+            return total;
+
+        } catch (error) {
+            console.error('Error calculating total investment:', error);
+            throw new Error(`Failed to calculate total investment: ${(error as Error).message}`);
+        }
+    }
 }
 
 export default InvestmentManagementRepository;
