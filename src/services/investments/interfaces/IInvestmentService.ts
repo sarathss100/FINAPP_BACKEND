@@ -5,6 +5,7 @@ interface IInvestmentService {
     searchStocks(keyword: string): Promise<IStock[]>;
     createInvestment(accessToken: string, investmentData: InvestmentDTO): Promise<InvestmentDTO>;
     updateStockPrice(): Promise<void>;
+    updateMutualFundPrice(): Promise<void>;
 }
 
 export default IInvestmentService;

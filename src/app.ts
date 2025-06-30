@@ -12,12 +12,14 @@ import expireJob from './cron/expireInsurances';
 import markExpiryDebts from './cron/DebtMonthlyExpiry';
 import markDebtCompleted from './cron/markEndedDebtsAsCompleted.ts';
 import updateStockPrice from 'cron/updateStockPrices';
+import updateMutualFundPrice from 'cron/updateMutualFundPrices';
 
 const app = express();
 expireJob.start();
 markExpiryDebts.start();
 markDebtCompleted.start();
 updateStockPrice.start();
+updateMutualFundPrice.start();
 
 // Middleware
 app.use(express.json());
