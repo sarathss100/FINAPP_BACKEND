@@ -13,6 +13,7 @@ import getMutualFundDetails from 'utils/mutualfunds/getMutualFundDetails';
 import calculateBondProfitOrLoss from 'utils/investments/stockcurrencyconverter/calculateBondProfitOrLoss';
 import { updateStockPrices } from 'utils/investments/stockcurrencyconverter/updateStockPricesJob';
 import { updateMutualFundPrices } from 'utils/investments/stockcurrencyconverter/updateMutualFundPrices';
+import { updateGoldPrices } from 'utils/investments/stockcurrencyconverter/updateGoldPrices';
 
 /**
  * Service class for managing accounts, including creating, updating, deleting, and retrieving accounts.
@@ -188,6 +189,36 @@ class InvestmentService implements IInvestmentService {
         } catch (error) {
             // Log and rethrow the error for upstream handling
             console.error('Failed to update the mutual fund prices:', error);
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+     * Updates current price per gram and value for all GOLD-type investments by fetching live data 
+     * and performing a bulk update in the database.
+     *
+     * @returns {Promise<void>}
+     * @throws {Error} If there's a failure in fetching or updating investment data.
+     */
+    async updateGoldPrice(): Promise<void> {
+        try {
+            // Get all gold investments from DB
+            const allGoldInvestments = await this._investmentRepository.getInvestments('GOLD');
+
+            // Update gold prices (fetch live data)
+            const updatedInvestments = await updateGoldPrices(allGoldInvestments);
+
+            // Bulk update all at once
+            if (updatedInvestments.length > 0) {
+                await this._investmentRepository.updateInvestmentBulk(updatedInvestments);
+                console.log(`Updated ${updatedInvestments.length} gold investments in bulk`);
+            } else {
+                console.log(`No gold investments were updated.`);
+            }
+
+        } catch (error) {
+            // Log and rethrow the error for upstream handling
+            console.error('Failed to update the gold prices:', error);
             throw new Error((error as Error).message);
         }
     }
