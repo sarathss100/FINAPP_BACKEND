@@ -4,6 +4,7 @@ import IStock from './IStock';
 interface IInvestmentService {
     searchStocks(keyword: string): Promise<IStock[]>;
     createInvestment(accessToken: string, investmentData: InvestmentDTO): Promise<InvestmentDTO>;
+    updateStockPrice(): Promise<void>;
 }
 
 export default IInvestmentService;

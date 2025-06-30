@@ -1,0 +1,204 @@
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const AccountsModel_1 = require("model/accounts/model/AccountsModel");
+class AccountManagementRepository {
+    /**
+     * Creates a new financial account in the database and returns the created account in `AccountDTO` format.
+     *
+     * This method accepts an `accountData` object conforming to the `AccountDTO` structure. Based on the account type
+     * (e.g., Bank, Investment, Cash, or Debt), it dynamically selects the appropriate Mongoose model (using discriminators)
+     * and inserts the data into the database. The result is converted to a plain JavaScript object for consistency.
+     *
+     * If the account type is not recognized, an error is thrown.
+     *
+     * @param {AccountDTO} accountData - The input data representing the account to be created. Must conform to the `AccountDTO` structure.
+     * @returns {Promise<AccountDTO>} A promise resolving to the created account in `AccountDTO` format.
+     * @throws {Error} Throws an error if:
+     * - The account type is unknown
+     * - The database operation fails
+     * - Invalid data is provided
+     */
+    addAccount(accountData) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a, _b, _c, _d, _e, _f;
+            try {
+                // Check if an account with the same name and number already exists for this user
+                const existingAccount = yield AccountsModel_1.AccountModel.findOne({
+                    account_name: accountData.account_name,
+                    account_number: accountData.account_number,
+                    user_id: accountData.user_id
+                });
+                if (existingAccount) {
+                    // Return the existing account instead of throwing error
+                    return {
+                        _id: (_a = existingAccount._id) === null || _a === void 0 ? void 0 : _a.toString(),
+                        user_id: (_b = existingAccount.user_id) === null || _b === void 0 ? void 0 : _b.toString(),
+                        account_name: existingAccount.account_name,
+                        currency: existingAccount.currency,
+                        description: existingAccount.description,
+                        is_active: existingAccount.is_active,
+                        created_by: existingAccount.created_by.toString(),
+                        last_updated_by: (_c = existingAccount.last_updated_by) === null || _c === void 0 ? void 0 : _c.toString(),
+                        account_type: existingAccount.account_type,
+                        current_balance: existingAccount.current_balance,
+                        institution: existingAccount.institution,
+                        account_number: existingAccount.account_number,
+                        account_subtype: existingAccount.account_subtype,
+                        loan_type: existingAccount.loan_type,
+                        interest_rate: existingAccount.interest_rate,
+                        monthly_payment: existingAccount.monthly_payment,
+                        due_date: existingAccount.due_date,
+                        term_months: existingAccount.term_months,
+                        investment_platform: existingAccount.investment_platform,
+                        portfolio_value: existingAccount.portfolio_value,
+                        location: existingAccount.location
+                    };
+                }
+                // No duplicate found, proceed to create a new account
+                const result = yield AccountsModel_1.AccountModel.create(accountData);
+                // Return the newly created account
+                const addedAccount = {
+                    _id: (_d = result._id) === null || _d === void 0 ? void 0 : _d.toString(),
+                    user_id: (_e = result.user_id) === null || _e === void 0 ? void 0 : _e.toString(),
+                    account_name: result.account_name,
+                    currency: result.currency,
+                    description: result.description,
+                    is_active: result.is_active,
+                    created_by: result.created_by.toString(),
+                    last_updated_by: (_f = result.last_updated_by) === null || _f === void 0 ? void 0 : _f.toString(),
+                    account_type: result.account_type,
+                    current_balance: result.current_balance,
+                    institution: result.institution,
+                    account_number: result.account_number,
+                    account_subtype: result.account_subtype,
+                    loan_type: result.loan_type,
+                    interest_rate: result.interest_rate,
+                    monthly_payment: result.monthly_payment,
+                    due_date: result.due_date,
+                    term_months: result.term_months,
+                    investment_platform: result.investment_platform,
+                    portfolio_value: result.portfolio_value,
+                    location: result.location
+                };
+                return addedAccount;
+            }
+            catch (error) {
+                throw new Error(error.message);
+            }
+        });
+    }
+    /**
+    * Updates an existing account in the database and returns the updated account in IAccountDTO format.
+    *
+    * This method takes an input object (`accountData`) containing updated account details, finds the account by `user_id`,
+    * and updates it in the database using the `AccountsModel`. The updated result is mapped to the `IAccountDTO` format,
+    * with MongoDB ObjectIds converted to strings for consistency.
+    *
+     * @param {IAccountDTO} accountData - The input data representing the account to be updated. Must include `user_id` to identify the account.
+    * @returns {Promise<IAccountDTO>} - A promise resolving to the updated account in IAccountsDTO format, with ObjectIds converted to strings.
+    * @throws {Error} - Throws an error if the database operation fails, the account is not found, or invalid data is provided.
+    */
+    updateAccount(accountId, accountData) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a, _b, _c;
+            try {
+                // Perform the update operation
+                const result = yield AccountsModel_1.AccountModel.findOneAndUpdate({ _id: accountId }, Object.assign({}, accountData), { new: true });
+                // Handle case where no account is found
+                if (!result) {
+                    throw new Error('Account not found');
+                }
+                // Map the updated result to IAccountDTO format
+                const updatedAccount = {
+                    _id: (_a = result._id) === null || _a === void 0 ? void 0 : _a.toString(),
+                    user_id: (_b = result === null || result === void 0 ? void 0 : result.user_id) === null || _b === void 0 ? void 0 : _b.toString(),
+                    account_name: result.account_name,
+                    currency: result.currency,
+                    description: result.description,
+                    is_active: result.is_active,
+                    created_by: result.created_by.toString(),
+                    last_updated_by: (_c = result.last_updated_by) === null || _c === void 0 ? void 0 : _c.toString(),
+                    account_type: result.account_type,
+                    current_balance: result.current_balance,
+                    institution: result.institution,
+                    account_number: result.account_number,
+                    account_subtype: result.account_subtype,
+                    loan_type: result.loan_type,
+                    interest_rate: result.interest_rate,
+                    monthly_payment: result.monthly_payment,
+                    due_date: result.due_date,
+                    term_months: result.term_months,
+                    investment_platform: result.investment_platform,
+                    portfolio_value: result.portfolio_value,
+                    location: result.location
+                };
+                return updatedAccount;
+            }
+            catch (error) {
+                console.error('Error updating Account:', error);
+                throw new Error(error.message);
+            }
+        });
+    }
+    /**
+    * Removes an existing account from the database.
+    *
+    * @param {string} accountId - The unique identifier of the account to be removed.
+    * @returns {Promise<boolean>} - A promise resolving to `true` if the account was successfully removed.
+    * @throws {Error} - Throws an error if the database operation fails or the account is not found.
+    */
+    removeAccount(accountId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                // Perform the deletion operation
+                const result = yield AccountsModel_1.AccountModel.findOneAndDelete({ _id: accountId }, { new: true });
+                // Handle case where no account is found
+                if (!result) {
+                    throw new Error('Account not found');
+                }
+                return true;
+            }
+            catch (error) {
+                console.error('Error updating Account:', error);
+                throw new Error(error.message);
+            }
+        });
+    }
+    /**
+     * Retrieves all accounts associated with a specific user from the database.
+     *
+     * @param {string} userId - The unique identifier of the user whose accounts are being retrieved.
+     * @returns {Promise<IAccountDTO[]>} - A promise resolving to an array of `IAccountDTO` objects representing the user's accounts.
+     * @throws {Error} - Throws an error if the database operation fails or no accounts are found for the given user.
+     */
+    getUserAccounts(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                // Query the database to retrieve all accounts associated with the given `userId`.
+                const result = yield AccountsModel_1.AccountModel.find({ user_id: userId });
+                // it means no accounts were found for the given user, and an error is thrown.
+                if (!result || result.length === 0) {
+                    throw new Error('No accounts found for the specified user');
+                }
+                // Return the retrieved accounts as an array of `IAccountDTO` objects.
+                return result;
+            }
+            catch (error) {
+                // Log the error for debugging purposes.
+                console.error('Error retrieving account details:', error);
+                // Re-throw the error with a more descriptive message, ensuring the caller is informed of the issue.
+                throw new Error(error.message);
+            }
+        });
+    }
+}
+exports.default = AccountManagementRepository;

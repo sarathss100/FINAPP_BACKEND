@@ -1,0 +1,22 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const AccountsManagementRepository_1 = __importDefault(require("repositories/accounts/AccountsManagementRepository"));
+const AccountService_1 = __importDefault(require("services/accounts/AccountService"));
+const AccountsController_1 = __importDefault(require("controller/accounts/AccountsController"));
+const router = (0, express_1.Router)();
+const accountsRepository = new AccountsManagementRepository_1.default();
+const accountService = new AccountService_1.default(accountsRepository);
+const accountsController = new AccountsController_1.default(accountService);
+router.post('/', accountsController.addAccount.bind(accountsController));
+router.put('/:accountId', accountsController.updateAccount.bind(accountsController));
+router.delete('/:accountId', accountsController.removeAccount.bind(accountsController));
+router.get('/', accountsController.getUserAccounts.bind(accountsController));
+router.get('/balance', accountsController.getTotalBalance.bind(accountsController));
+router.get('/bank-balance', accountsController.getTotalBankBalance.bind(accountsController));
+router.get('/debt', accountsController.getTotalDebt.bind(accountsController));
+router.get('/investment', accountsController.getTotalInvestment.bind(accountsController));
+exports.default = router;

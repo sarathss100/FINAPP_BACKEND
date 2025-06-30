@@ -7,16 +7,17 @@ import cors from 'cors';
 import corsOptions from 'utils/middleware/corsOptions';
 // import rateLimiter from 'utils/middleware/rateLimiter';
 import helmet from 'helmet';
-// import apiRouter from 'routes/v1/onemoney/api.routes';
 import './cron/scheduler';
 import expireJob from './cron/expireInsurances';
 import markExpiryDebts from './cron/DebtMonthlyExpiry';
 import markDebtCompleted from './cron/markEndedDebtsAsCompleted.ts';
+import updateStockPrice from 'cron/updateStockPrices';
 
 const app = express();
 expireJob.start();
 markExpiryDebts.start();
 markDebtCompleted.start();
+updateStockPrice.start();
 
 // Middleware
 app.use(express.json());
@@ -26,7 +27,6 @@ app.use(loggingMiddleware);
 app.use(cors(corsOptions));
 app.use(helmet());
 // app.use(rateLimiter);
-// app.use('/api/onemoney', apiRouter);
 app.use('/api', router);
 
 // Server Health Check

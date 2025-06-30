@@ -16,7 +16,25 @@ const modelMap = {
 };
 
 class InvestmentManagementRepository implements IInvestmentManagementRepository {
+    private static _instance: IInvestmentManagementRepository;
 
+    /**
+     * Private constructor to enforce singleton pattern.
+     */
+    public constructor() {}
+
+    /**
+     * Gets the singleton instance of InvestmentManagementRepository
+     * 
+     * @returns {IInvestmentManagementRepository}
+     */
+    public static get instance(): IInvestmentManagementRepository {
+        if (!InvestmentManagementRepository._instance) {
+            InvestmentManagementRepository._instance = new InvestmentManagementRepository();
+        }
+        return InvestmentManagementRepository._instance;
+    }
+    
     /**
      * Creates a new investment in the database.
      *
@@ -45,6 +63,65 @@ class InvestmentManagementRepository implements IInvestmentManagementRepository 
         } catch (error) {
             console.error('Error creating investment:', error);
             throw new Error(`Failed to create investment: ${(error as Error).message}`);
+        }
+    }
+
+    /**
+     * Fetches all investments of a specific type from the database.
+     *
+     * @param {string} investmentType - The type of investment to retrieve (e.g., STOCK, MUTUAL_FUND).
+     * @returns {Promise<InvestmentDTO[]>} - A promise resolving to an array of investment DTOs.
+     * @throws {Error} - Throws an error if the investment type is invalid or the database operation fails.
+     */
+    async getInvestments(investmentType: string): Promise<InvestmentDTO[]> {
+        try {
+            const Model = modelMap[investmentType as keyof typeof modelMap];
+
+            if (!Model) {
+                throw new Error(`Invalid investment type: ${investmentType}`);
+            }
+
+            // Fetch all documents for this investment type
+            const investmentDocs = await Model.find(); 
+
+            // Convert Mongoose documents to plain objects and return as InvestmentDTO[]
+            const plainInvestments = investmentDocs.map(doc => doc.toObject());
+
+            return plainInvestments as unknown as InvestmentDTO[];
+        } catch (error) {
+            console.error('Error fetching investments:', error);
+            throw new Error(`Failed to fetch investments: ${(error as Error).message}`);
+        }
+    }
+
+    /**
+     * Updates multiple investment documents in bulk for the same investment type.
+     *
+     * @param {InvestmentDTO[]} investments - An array of investment DTOs to be updated.
+     * @returns {Promise<void>}
+     * @throws {Error} - Throws an error if the investment type is invalid or the database operation fails.
+     */
+    async updateInvestmentBulk(investments: InvestmentDTO[]): Promise<void> {
+        try {
+            if (!investments.length) return;
+            const investmentType = investments[0].type;
+            const Model = modelMap[investmentType];
+
+            if (!Model) throw new Error(`Invalid investment type: ${investmentType}`);
+
+            // Prepare bulk operations
+            const operations = investments.map((investment) => ({
+                updateOne: {
+                    filter: { _id: investment._id },
+                    update: { $set: investment },
+                },
+            }));
+
+            // Perform the bulk write 
+            await Model.bulkWrite(operations, { ordered: false }); // ordered: false continues on error
+        } catch (error) {
+            console.error('Error fetching investments:', error);
+            throw new Error(`Failed to fetch investments: ${(error as Error).message}`);
         }
     }
 }

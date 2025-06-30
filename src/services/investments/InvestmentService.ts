@@ -11,12 +11,14 @@ import { detectCurrencyFromExchange } from 'utils/investments/stockcurrencyconve
 import { getExchangeRate } from 'utils/investments/stockcurrencyconverter/currencyConverter';
 import getMutualFundDetails from 'utils/mutualfunds/getMutualFundDetails';
 import calculateBondProfitOrLoss from 'utils/investments/stockcurrencyconverter/calculateBondProfitOrLoss';
+import { updateStockPrices } from 'utils/investments/stockcurrencyconverter/updateStockPricesJob';
 
 /**
  * Service class for managing accounts, including creating, updating, deleting, and retrieving accounts.
  * This class interacts with the account repository to perform database operations.
  */
 class InvestmentService implements IInvestmentService {
+    private static _instance: IInvestmentService;
     private _investmentRepository: InvestmentManagementRepository;
 
     /**
@@ -26,6 +28,14 @@ class InvestmentService implements IInvestmentService {
      */
     constructor(investmentRepository: InvestmentManagementRepository) {
         this._investmentRepository = investmentRepository;
+    }
+
+    public static get instance(): IInvestmentService {
+        if (!InvestmentService._instance) {
+            const repo = InvestmentManagementRepository.instance;
+            InvestmentService._instance = new InvestmentService(repo);
+        }
+        return InvestmentService._instance;
     }
 
     /**
@@ -120,7 +130,36 @@ class InvestmentService implements IInvestmentService {
             throw new Error((error as Error).message);
         }
     }
+
+    /**
+     * Updates current prices for all STOCK-type investments by fetching live data from external APIs 
+     * and performing a bulk update in the database.
+     *
+     * @returns {Promise<void>}
+     * @throws {Error} If there's a failure in fetching or updating investment data.
+     */
+    async updateStockPrice(): Promise<void> {
+        try {
+            // Get all stock investments from DB
+            const allStockInvestments = await this._investmentRepository.getInvestments('STOCK');
+
+            // Update stock prices (fetch live data)
+            const updatedInvestments = await updateStockPrices(allStockInvestments);
+
+            // Bulk update all at once
+            if (updatedInvestments.length > 0) {
+                await this._investmentRepository.updateInvestmentBulk(updatedInvestments);
+                console.log(`Updated ${updatedInvestments.length} stock investments in bulk.`);
+            } else {
+                console.log(`No stock investments were updated.`);
+            }
+
+        } catch (error) {
+            // Log and rethrow the error for upstream handling
+            console.error('Failed to update the stock price:', error);
+            throw new Error((error as Error).message);
+        }
+    }
 }
 
 export default InvestmentService;
-
