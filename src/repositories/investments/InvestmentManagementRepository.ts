@@ -188,6 +188,51 @@ class InvestmentManagementRepository implements IInvestmentManagementRepository 
             throw new Error(`Failed to calculate current total value: ${(error as Error).message}`);
         }
     }
+
+    /**
+     * Calculates the total returns (profit or loss) across all investment types for a given user.
+     *
+     * This function iterates over all investment models mapped in `modelMap`, performs an aggregation
+     * to sum the 'totalProfitOrLoss' field for investments belonging to the specified user,
+     * and returns the combined total.
+     *
+     * @param {string} userId - The ID of the user whose investment returns are to be summed.
+     * @returns {Promise<number>} A promise resolving to the total returns (profit or loss) from all investments.
+     * @throws {Error} If there's a failure during database query or summation.
+     */
+    async getTotalReturns(userId: string): Promise<number> {
+        try {
+            let total = 0;
+
+            // Iterate through each investment model (e.g., stocks, crypto, mutual funds)
+            for (const Model of Object.values(modelMap)) {
+                // Aggregate total profit or loss for the current investment type and user
+                const result = await Model.aggregate([
+                    {
+                        $match: {
+                            userId: new mongoose.Types.ObjectId(userId)
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: null, // Group all documents into one
+                            currentTotalValue: { $sum: '$totalProfitOrLoss' } // Sum all profit/loss values
+                        }
+                    }
+                ]);
+
+                // Add the result for this investment type to the total, defaulting to 0 if no data
+                total += result[0]?.currentTotalValue || 0;
+            }
+
+            return total;
+
+        } catch (error) {
+            // Log detailed error and re-throw with context
+            console.error('Error calculating total returns (profit or loss):', error);
+            throw new Error(`Failed to calculate total returns: ${(error as Error).message}`);
+        }
+    }
 }
 
 export default InvestmentManagementRepository;

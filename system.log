@@ -3625,3 +3625,5 @@
 [2025-06-30T13:45:55.996Z] INFO: GET /api/v1/investment/summary/total-invested 304 508ms
 [2025-06-30T13:45:58.667Z] INFO: GET /api/v1/investment/summary/current-value 304 472ms
 [2025-06-30T13:45:58.670Z] INFO: GET /api/v1/investment/summary/total-invested 304 480ms
+[2025-07-01T04:30:52.678Z] INFO: POST /api/v1/auth/signin 201 1714ms
+[2025-07-01T04:30:55.704Z] INFO: GET /api/v1/investment/summary/total-returns 200 885ms

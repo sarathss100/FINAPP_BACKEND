@@ -13,6 +13,7 @@ const investmentController: IInvestmentController = new InvestmentController(inv
 router.post('/', investmentController.createInvestment.bind(investmentController));
 router.get('/summary/total-invested', investmentController.totalInvestedAmount.bind(investmentController));
 router.get('/summary/current-value', investmentController.currentTotalValue.bind(investmentController));
+router.get('/summary/total-returns', investmentController.getTotalReturns.bind(investmentController));
 
 // Search
 router.get('/stock', investmentController.searchStocks.bind(investmentController));

@@ -5,6 +5,7 @@ interface IInvestmentController {
     createInvestment(request: Request, response: Response): Promise<void>;
     totalInvestedAmount(request: Request, response: Response): Promise<void>;
     currentTotalValue(request: Request, response: Response): Promise<void>;
+    getTotalReturns(request: Request, response: Response): Promise<void>;
 }
 
 export default IInvestmentController;
