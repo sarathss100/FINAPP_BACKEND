@@ -7,6 +7,7 @@ interface IInvestmentController {
     currentTotalValue(request: Request, response: Response): Promise<void>;
     getTotalReturns(request: Request, response: Response): Promise<void>;
     getCategorizedInvestments(request: Request, response: Response): Promise<void>;
+    removeInvestment(request: Request, response: Response): Promise<void>;
 }
 
 export default IInvestmentController;

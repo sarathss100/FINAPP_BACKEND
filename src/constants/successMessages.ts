@@ -67,4 +67,6 @@ export const SuccessMessages = {
 
     FAQ_DELETED_SUCCESSFULLY: 'Faq Removed Successfully!',
     FAQ_UPDATED_SUCCESSFULLY: 'Faq Updated Successfully!',
+
+    INVESTMENT_REMOVED: 'Investment removed successfully.',
 } as const;

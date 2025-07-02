@@ -12,6 +12,7 @@ interface IInvestmentService {
     currentTotalValue(accessToken: string): Promise<number>;
     getTotalReturns(accessToken: string): Promise<number>;
     getCategorizedInvestments(accessToken: string): Promise<Record<string, InvestmentDTO[]>>;
+    removeInvestment(investmentType: string, investmentId: string): Promise<void>;
 }
 
 export default IInvestmentService;

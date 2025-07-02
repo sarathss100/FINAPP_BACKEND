@@ -372,6 +372,24 @@ class InvestmentService implements IInvestmentService {
             throw new Error((error as Error).message);
         }
     }
+
+    /**
+     * Removes an investment document of the specified type and ID from the database.
+     *
+     * @param {string} investmentType - The type of investment (e.g., STOCK, MUTUAL_FUND).
+     * @param {string} investmentId - The ID of the investment to be deleted.
+     * @returns {Promise<void>} A promise that resolves when the deletion is successful.
+     * @throws {Error} If the investment type is invalid or the deletion operation fails.
+     */
+    async removeInvestment(investmentType: string, investmentId: string): Promise<void> {
+        try {
+            await this._investmentRepository.removeInvestment(investmentType, investmentId);
+        } catch (error) {
+            // Log and rethrow the error for upstream handling
+            console.error('Failed to delete investment:', error);
+            throw new Error((error as Error).message);
+        }
+    }
 }
 
 export default InvestmentService;

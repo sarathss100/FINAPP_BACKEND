@@ -224,6 +224,34 @@ class InvestmentController implements IInvestmentController {
             }
         }
     }
+
+    /**
+     * @method removeInvestment
+     * @description Handles incoming requests to delete an investment of a specific type and ID.
+     * Extracts the investment type and ID from request parameters and delegates the deletion logic to the service layer.
+     * Sends a success response if the deletion is successful, or an error response if something goes wrong.
+     *
+     * @param {Request} request - Express request object containing the investment type and ID in params.
+     * @param {Response} response - Express response object used to send the HTTP response.
+     * @returns {Promise<void>}
+     */
+    async removeInvestment(request: Request, response: Response): Promise<void> {
+        try {
+            const { investmentType, investmentId } = request.params;
+
+            // Call the service to perform the deletion
+            await this._investmentService.removeInvestment(investmentType, investmentId);
+
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.INVESTMENT_REMOVED);
+        } catch (error) {
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                console.error('Unexpected error:', error);
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
 }
 
 export default InvestmentController;

@@ -295,6 +295,36 @@ class InvestmentManagementRepository implements IInvestmentManagementRepository 
             throw new Error(`Failed to fetch and categorize investments: ${(error as Error).message}`);
         }
     }
+
+    /**
+     * Deletes a single investment document by ID for a given investment type.
+     *
+     * @param {string} investmentType - The type of investment (e.g., STOCK, MUTUAL_FUND).
+     * @param {string} investmentId - The ID of the investment document to delete.
+     * @returns {Promise<void>}
+     * @throws {Error} If the investment type is invalid or database operation fails.
+     */
+    async removeInvestment(investmentType: string, investmentId: string): Promise<void> {
+        try {
+            const Model = modelMap[investmentType as keyof typeof modelMap];
+            if (!Model) {
+                throw new Error(`Invalid investment type: ${investmentType}`);
+            }
+
+            // Convert investmentId to ObjectId
+            const mongooseId = new mongoose.Types.ObjectId(investmentId);
+
+            // Delete the document
+            const result = await Model.deleteOne({ _id: mongooseId });
+
+            if (result.deletedCount === 0) {
+                throw new Error(`No investment found with ID: ${investmentId}`);
+            } 
+        } catch (error) {
+            console.error('Error deleting investment:', error);
+            throw new Error(`Failed to delete investment: ${(error as Error).message}`);
+        }
+    }
 }
 
 export default InvestmentManagementRepository;
