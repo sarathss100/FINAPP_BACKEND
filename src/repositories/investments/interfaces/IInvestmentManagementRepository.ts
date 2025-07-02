@@ -7,6 +7,7 @@ interface IInvestmentManagementRepository {
     totalInvestment(userId: string): Promise<number>;
     currentTotalValue(userId: string): Promise<number>;
     getTotalReturns(userId: string): Promise<number>;
+    getCategorizedInvestments(userId: string): Promise<Record<string, InvestmentDTO[]>>;
 }
 
 export default IInvestmentManagementRepository;

@@ -233,6 +233,68 @@ class InvestmentManagementRepository implements IInvestmentManagementRepository 
             throw new Error(`Failed to calculate total returns: ${(error as Error).message}`);
         }
     }
+
+    /**
+ * Fetches all investment records for a given user across all investment types.
+ *
+ * @param {string} userId - The ID of the user whose investments are to be fetched.
+ * @returns {Promise<InvestmentDTO[]>} A promise resolving to an array of investment DTOs.
+ * @throws {Error} If there's a failure during database query or mapping.
+ */
+/**
+     * Fetches all investments for a given user and categorizes them by investment type.
+     *
+     * @param userId - The ID of the user whose investments are to be fetched and categorized.
+     * @returns A promise resolving to an object where keys are investment types and values are arrays of corresponding investments.
+     * @throws Error if the database query fails.
+     */
+    async getCategorizedInvestments(userId: string): Promise<Record<string, InvestmentDTO[]>> {
+        try {
+            const categorizedInvestments: Record<string, InvestmentDTO[]> = {};
+            const mongooseUserId = new mongoose.Types.ObjectId(userId);
+
+            // Loop through each investment model (e.g., StockModel, MutualFundModel)
+            for (const Model of Object.values(modelMap)) {
+                // Fetch all investments of this type belonging to the user
+                const result = await Model.aggregate([
+                    {
+                        $match: {
+                            userId: mongooseUserId
+                        }
+                    }
+                ]);
+
+                if (!Array.isArray(result) || result.length === 0) {
+                    continue; // skip if no investments found
+                }
+
+                // Convert Mongoose documents to plain objects
+                const investments = result.map(doc => doc as InvestmentDTO);
+
+                // Determine category from model or individual document
+                const category = investments[0]?.type;
+
+                if (!category) {
+                    console.warn('Uncategorized or invalid investment type found');
+                    continue;
+                }
+
+                // Initialize category if not exists
+                if (!categorizedInvestments[category]) {
+                    categorizedInvestments[category] = [];
+                }
+
+                // Add all investments to the appropriate category
+                categorizedInvestments[category].push(...investments);
+            }
+
+            return categorizedInvestments;
+
+        } catch (error) {
+            console.error('Error fetching and categorizing investments:', error);
+            throw new Error(`Failed to fetch and categorize investments: ${(error as Error).message}`);
+        }
+    }
 }
 
 export default InvestmentManagementRepository;

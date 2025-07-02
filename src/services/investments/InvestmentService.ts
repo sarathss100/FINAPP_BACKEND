@@ -331,6 +331,47 @@ class InvestmentService implements IInvestmentService {
             throw new Error((error as Error).message);
         }
     }
+
+    /**
+     * Fetches all investments for the authenticated user and categorizes them by investment type.
+     *
+     * This method decodes the provided JWT access token to extract the user ID,
+     * retrieves all investment records for that user, and organizes them into categories
+     * based on their investment type (e.g., STOCK, MUTUAL_FUND).
+     *
+     * @param {string} accessToken - The JWT access token used to authenticate the user.
+     * @returns {Promise<Record<string, InvestmentDTO[]>>} A promise resolving to an object where keys are investment types and values are arrays of corresponding investments.
+     * @throws {AuthenticationError} If the access token is invalid or missing user information.
+     * @throws {Error} If there's a failure during token decoding or database query.
+     */
+    async getCategorizedInvestments(accessToken: string): Promise<Record<string, InvestmentDTO[]>> {
+        try {
+            // Decode and validate the access token to extract the user ID
+            const userId = decodeAndValidateToken(accessToken);
+            if (!userId) {
+                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
+            }
+
+            const investments = await this._investmentRepository.getCategorizedInvestments(userId);
+            
+            // Group investments by type/category
+            const categorized: Record<string, InvestmentDTO[]> = {};
+            for (const inv of Object.values(investments).flat()) {
+                const key = inv.type || 'UNKNOWN';
+                if (!categorized[key]) {
+                    categorized[key] = [];
+                }
+                categorized[key].push(inv);
+            }
+
+            return categorized;
+
+        } catch (error) {
+            // Log and rethrow the error for upstream handling
+            console.error('Failed to fetch and categorize investments:', error);
+            throw new Error((error as Error).message);
+        }
+    }
 }
 
 export default InvestmentService;

@@ -196,6 +196,34 @@ class InvestmentController implements IInvestmentController {
             }
         }
     }
+
+    /**
+     * @method getCategorizedInvestments
+     * @description Handles incoming requests to fetch and return all investments for the authenticated user,
+     * grouped by investment type (e.g., STOCK, MUTUAL_FUND).
+     * Extracts the access token from cookies, authenticates the user, and delegates the data fetching to the service layer.
+     *
+     * @param {Request} request - Express request object containing cookies and body data.
+     * @param {Response} response - Express response object used to send the HTTP response.
+     * @returns {Promise<void>}
+     */
+    async getCategorizedInvestments(request: Request, response: Response): Promise<void> {
+        try {
+            const { accessToken } = request.cookies;
+
+            // Call the service to get categorized investments
+            const investments = await this._investmentService.getCategorizedInvestments(accessToken);
+
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { investments });
+        } catch (error) {
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                console.error('Unexpected error:', error);
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
 }
 
 export default InvestmentController;
