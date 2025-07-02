@@ -9,5 +9,3 @@ interface IChat extends Document {
 }
 
 export default IChat;
-
-
