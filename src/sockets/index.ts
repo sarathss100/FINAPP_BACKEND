@@ -7,7 +7,7 @@ let io: Server;
 export const setupSocketIO = function(server: HTTPServer): void {
     io = new Server(server, {
         cors: {
-            origin: 'http://localhost:3000',
+            origin: '*',
             methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
             credentials: true
         },
@@ -15,7 +15,7 @@ export const setupSocketIO = function(server: HTTPServer): void {
     });
 
     io.on('connection', (socket) => {
-        registerChatHandlers(socket, io);
+        registerChatHandlers(socket, io, );
     });
 
     console.log(`Socket.IO initialized`);

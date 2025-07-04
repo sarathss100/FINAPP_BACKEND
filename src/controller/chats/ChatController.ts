@@ -7,7 +7,7 @@ import { SuccessMessages } from 'constants/successMessages';
 import { ZodError } from 'zod';
 import IChatController from './interfaces/IChatController';
 import IChatService from 'services/chats/interfaces/IChatService';
-import { chatDTOSchema } from 'validation/chats/chat.validation';
+// import { chatDTOSchema } from 'validation/chats/chat.validation';
 
 /**
  * @class ChatController
@@ -40,12 +40,12 @@ class ChatController implements IChatController {
             const { accessToken } = request.cookies;
 
             // Validate request body against the Zod schema
-            const dto = chatDTOSchema.parse(request.body);
+            // const dto = chatDTOSchema.parse(request.body);
 
-            const { role, message } = dto;
+            const { role = 'user', message = '' } = request.body;
 
             // Delegate to the service layer
-            const chat = await this._chatService.createChat(accessToken, role, message);
+            const chat = await this._chatService.createChat(accessToken, role, message );
 
             // Send success response
             sendSuccessResponse(response, StatusCodes.CREATED, SuccessMessages.CHAT_CREATED_SUCCESSFULLY, { chat });
@@ -60,6 +60,32 @@ class ChatController implements IChatController {
 
                 sendErrorResponse(response, StatusCodes.BAD_REQUEST, `Validation failed: ${errorMessages}`);
             } else if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                console.error('Unexpected error:', error);
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    /**
+     * @method createChat
+     * @description Handles incoming requests to create a new chat record.
+     * Extracts the access token from cookies, validates the request body using Zod schema,
+     * and delegates creation logic to the service layer.
+     *
+     * @param {Request} request - Express request object containing cookies and body data.
+     * @param {Response} response - Express response object used to send the HTTP response.
+     * @returns {Promise<void>}
+     */
+    async getAccessToken(request: Request, response: Response): Promise<void> {
+        try {
+            const { accessToken } = request.cookies;
+
+            // Send success response
+            sendSuccessResponse(response, StatusCodes.CREATED, SuccessMessages.OPERATION_SUCCESS, { accessToken });
+        } catch (error) {
+            if (error instanceof AppError) {
                 sendErrorResponse(response, error.statusCode, error.message);
             } else {
                 console.error('Unexpected error:', error);

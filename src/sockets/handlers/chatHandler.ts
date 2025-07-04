@@ -15,7 +15,6 @@ declare module "socket.io" {
 
 const registerChatHandlers = function(socket: Socket, io: Server): void {
     const { accessToken } = socket.handshake.auth || socket.handshake.query || {};
-
     if (!accessToken) {
         socket.emit(`auth_error`, 'Missing access token');
         socket.disconnect();
@@ -35,8 +34,8 @@ const registerChatHandlers = function(socket: Socket, io: Server): void {
 
         const chatSocketService = new ChatSocketService();
 
-        socket.on('chat_message', async (payload) => {
-            await chatSocketService.handleMessage(socket, io, payload, userId);
+        socket.on('user_message', async (payload) => {
+            await chatSocketService.handleMessage(socket, io, payload);
         });
 
         socket.on('disconnect', () => {

@@ -46,7 +46,7 @@ class ChatService implements IChatService {
      * @throws {AuthenticationError} If the access token is invalid or missing user information.
      * @throws {Error} If an unexpected error occurs during the chat creation process.
      */
-    async createChat(accessToken: string, role: 'user' | 'bot', message: string): Promise<void> {
+    async createChat(accessToken: string, role: 'user' | 'bot', message: string): Promise<string> {
         try {
             // Decode and validate the access token to extract the user ID associated with it.
             const userId = decodeAndValidateToken(accessToken);
@@ -63,6 +63,7 @@ class ChatService implements IChatService {
             // Save bot reply
             await this._chatManagementRepository.createChat(userId, 'bot', botReply);
 
+            return botReply;
         } catch (error) {
             // Log and rethrow the error for upstream handling
             console.error('Error creating chat:', error);

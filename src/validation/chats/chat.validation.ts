@@ -6,8 +6,8 @@ export const chatDTOSchema = z.object({
     role: z.union(
         [z.literal('user'), z.literal('bot')],
         { message: "Role must be either 'user' or 'bot'" }
-    ),
-    message: z.string().min(1, { message: 'Message content is required' }),
+    ).optional(),
+    message: z.string().min(1, { message: 'Message content is required' }).optional(),
     timestamp: z.string()
         .refine(dateStr => {
             const date = new Date(dateStr);

@@ -13,6 +13,7 @@ const chatService = new ChatService(chatRepository);
 const chatController: IChatController = new ChatController(chatService);
 
 // CRUD operations
-router.post('/', chatController.createChat.bind(chatController));
+router.get('/', chatController.createChat.bind(chatController));
+router.get('/token', chatController.getAccessToken.bind(chatController));
 
 export default router;
