@@ -8,9 +8,10 @@ import {
 } from 'error/AppError';
 import { ErrorMessages } from 'constants/errorMessages';
 import { StatusCodes } from 'constants/statusCodes';
-import transactionDTOSchema, { ITransactionDTO } from 'dtos/transaction/TransactionDto';
+import { ITransactionDTO } from 'dtos/transaction/TransactionDto';
 import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
 import { SuccessMessages } from 'constants/successMessages';
+import transactionDTOSchema from 'validation/transaction/transaction.validation';
 
 class TransactionController implements ITransactionController {
   private readonly _transactionService: ITransactionService;

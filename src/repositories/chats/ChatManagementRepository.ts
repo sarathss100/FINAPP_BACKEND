@@ -1,3 +1,4 @@
+import ChatModel from "model/chats/model/ChatModel";
 import IChatRepository from "./interfaces/IChatRepository";
 
 /**
@@ -32,9 +33,9 @@ class ChatManagementRepository implements IChatRepository {
      * @returns {Promise<IChatDTO>} - A promise resolving to the created chat data.
      * @throws {Error} - Throws an error if the database operation fails.
      */
-    async createChat(): Promise<void> {
+    async createChat(userId: string, role: 'user' | 'bot', message: string): Promise<void> {
         try {
-            console.log('test');
+            await ChatModel.create({ userId, role, message });
         } catch (error) {
             console.error('Error creating chat:', error);
             throw new Error(`Failed to create chat: ${(error as Error).message}`);

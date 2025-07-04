@@ -304,8 +304,8 @@ class DebtManagementRepository implements IDebtRepository {
                 name: debt.debtName,
                 principal: debt.initialAmount,
                 currentBalance: debt.currentBalance ?? debt.initialAmount,
-                interestRate: debt.interestRate,
-                interestType: debt.interestType,
+                interestRate: debt.interestRate ?? 0,
+                interestType: debt.interestType ?? "Flat",
                 monthlyPayment: debt.monthlyPayment ?? 0,
                 tenureMonths: debt.tenureMonths
             }));

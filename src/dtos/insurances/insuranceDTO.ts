@@ -1,21 +1,13 @@
-import { z } from 'zod';
-
-export const insuranceDTOSchema = z.object({
-    _id: z.string().optional(),
-    userId: z.string().optional(),
-    type: z.string().min(1, { message: 'Type is required' }),
-    coverage: z.number().positive({ message: 'Coverage must be a positive number' }),
-    premium: z.number().positive({ message: 'Premium must be a positive number' }),
-    next_payment_date: z.string()
-        .refine(dateStr => {
-            const date = new Date(dateStr);
-            return !isNaN(date.getTime());
-        }, {
-            message: 'Invalid date value',
-        })
-        .transform(dateStr => new Date(dateStr)),
-    payment_status: z.string().min(1, { message: `Payment Status is Required` }),
-    status: z.string().min(1, { message: 'Status is required' }).optional(),
-});
-
-export type InsuranceDTO = z.infer<typeof insuranceDTOSchema>;
+/**
+ * DTO for Insurance entity
+ */
+export interface InsuranceDTO {
+    _id?: string;
+    userId?: string;
+    type: string; // Must not be empty
+    coverage: number; // Must be positive
+    premium: number; // Must be positive
+    next_payment_date: Date; // Must be a valid date
+    payment_status: string; // Must not be empty
+    status?: string; // Optional, but must not be empty if provided
+}

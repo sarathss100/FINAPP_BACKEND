@@ -6,7 +6,7 @@ import { Request, Response } from 'express';
 import { AppError, ValidationError } from 'error/AppError';
 import { ErrorMessages } from 'constants/errorMessages';
 import { SuccessMessages } from 'constants/successMessages';
-import faqSchema from '../../dtos/base/FaqDto';
+import faqSchema from 'validation/base/faq.validation';
 
 class AdminController implements IAdminController {
     private readonly _adminService: IAdminService;

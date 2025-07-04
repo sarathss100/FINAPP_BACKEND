@@ -1,5 +1,6 @@
 import { IBondDTO } from "dtos/investments/investmentDTO";
 
+
 /**
  * Calculates the current value and total profit or loss for a bond investment.
  *

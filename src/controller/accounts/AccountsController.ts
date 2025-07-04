@@ -6,7 +6,8 @@ import { AppError, AuthenticationError, ServerError, ValidationError } from 'err
 import { SuccessMessages } from 'constants/successMessages';
 import IAccountsController from './interfaces/IAccountsController';
 import IAccountsService from 'services/accounts/interfaces/IAccountsService';
-import { accountDTOSchema, IAccountDTO } from 'dtos/accounts/AccountsDTO';
+import { IAccountDTO } from 'dtos/accounts/AccountsDTO';
+import accountValidationSchema from 'validation/accounts/account.validation';
 
 class AccountsController implements IAccountsController {
     private readonly _accountsService: IAccountsService;
@@ -33,7 +34,7 @@ class AccountsController implements IAccountsController {
             }
 
             // Now assert it to IAccountDTO only when passing it to Zod for validation
-            const parsedBody = accountDTOSchema.safeParse(formData);
+            const parsedBody = accountValidationSchema.safeParse(formData);
 
             if (!parsedBody || !parsedBody.success) {
                 // If validation fails, extract the error details
@@ -76,7 +77,7 @@ class AccountsController implements IAccountsController {
                 throw new ValidationError(ErrorMessages.ACCOUNT_ID_NOT_FOUND, StatusCodes.BAD_REQUEST);
             } 
 
-            const partialaccountsDTOSchema = accountDTOSchema.partial();
+            const partialaccountsDTOSchema = accountValidationSchema.partial();
 
             // Validate the request body using the Zod schema
             const parsedBody = partialaccountsDTOSchema.safeParse(accountData);

@@ -7,7 +7,6 @@ import { SuccessMessages } from 'constants/successMessages';
 import { ErrorMessages } from 'constants/errorMessages';
 import { AuthenticationError, ServerError } from 'error/AppError';
 import { AppError } from 'error/AppError';
-// import { httpOnlyCookieOptions } from 'utils/cookiesOptions';
 
 class AuthController implements IAuthController {
     private readonly _authService: IAuthService;

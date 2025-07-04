@@ -5,8 +5,9 @@ import { ErrorMessages } from 'constants/errorMessages';
 import { StatusCodes } from 'constants/statusCodes';
 import { Request, Response } from 'express';
 import { AppError, AuthenticationError, ServerError, ValidationError } from 'error/AppError';
-import goalDTOSchema, { IGoalDTO } from 'dtos/goal/GoalDto';
 import { SuccessMessages } from 'constants/successMessages';
+import goalDTOSchema from 'validation/goal/goal.validation';
+import { IGoalDTO } from 'dtos/goal/GoalDto';
 
 class GoalController implements IGoalController {
     private readonly _goalService: IGoalService;

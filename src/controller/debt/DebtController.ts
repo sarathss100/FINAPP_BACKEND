@@ -7,7 +7,7 @@ import { SuccessMessages } from 'constants/successMessages';
 import { ZodError } from 'zod';
 import IDebtController from './interfaces/IDebtController';
 import IDebtService from 'services/debt/interfaces/IDebtService';
-import debtDTOSchema from 'dtos/debt/DebtDto';
+import debtDTOSchema from 'validation/debt/debt.validation';
 
 /**
  * @class DebtController

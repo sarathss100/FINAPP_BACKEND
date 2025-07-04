@@ -1,5 +1,6 @@
 import app from './app';
 import mongooseConnection from './config/database/mongooseConnection';
+import { setupSocketIO } from 'sockets';
 
 const PORT: number = parseInt(process.env.PORT || '5000', 10);
 
@@ -10,6 +11,9 @@ const PORT: number = parseInt(process.env.PORT || '5000', 10);
         const server = app.listen(PORT, () => {
             console.log(`Server Successfully start on PORT ${PORT}`)
         });
+
+        // Initialize Socket.IO
+        setupSocketIO(server);
 
         // Handle server errors
         server.on('error', (error) => {

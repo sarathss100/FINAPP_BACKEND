@@ -56,11 +56,14 @@ class DebtService implements IDebtService {
             const monthlyPayment = await calculateLoanBreakdown({
                 initialAmount: debtData.initialAmount,
                 tenureMonths: debtData.tenureMonths,
-                interestRate: debtData.interestRate,
-                interestType: debtData.interestType,
+                interestRate: debtData.interestRate ?? 0,
+                interestType: debtData.interestType ?? 'simple',
                 targetMonth: 1,
             });
 
+            if (!debtData.startDate) {
+                throw new Error('startDate is required to calculate loan closing month.');
+            }
             const loanClosingMonth = calculateLoanClosingMonth(debtData.startDate, debtData.tenureMonths);
             const nextDueDate = calculateNextDueDate(debtData.startDate);
             const isGoodDebt = categorizeDebt(debtData.debtName);

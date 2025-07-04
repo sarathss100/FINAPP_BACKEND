@@ -6,8 +6,8 @@ import { AppError } from 'error/AppError';
 import { SuccessMessages } from 'constants/successMessages';
 import { ZodError } from 'zod';
 import IInsuranceController from './interfaces/IInsuranceController';
-import { insuranceDTOSchema } from 'dtos/insurances/insuranceDTO';
 import IInsuranceService from 'services/insurances/interfaces/IInsuranceService';
+import { insuranceDTOSchema } from 'validation/insurances/insurance.validation';
 
 /**
  * @class InsuranceController

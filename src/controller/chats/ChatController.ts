@@ -7,6 +7,7 @@ import { SuccessMessages } from 'constants/successMessages';
 import { ZodError } from 'zod';
 import IChatController from './interfaces/IChatController';
 import IChatService from 'services/chats/interfaces/IChatService';
+import { chatDTOSchema } from 'validation/chats/chat.validation';
 
 /**
  * @class ChatController
@@ -36,16 +37,18 @@ class ChatController implements IChatController {
      */
     async createChat(request: Request, response: Response): Promise<void> {
         try {
-            // const { accessToken } = request.cookies;
+            const { accessToken } = request.cookies;
 
             // Validate request body against the Zod schema
-            // const dto = debtDTOSchema.parse(request.body);
+            const dto = chatDTOSchema.parse(request.body);
+
+            const { role, message } = dto;
 
             // Delegate to the service layer
-            // const debt = await this._debtService.createDebt(accessToken, dto);
+            const chat = await this._chatService.createChat(accessToken, role, message);
 
             // Send success response
-            sendSuccessResponse(response, StatusCodes.CREATED, SuccessMessages.DEBT_CREATED_SUCCESSFULLY);
+            sendSuccessResponse(response, StatusCodes.CREATED, SuccessMessages.CHAT_CREATED_SUCCESSFULLY, { chat });
         } catch (error) {
             if (error instanceof ZodError) {
                 console.log(error.errors);

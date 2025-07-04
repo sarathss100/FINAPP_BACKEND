@@ -6,7 +6,7 @@ import { AppError, AuthenticationError, ValidationError } from 'error/AppError';
 import { SuccessMessages } from 'constants/successMessages';
 import INotificationController from './interfaces/INotificationController';
 import INotificationService from 'services/notification/interfaces/INotificationService';
-import notificationDTOSchema from 'dtos/notification/NotificationDto';
+import notificationDTOSchema from 'validation/notification/notification.validation';
 
 class NotificationController implements INotificationController {
     private readonly _notificationService: INotificationService;

@@ -6,8 +6,8 @@ import { AppError, ValidationError } from 'error/AppError';
 import { SuccessMessages } from 'constants/successMessages';
 import IInvestmentService from 'services/investments/interfaces/IInvestmentService';
 import IInvestmentController from './interfaces/IInvestmentController';
-import { InvestmentDTOSchema } from 'dtos/investments/investmentDTO';
 import { ZodError } from 'zod';
+import { InvestmentDTOSchema } from 'validation/investments/investment.validation';
 
 /**
  * @class InvestmentController

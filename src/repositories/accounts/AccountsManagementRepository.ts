@@ -2,7 +2,6 @@ import { IAccountDTO } from 'dtos/accounts/AccountsDTO';
 import IAccountsManagementRepository from './interfaces/IAccountsManagementRepository';
 import { AccountModel } from 'model/accounts/model/AccountsModel';
 
-
 class AccountManagementRepository implements IAccountsManagementRepository {
     /**
      * Creates a new financial account in the database and returns the created account in `AccountDTO` format.

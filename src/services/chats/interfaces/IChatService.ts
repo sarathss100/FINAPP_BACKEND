@@ -1,6 +1,6 @@
 
 interface IChatService {
-    createChat(): Promise<void>;
+    createChat(accessToken: string, role: 'user' | 'bot', message: string): Promise<void>;
 }
 
 export default IChatService;

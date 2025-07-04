@@ -1,6 +1,6 @@
 
 interface IChatRepository {
-    createChat(): Promise<void>;
+    createChat(userId: string, role: 'user' | 'bot', message: string): Promise<void>;
 }
 
 export default IChatRepository;
