@@ -41,10 +41,10 @@ class NotificationController implements INotificationController {
             // Extract the validated data
             const notificationData = parsedBody.data;
             
-            // Call the service layer to create the goal
-            const createdGoal = await this._notificationService.createNotification(accessToken, notificationData);
+            // Call the service layer to create the notification
+            const createdNotification = await this._notificationService.createNotification(accessToken, notificationData);
 
-            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOAL_CREATED, { createdGoal } );
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { createdNotification } );
         } catch (error) {
             if (error instanceof AppError) {
                 sendErrorResponse(response, error.statusCode, error.message);

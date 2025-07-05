@@ -1,42 +1,38 @@
 import { Schema } from 'mongoose';
-import INotification from '../interfaces/INotificaiton';
+import INotification, { NOTIFICATION_TYPES } from '../interfaces/INotificaiton';
 
 const NotificaitonSchema = new Schema<INotification>(
     {
         user_id: {
-            type: Schema.Types.ObjectId,
-            ref: 'User',
-            required: true
+            type: String,
+            required: true,
+            index: true,
+        },
+        title: {
+            type: String,
+            required: true,
         },
         message: {
             type: String,
-            required: true
-        },
-        isSeen: {
-            type: Boolean,
-            required: true
-        },
-        is_completed: {
-            type: Boolean,
-            default: false
-        },
-        reminder_frequency: {
-            type: String,
-            enum: ['Daily', 'Weekly', 'Monthly', 'None'],
-            default: 'None'
-        },
-        next_reminder_date: {
-            type: Date
-        },
-        priority_level: {
-            type: String,
-            enum: ['Low', 'Medium', 'High'],
-            default: 'Medium'
-        },
-        target_date: {
-            type: Date,
             required: true,
-        }
+        },
+        type: {
+            type: String,
+            enum: NOTIFICATION_TYPES,
+            required: true,
+        },
+        is_read: {
+            type: Boolean,
+            default: false,
+        },
+        meta: {
+            type: Schema.Types.Mixed,
+            default: null,
+        },
+        archived: {
+            type: Boolean,
+            default: false,
+        },
     },
     {
         timestamps: true

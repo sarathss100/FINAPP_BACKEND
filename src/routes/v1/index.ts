@@ -11,6 +11,7 @@ import mutualFundRoutes from './mutualfunds/MutualFundRouter';
 import insuranceRoutes from './insurances/InsuranceRouter';
 import debtRoutes from './debt/debtRouter';
 import chatRoutes from './chats/ChatRouter';
+import notificationRoutes from './notification/NotificationRouter';
 
 import { authorizeRoles } from 'middleware/authMiddleware'; 
 import { UserRole } from 'types/auth/roles';
@@ -30,6 +31,7 @@ apiV1Router.use('/mutualfund', authorizeRoles(UserRole.USER, UserRole.ADMIN), mu
 apiV1Router.use('/insurance', authorizeRoles(UserRole.USER), insuranceRoutes);
 apiV1Router.use('/debt', authorizeRoles(UserRole.USER), debtRoutes);
 apiV1Router.use('/chat', authorizeRoles(UserRole.USER), chatRoutes);
+apiV1Router.use('/notification', authorizeRoles(UserRole.USER), notificationRoutes);
 
 // Admin-only routes
 apiV1Router.use('/admin', authorizeRoles(UserRole.ADMIN), adminRoutes);

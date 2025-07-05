@@ -8,6 +8,6 @@ const notificationRepository = new NotificationManagementRepository();
 const notificationService = new NotificationService(notificationRepository);
 const notificatonController = new NotificationController(notificationService);
 
-router.post('/create', notificatonController.createNotification.bind(notificatonController));
+router.post('/', notificatonController.createNotification.bind(notificatonController));
 
 export default router;
