@@ -14,6 +14,7 @@ interface IDebtService {
     updateExpiry(): Promise<void>;
     markEndedDebtsAsCompleted(): Promise<void>;
     markAsPaid(debtId: string): Promise<boolean>;
+    getDebtsForNotifyUpcomingDebtPayments(): Promise<IDebtDTO[]>;
 }
 
 export default IDebtService;

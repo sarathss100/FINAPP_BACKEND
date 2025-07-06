@@ -282,6 +282,44 @@ class InsuranceManagementRepository implements IInsuranceManagementRepository {
             throw new Error(`Failed to update payment status: ${(error as Error).message}`);
         }
     }
+
+    /**
+     * Retrieves insurance policies whose next payment date is within the next 2 days.
+     *
+     * @returns {Promise<InsuranceDTO[]>} A promise that resolves with a list of insurance policies due for payment soon.
+     * @throws {Error} Throws an error if the database fetch operation fails.
+     */
+    async getInsuranceForNotifyInsurancePayments(): Promise<InsuranceDTO[]> {
+        try {
+            const now = new Date();
+            const twoDaysFromNow = new Date();
+            twoDaysFromNow.setDate(now.getDate() + 2);
+
+            // Fetch only those policies whose next payment date is within the next 2 days
+            const insurances = await InsuranceModel.find({
+                next_payment_date: {
+                    $gte: now,
+                    $lte: twoDaysFromNow
+                }
+            });
+
+            const refinedData: InsuranceDTO[] = insurances.map((data) => ({
+                _id: String(data._id),
+                userId: String(data.userId),
+                type: data.type,
+                coverage: data.coverage,
+                premium: data.premium,
+                next_payment_date: data.next_payment_date,
+                payment_status: data.payment_status,
+                status: data.status,
+            }));
+
+            return refinedData;
+        } catch (error) {
+            console.error('Error fetching insurance records:', error);
+            throw new Error(`Failed to retrieve insurance data: ${(error as Error).message}`);
+        }
+    }
 }
 
 export default InsuranceManagementRepository;

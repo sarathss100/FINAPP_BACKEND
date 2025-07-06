@@ -9,5 +9,8 @@ const notificationService = new NotificationService(notificationRepository);
 const notificatonController = new NotificationController(notificationService);
 
 router.post('/', notificatonController.createNotification.bind(notificatonController));
+router.get('/', notificatonController.getNotifications.bind(notificatonController));
+router.patch('/archieve/:notificationId', notificatonController.updateArchieveStatus.bind(notificatonController));
+router.patch('/seen/:notificationId', notificatonController.updateReadStatus.bind(notificatonController));
 
 export default router;

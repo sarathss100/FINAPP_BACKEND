@@ -14,6 +14,7 @@ interface IDebtRepository {
     updateExpiry(): Promise<void>;
     markEndedDebtsAsCompleted(): Promise<void>;
     markAsPaid(debtId: string): Promise<boolean>;
+    getDebtForNotifyUpcomingDebtPayments(): Promise<IDebtDTO[]>;
 }
 
 export default IDebtRepository;

@@ -226,6 +226,26 @@ class InsuranceService implements IInsuranceService {
             throw new Error((error as Error).message);
         }
     }
+
+    /**
+     * Retrieves insurance policies that require payment notifications.
+     * This typically includes policies where the next payment date is approaching or overdue.
+     *
+     * @returns {Promise<InsuranceDTO[]>} A promise that resolves with a list of insurance policies requiring payment attention.
+     * @throws {Error} If an unexpected error occurs during the fetch operation.
+     */
+    async getInsuranceForNotifyInsurancePayments(): Promise<InsuranceDTO[]> {
+        try {
+            // Delegate the fetch operation to the repository
+            const insurances = await this._insuranceRepository.getInsuranceForNotifyInsurancePayments();
+
+            return insurances;
+        } catch (error) {
+            // Log and rethrow the error for upstream handling
+            console.error('Error fetching insurance records for payment notification:', error);
+            throw new Error((error as Error).message);
+        }
+    }
 }
 
 export default InsuranceService;

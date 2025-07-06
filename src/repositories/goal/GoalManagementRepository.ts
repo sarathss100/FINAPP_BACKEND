@@ -4,6 +4,17 @@ import { GoalModel } from 'model/goal/model/GoalModel';
 import mongoose from 'mongoose';
 
 class GoalManagementRepository implements IGoalManagementRepository {
+    private static _instance: GoalManagementRepository;
+
+    public constructor() {};
+
+    public static get instance(): GoalManagementRepository {
+        if (!GoalManagementRepository._instance) {
+            GoalManagementRepository._instance = new GoalManagementRepository();
+        }
+        return GoalManagementRepository._instance;
+    }
+
     /**
     * Creates a new goal in the database and returns the created goal in IGoalDTO format.
     * 
@@ -233,6 +244,51 @@ class GoalManagementRepository implements IGoalManagementRepository {
             }
         } catch (error) {
             console.error('Error updating transaction:', error);
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+     * Retrieves all active (non-completed) goals to check for monthly payment notifications.
+     *
+     * This method fetches goals that are still in progress (i.e., not completed),
+     * and returns them in a structured format for further processing,
+     * such as sending monthly reminder notifications to users.
+     *
+     * @returns {Promise<IGoalDTO[]>} A promise resolving to an array of goal DTOs representing active goals.
+     * @throws {Error} If an error occurs during the database query or data transformation.
+     */
+    async getGoalsForNotifyMonthlyGoalPayments(): Promise<IGoalDTO[]> {
+        try {
+            // Fetch all non-completed goals from the database
+            const goals = await GoalModel.find({ is_completed: false });
+
+            // Map the raw database results to IGoalDTO format for consistent usage across the app
+            const updatedGoals: IGoalDTO[] = goals.map((result) => ({
+                user_id: result.user_id.toString(),
+                tenant_id: result.tenant_id?.toString(),
+                goal_name: result.goal_name,
+                goal_category: result.goal_category,
+                target_amount: result.target_amount,
+                initial_investment: result.initial_investment,
+                current_amount: result.current_amount,
+                currency: result.currency,
+                target_date: result.target_date,
+                contribution_frequency: result.contribution_frequency,
+                priority_level: result.priority_level,
+                description: result.description,
+                reminder_frequency: result.reminder_frequency,
+                goal_type: result.goal_type,
+                tags: result.tags,
+                dependencies: result.dependencies?.map(dep => dep.toString()),
+                is_completed: result.is_completed,
+                created_by: result.created_by.toString(),
+                last_updated_by: result.last_updated_by?.toString(),
+            }));
+
+            return updatedGoals;
+        } catch (error) {
+            console.error('Error fetching active goals for monthly payment notification:', error);
             throw new Error((error as Error).message);
         }
     }

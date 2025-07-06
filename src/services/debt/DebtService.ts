@@ -398,6 +398,28 @@ class DebtService implements IDebtService {
             throw new Error((error as Error).message);
         }
     }
+
+    /**
+     * Retrieves debts that need to be checked for upcoming payment notifications.
+     *
+     * This method fetches relevant debt records (non-deleted, non-completed) from the repository
+     * to determine which users should receive a payment due notification.
+     *
+     * @returns {Promise<IDebtDTO[]>} A promise resolving to an array of debt DTOs that are eligible for payment alerts.
+     * @throws {Error} If an error occurs while fetching debt data from the repository.
+     */
+    async getDebtsForNotifyUpcomingDebtPayments(): Promise<IDebtDTO[]> {
+        try {
+            // Fetch active debts from the repository for upcoming payment checks
+            const debts = await this._debtManagementRepository.getDebtForNotifyUpcomingDebtPayments();
+
+            return debts;
+        } catch (error) {
+            // Log and rethrow the error for upstream handling
+            console.error('Error fetching debts for upcoming payment notifications:', error);
+            throw new Error((error as Error).message);
+        }
+    }
 }
 
 export default DebtService;

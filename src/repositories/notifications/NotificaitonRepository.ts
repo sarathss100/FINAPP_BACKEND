@@ -48,6 +48,83 @@ class NotificationManagementRepository implements INotificatonManagementReposito
             throw new Error((error as Error).message);
         }
     }
+
+    /**
+     * Retrieves all notifications for a specific user from the data store.
+     * 
+     * @param userId - The ID of the user whose notifications are to be fetched.
+     * @returns A promise that resolves to an array of notification DTOs.
+     * @throws Error if the retrieval process fails.
+     */
+    async getNotifications(userId: string): Promise<INotificationDTO[]> {
+        try {
+            // Fetch all notifications associated with the provided user ID
+            const response = await NotificationModel.find({ user_id: userId, archived: false });
+
+            // Map the database documents to the notification DTO format
+            const notifications = response.map((data) => ({
+                user_id: data.user_id,
+                title: data.title,
+                message: data.message,
+                type: data.type,
+                is_read: data.is_read,
+                meta: data.meta,
+                archived: data.archived,
+            }));
+
+            // Return the list of notifications
+            return notifications;
+        } catch (error) {
+            // Catch and throw any errors that occur during the retrieval process
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+     * Archives a notification by setting its `archived` flag to true.
+     *
+     * @param notificationId - The ID of the notification to be archived.
+     * @returns A promise that resolves to `true` if the notification was found and updated, otherwise `false`.
+     * @throws Error if an exception occurs during the update process.
+     */
+    async updateArchieveStatus(notificationId: string): Promise<boolean> {
+        try {
+            // Find the notification by ID and update its `archived` field to true
+            const response = await NotificationModel.findByIdAndUpdate(
+                notificationId,
+                { $set: { archived: true } }
+            );
+
+            // Return true if a document was found and updated, false otherwise
+            return !!response;
+        } catch (error) {
+            // Catch any errors during the update process and re-throw with descriptive message
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+     * Marks a notification as read by setting its `is_read` flag to true.
+     *
+     * @param notificationId - The ID of the notification to be marked as read.
+     * @returns A promise that resolves to `true` if the notification was found and updated, otherwise `false`.
+     * @throws Error if an exception occurs during the update process.
+     */
+    async updateReadStatus(notificationId: string): Promise<boolean> {
+        try {
+            // Find the notification by ID and update its `is_read` field to true
+            const response = await NotificationModel.findByIdAndUpdate(
+                notificationId,
+                { $set: { is_read: true } }
+            );
+
+            // Return true if a document was found and updated, false otherwise
+            return !!response;
+        } catch (error) {
+            // Catch any errors during the update process and re-throw with a descriptive message
+            throw new Error((error as Error).message);
+        }
+    }
 }
 
 export default NotificationManagementRepository;

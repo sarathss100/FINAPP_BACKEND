@@ -14,6 +14,8 @@ import markDebtCompleted from './cron/markEndedDebtsAsCompleted.ts';
 import updateStockPrice from 'cron/updateStockPrices';
 import updateMutualFundPrice from 'cron/updateMutualFundPrices';
 import updateBondPricesCron from 'cron/updateBondPrices';
+import { startNotificationCronJobs } from 'cron/notificationCron';
+import { startGoalNotificationCronJob } from 'cron/notificationCron';
 
 const app = express();
 expireJob.start();
@@ -22,6 +24,8 @@ markDebtCompleted.start();
 updateStockPrice.start();
 updateMutualFundPrice.start();
 updateBondPricesCron.start();
+startNotificationCronJobs();
+startGoalNotificationCronJob();
 
 // Middleware
 app.use(express.json());

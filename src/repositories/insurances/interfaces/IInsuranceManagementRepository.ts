@@ -9,6 +9,7 @@ interface IInsuranceManagementRepository {
     getClosestNextPaymentDate(userId: string): Promise<InsuranceDTO | null>;
     markPaymentAsPaid(insuranceId: string): Promise<boolean>;
     markExpiredInsurances(): Promise<void>;
+    getInsuranceForNotifyInsurancePayments(): Promise<InsuranceDTO[]>;
 }
 
 export default IInsuranceManagementRepository;

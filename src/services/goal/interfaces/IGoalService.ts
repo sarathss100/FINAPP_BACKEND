@@ -15,6 +15,7 @@ interface IGoalService {
     monthlyContribution(accessToken: string): Promise<number>;
     getGoalById(accessToken: string, goalId: string): Promise<IGoalDTO>;
     updateTransaction(accessToken: string, goalId: string, transactionData: { amount: number; transaction_id?: string; date?: Date }): Promise<boolean>;
+    getGoalsForNotifyMonthlyGoalPayments(): Promise<IGoalDTO[]>;
 }
 
 export default IGoalService;

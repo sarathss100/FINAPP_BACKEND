@@ -15,7 +15,7 @@ export const setupSocketIO = function(server: HTTPServer): void {
     });
 
     io.on('connection', (socket) => {
-        registerChatHandlers(socket, io, );
+        registerChatHandlers(socket, io);
     });
 
     console.log(`Socket.IO initialized`);

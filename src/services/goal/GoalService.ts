@@ -10,12 +10,14 @@ import ISmartAnalysisResult from './interfaces/ISmartAnalysisResult';
 import IGoalCategory from './interfaces/IGoalCategory';
 import { createGeminiPrompt, parseGeminiResponse } from 'utils/transaction/analyzeWithGemini';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import GoalManagementRepository from 'repositories/goal/GoalManagementRepository';
 
 /**
  * Service class for managing goals, including creating, updating, deleting, and retrieving goals.
  * This class interacts with the goal repository to perform database operations.
  */
 class GoalService implements IGoalService {
+    private static _instance: GoalService;
     private _goalRepository: IGoalManagementRepository;
 
     /**
@@ -25,6 +27,14 @@ class GoalService implements IGoalService {
      */
     constructor(goalRepository: IGoalManagementRepository) {
         this._goalRepository = goalRepository;
+    }
+
+    public static get instance(): GoalService {
+        if (!GoalService._instance) {
+            const repo = GoalManagementRepository.instance;
+            GoalService._instance = new GoalService(repo);
+        }
+        return GoalService._instance;
     }
 
     /**
@@ -622,6 +632,31 @@ class GoalService implements IGoalService {
         } catch (error) {
             // Log and re-throw the error to propagate it to the caller.
             console.error('Error updating transaction ID:', error);
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+     * Retrieves all active goals that require monthly payment notifications.
+     *
+     * This method is typically used by a scheduled job or notification system
+     * to identify goals that need a monthly payment reminder based on their schedule.
+     *
+     * @returns {Promise<IGoalDTO[]>} A promise resolving to an array of goal DTOs that are eligible for monthly payment alerts.
+     * @throws {Error} If an error occurs during the repository call or data retrieval process.
+     */
+    async getGoalsForNotifyMonthlyGoalPayments(): Promise<IGoalDTO[]> {
+        try {
+            // Fetch goals that are due for monthly payment reminders
+            const goals = await this._goalRepository.getGoalsForNotifyMonthlyGoalPayments();
+
+            // Return the list of goals to be processed for notifications
+            return goals;
+        } catch (error) {
+            // Log the error for debugging purposes
+            console.error('Error fetching goals for monthly payment notifications:', error);
+
+            // Re-throw the error with a descriptive message
             throw new Error((error as Error).message);
         }
     }

@@ -554,6 +554,63 @@ class DebtManagementRepository implements IDebtRepository {
             throw new Error(`Failed to update ended debts: ${(error as Error).message}`);
         }
     }
+
+    /**
+     * Retrieves all active debts for checking upcoming debt payments.
+     *
+     * This method fetches non-deleted, non-completed debts from the database
+     * to determine which ones are due soon and require a notification.
+     *
+     * @returns {Promise<IDebtDTO[]>} A promise resolving to an array of debt DTOs that need to be checked for upcoming due dates.
+     * @throws {Error} If an error occurs during the database query or data transformation.
+     */
+    async getDebtForNotifyUpcomingDebtPayments(): Promise<IDebtDTO[]> {
+        try {
+            // Fetch all active debts (not deleted or completed)
+            const debts = await DebtModel.find({ isDeleted: false, isCompleted: false });
+
+            if (!debts || debts.length === 0) {
+                return [];
+            }
+
+            // Transform Mongoose documents into IDebtDTO objects
+            const refinedData: IDebtDTO[] = debts.map((debt) => ({
+                _id: String(debt._id),
+                userId: String(debt.userId),
+                accountId: debt.accountId ? String(debt.accountId) : debt.accountId,
+                debtName: debt.debtName,
+                initialAmount: debt.initialAmount,
+                currency: debt.currency,
+                interestRate: debt.interestRate,
+                interestType: debt.interestType,
+                tenureMonths: debt.tenureMonths,
+                monthlyPayment: debt.monthlyPayment,
+                monthlyPrincipalPayment: debt.monthlyPrincipalPayment,
+                montlyInterestPayment: debt.montlyInterestPayment,
+                startDate: debt.startDate,
+                nextDueDate: debt.nextDueDate,
+                endDate: debt.endDate,
+                status: debt.status,
+                currentBalance: debt.currentBalance,
+                totalInterestPaid: debt.totalInterestPaid,
+                totalPrincipalPaid: debt.totalPrincipalPaid,
+                additionalCharges: debt.additionalCharges,
+                notes: debt.notes,
+                isDeleted: debt.isDeleted,
+                isGoodDebt: debt.isGoodDebt,
+                isCompleted: debt.isCompleted,
+                isExpired: debt.isExpired,
+            }));
+
+            return refinedData;
+        } catch (error) {
+            // Log the raw error for debugging purposes
+            console.error('Error during fetching debts for notifications:', error);
+
+            // Throw a new, user-friendly error with context
+            throw new Error(`Failed to fetch debts for notification checks: ${(error as Error).message}`);
+        }
+    }
 }
 
 export default DebtManagementRepository;
