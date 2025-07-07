@@ -1,6 +1,7 @@
 import { Server } from 'socket.io';
 import registerChatHandlers from './handlers/chatHandler';
 import { Server as HTTPServer } from 'http';
+import registerNotificationHandlers from './handlers/notificationHandler';
 
 let io: Server;
 
@@ -16,6 +17,7 @@ export const setupSocketIO = function(server: HTTPServer): void {
 
     io.on('connection', (socket) => {
         registerChatHandlers(socket, io);
+        registerNotificationHandlers(socket);
     });
 
     console.log(`Socket.IO initialized`);

@@ -10,6 +10,7 @@ import DebtService from 'services/debt/DebtService';
 import GoalService from 'services/goal/GoalService';
 import { NOTIFICATION_TYPES } from 'model/notification/interfaces/INotificaiton';
 import InsuranceService from 'services/insurances/InsuranceService';
+import { io } from 'sockets';
 
 /**
  * Service class responsible for managing notifications.
@@ -57,9 +58,10 @@ class NotificationService implements INotificationService {
         notificationData: INotificationDTO
     ): Promise<INotificationDTO> {
         try {
+            let userId;
             if (accessToken) {
                 // Decode and validate the access token to extract the user ID
-                const userId = decodeAndValidateToken(accessToken);
+                userId = decodeAndValidateToken(accessToken);
 
                 // Ensure the token contains a valid user ID
                 if (!userId) {
@@ -75,6 +77,9 @@ class NotificationService implements INotificationService {
 
             // Delegate creation to the repository layer
             const createdNotification = await this._notificationRepository.createNotification(notificationData);
+
+            // Emit socket event to notify user about new notification
+            io.to(userId!).emit('new_notification', createdNotification);
 
             // Return the created notification to the caller
             return createdNotification;
@@ -111,6 +116,9 @@ class NotificationService implements INotificationService {
             // Delegate the fetching of notifications to the repository layer
             const notifications = await this._notificationRepository.getNotifications(userId);
 
+            // Emit socket event to notify user about new notification
+            io.to(userId!).emit('notifications', notifications);
+
             // Return the list of notifications to the caller
             return notifications;
         } catch (error) {
@@ -130,10 +138,24 @@ class NotificationService implements INotificationService {
      * @throws AuthenticationError if the token is invalid or user ID is missing.
      * @throws Error if any other exception occurs during the operation.
      */
-    async updateArchieveStatus(notificationId: string): Promise<boolean> {
+    async updateArchieveStatus(accessToken: string, notificationId: string): Promise<boolean> {
         try {
+            // Decode and validate the access token to extract the user ID
+            const userId = decodeAndValidateToken(accessToken);
+
+            // Ensure the token contains a valid user ID
+            if (!userId) {
+                throw new AuthenticationError(
+                    ErrorMessages.USER_ID_MISSING_IN_TOKEN,
+                    StatusCodes.BAD_REQUEST
+                );
+            }
+
             // Delegate the archiving operation to the repository layer
             const isUpdated = await this._notificationRepository.updateArchieveStatus(notificationId);
+
+            // Emit socket event to notify user about new notification
+            io.to(userId!).emit('notification_archieved', notificationId);
 
             // Return the result indicating whether the update was successful
             return isUpdated;
@@ -154,10 +176,24 @@ class NotificationService implements INotificationService {
      * @throws AuthenticationError if the user could not be authenticated or identified.
      * @throws Error if any exception occurs during the operation.
      */
-    async updateReadStatus(notificationId: string): Promise<boolean> {
+    async updateReadStatus(accessToken: string, notificationId: string): Promise<boolean> {
         try {
+            // Decode and validate the access token to extract the user ID
+            const userId = decodeAndValidateToken(accessToken);
+
+            // Ensure the token contains a valid user ID
+            if (!userId) {
+                throw new AuthenticationError(
+                    ErrorMessages.USER_ID_MISSING_IN_TOKEN,
+                    StatusCodes.BAD_REQUEST
+                );
+            }
+
             // Delegate the 'mark as read' operation to the repository layer
             const isUpdated = await this._notificationRepository.updateReadStatus(notificationId);
+
+            // Emit socket event to notify user about new notification
+            io.to(userId!).emit('notification_marked_read', notificationId);
 
             // Return the result indicating whether the update was successful
             return isUpdated;
@@ -166,6 +202,48 @@ class NotificationService implements INotificationService {
             console.error('Error marking notification as read:', error);
 
             // Re-throw the error in a standardized format
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+     * Marks all notifications for the authenticated user as read.
+     *
+     * This method decodes the provided access token to identify the user,
+     * delegates the update operation to the repository layer,
+     * and emits a WebSocket event to notify the client.
+     *
+     * @param accessToken - The JWT access token used to authenticate and identify the user.
+     * @returns A promise that resolves to `true` if any notifications were updated, otherwise `false`.
+     * @throws AuthenticationError if the token is invalid or missing user information.
+     * @throws Error if an exception occurs during the update process.
+     */
+    async updateReadStatusAll(accessToken: string): Promise<boolean> {
+        try {
+            // Decode and validate the access token to extract the user ID
+            const userId = decodeAndValidateToken(accessToken);
+
+            // Ensure the token contains a valid user ID
+            if (!userId) {
+                throw new AuthenticationError(
+                    ErrorMessages.USER_ID_MISSING_IN_TOKEN,
+                    StatusCodes.BAD_REQUEST
+                );
+            }
+
+            // Delegate the 'mark all as read' operation to the repository layer
+            const isUpdated = await this._notificationRepository.updateReadStatusAll(userId);
+
+            // Emit socket event to notify user that all notifications are marked as read
+            io.to(userId!).emit('all_notifications_marked_read');
+
+            // Return result indicating success or failure
+            return isUpdated;
+        } catch (error) {
+            // Log error for debugging
+            console.error('Error marking notifications as read:', error);
+
+            // Re-throw error preserving the original message
             throw new Error((error as Error).message);
         }
     }

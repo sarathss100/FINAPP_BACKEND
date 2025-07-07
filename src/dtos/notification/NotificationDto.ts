@@ -12,6 +12,7 @@ export interface INotificationDTO {
     is_read: boolean;
     meta?: string | object;
     archived: boolean;
+    createdAt?: Date;
 }
 
 

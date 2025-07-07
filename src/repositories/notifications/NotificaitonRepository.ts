@@ -32,6 +32,7 @@ class NotificationManagementRepository implements INotificatonManagementReposito
 
             // Map the saved document back into a DTO format to return
             const createdNotification: INotificationDTO = {
+                _id: response._id?.toString(),
                 user_id: response.user_id,
                 title: response.title,
                 message: response.message,
@@ -39,6 +40,7 @@ class NotificationManagementRepository implements INotificatonManagementReposito
                 is_read: response.is_read,
                 meta: response.meta,
                 archived: response.archived,
+                createdAt: response.createdAt,
             };
 
             // Return the newly created notification as a DTO
@@ -63,6 +65,7 @@ class NotificationManagementRepository implements INotificatonManagementReposito
 
             // Map the database documents to the notification DTO format
             const notifications = response.map((data) => ({
+                _id: data._id?.toString(),
                 user_id: data.user_id,
                 title: data.title,
                 message: data.message,
@@ -70,6 +73,7 @@ class NotificationManagementRepository implements INotificatonManagementReposito
                 is_read: data.is_read,
                 meta: data.meta,
                 archived: data.archived,
+                createdAt: data.createdAt,
             }));
 
             // Return the list of notifications
@@ -122,6 +126,32 @@ class NotificationManagementRepository implements INotificatonManagementReposito
             return !!response;
         } catch (error) {
             // Catch any errors during the update process and re-throw with a descriptive message
+            throw new Error((error as Error).message);
+        }
+    }
+
+    /**
+     * Marks all notifications for a specific user as read by setting their `is_read` flag to true.
+     *
+     * @param {string} userId - The ID of the user whose notifications should be marked as read.
+     * @returns {Promise<boolean>} Returns `true` if at least one notification was updated, otherwise `false`.
+     * @throws {Error} If an error occurs during the update process.
+     */
+    async updateReadStatusAll(userId: string): Promise<boolean> {
+        try {
+            const user_id = userId.toString();
+
+            console.log(`Request comes here`, user_id);
+            // Update all notifications for the given user ID
+            const result = await NotificationModel.updateMany(
+                { user_id }, 
+                { $set: { is_read: true } }
+            );
+
+            // Return true if at least one document was modified
+            return result.modifiedCount > 0;
+        } catch (error) {
+            // Throw a new error with the original message
             throw new Error((error as Error).message);
         }
     }

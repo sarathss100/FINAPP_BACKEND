@@ -16,6 +16,7 @@ interface INotification extends Document {
     is_read: boolean;
     meta?: string | object;
     archived: boolean;
+    createdAt?: Date;
 }
 
 export default INotification;

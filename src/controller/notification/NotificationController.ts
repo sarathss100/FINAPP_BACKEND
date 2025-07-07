@@ -129,11 +129,19 @@ class NotificationController implements INotificationController {
      */
     async updateArchieveStatus(request: Request, response: Response): Promise<void> {
         try {
+            // Extract the access token from cookies
+            const { accessToken } = request.cookies;
+
+            // If no access token is found, throw an authentication error
+            if (!accessToken) {
+                throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
+            }
+
             // Extract the notification ID from the request parameters
             const { notificationId } = request.params;
 
             // Delegate the archiving operation to the service layer
-            const isUpdated = await this._notificationService.updateArchieveStatus(notificationId);
+            const isUpdated = await this._notificationService.updateArchieveStatus(accessToken, notificationId);
 
             // Send a success response indicating whether the archive operation was successful
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { isUpdated });
@@ -157,11 +165,57 @@ class NotificationController implements INotificationController {
      */
     async updateReadStatus(request: Request, response: Response): Promise<void> {
         try {
+            // Extract the access token from cookies
+            const { accessToken } = request.cookies;
+
+            // If no access token is found, throw an authentication error
+            if (!accessToken) {
+                throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
+            }
+
             // Extract the notification ID from the request parameters
             const { notificationId } = request.params;
 
             // Delegate the 'mark as read' operation to the service layer
-            const isUpdated = await this._notificationService.updateReadStatus(notificationId);
+            const isUpdated = await this._notificationService.updateReadStatus(accessToken, notificationId);
+
+            // Send a success response indicating whether the update was successful
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { isUpdated });
+        } catch (error) {
+            // Handle known application errors by sending appropriate HTTP response
+            if (error instanceof AppError) {
+                sendErrorResponse(response, error.statusCode, error.message);
+            } else {
+                // Catch any unexpected errors and return a generic server error response
+                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    /**
+     * Handles the request to mark all notifications as read for the authenticated user.
+     * Extracts the access token from cookies to identify the user,
+     * and delegates the operation to the service layer.
+     *
+     * @param request - Express request object containing cookies (access token).
+     * @param response - Express response object used to send back the result.
+     */
+    async updateReadStatusAll(request: Request, response: Response): Promise<void> {
+        try {
+            console.log(`Request comes here`);
+            // Extract the access token from cookies
+            const { accessToken } = request.cookies;
+
+            // If no access token is found, throw an authentication error
+            if (!accessToken) {
+                throw new AuthenticationError(
+                    ErrorMessages.ACCESS_TOKEN_NOT_FOUND,
+                    StatusCodes.UNAUTHORIZED
+                );
+            }
+
+            // Delegate the 'mark all as read' operation to the service layer
+            const isUpdated = await this._notificationService.updateReadStatusAll(accessToken);
 
             // Send a success response indicating whether the update was successful
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { isUpdated });
