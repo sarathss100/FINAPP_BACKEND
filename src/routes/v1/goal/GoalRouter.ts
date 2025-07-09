@@ -22,6 +22,7 @@ router.delete('/:goalId', goalController.removeGoal.bind(goalController));
 
 // Summary routes 
 router.get('/summary/total', goalController.getTotalActiveGoalAmount.bind(goalController));
+router.get('/summary/initial/total', goalController.getTotalInitialGoalAmount.bind(goalController));
 router.get('/summary/longest-period', goalController.findLongestTimePeriod.bind(goalController));
 
 // Contribution analysis 

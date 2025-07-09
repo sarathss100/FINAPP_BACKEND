@@ -8,6 +8,7 @@ interface IGoalService {
     removeGoal(goalId: string): Promise<boolean>;
     getUserGoals(accessToken: string): Promise<IGoalDTO[]>;
     getTotalActiveGoalAmount(accessToken: string): Promise<number>;
+    getTotalInitialGoalAmount(accessToken: string): Promise<number>;
     findLongestTimePeriod(accessToken: string): Promise<string>;
     analyzeGoal(accessToken: string): Promise<ISmartAnalysisResult>;
     goalsByCategory(accessToken: string): Promise<IGoalCategory>;  
