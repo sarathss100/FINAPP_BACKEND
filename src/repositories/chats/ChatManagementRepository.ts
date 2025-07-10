@@ -1,5 +1,6 @@
 import ChatModel from "model/chats/model/ChatModel";
 import IChatRepository from "./interfaces/IChatRepository";
+import { ChatDTO } from "dtos/chats/chatDTO";
 
 /**
  * @class ChatManagementRepository
@@ -33,9 +34,26 @@ class ChatManagementRepository implements IChatRepository {
      * @returns {Promise<IChatDTO>} - A promise resolving to the created chat data.
      * @throws {Error} - Throws an error if the database operation fails.
      */
-    async createChat(userId: string, role: 'user' | 'bot', message: string): Promise<void> {
+    async createChat(userId: string, role: 'user' | 'admin', message: string): Promise<void> {
         try {
             await ChatModel.create({ userId, role, message });
+        } catch (error) {
+            console.error('Error creating chat:', error);
+            throw new Error(`Failed to create chat: ${(error as Error).message}`);
+        }
+    }
+
+    async getHistory(userId: string): Promise<ChatDTO[]> {
+        try {
+            const response = await ChatModel.find({ userId }).sort({ timestamp: 1 }).lean();
+            
+            return response.map(doc => ({
+                _id: doc._id.toString(),
+                userId: doc.userId,
+                role: doc.role,
+                message: doc.message,
+                timestamp: doc.timestamp,
+            }));
         } catch (error) {
             console.error('Error creating chat:', error);
             throw new Error(`Failed to create chat: ${(error as Error).message}`);

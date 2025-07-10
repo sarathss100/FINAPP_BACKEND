@@ -1,51 +1,66 @@
-import { ErrorMessages } from "constants/errorMessages";
-import { StatusCodes } from "constants/statusCodes";
-import { AuthenticationError } from "error/AppError";
-import mongoose from "mongoose";
-import { decodeAndValidateToken } from "utils/auth/tokenUtils";
 import { Socket, Server } from "socket.io";
-import ChatSocketService from "sockets/services/chatSocketService";
+import { decodeAndValidateToken } from "utils/auth/tokenUtils";
+import mongoose from "mongoose";
+import ChatService from "services/chats/ChatService";
 
-// Extend the Socket interface to include userId
 declare module "socket.io" {
-    interface Socket {
-        userId?: string;
-    }
+  interface Socket {
+    userId?: string;
+  }
 }
 
-const registerChatHandlers = function(socket: Socket, io: Server): void {
-    const { accessToken } = socket.handshake.auth || socket.handshake.query || {};
-    if (!accessToken) {
-        socket.emit(`auth_error`, 'Missing access token');
-        socket.disconnect();
-        return;
+const chatService = ChatService.instance;
+
+const registerChatHandlers = (socket: Socket, io: Server): void => {
+  const { accessToken } = socket.handshake.auth || {};
+  if (!accessToken) {
+    socket.emit("auth_error", "Missing access token");
+    socket.disconnect();
+    return;
+  }
+
+  try {
+    const userId = decodeAndValidateToken(accessToken);
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      socket.emit("auth_error", "Invalid user ID in token");
+      socket.disconnect();
+      return;
     }
 
-    try {
-        const userId = decodeAndValidateToken(accessToken);
-        if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
-            throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-        }
+    socket.userId = userId;
+    const roomName = `chat_${userId}`;
+    socket.join(roomName);
+    console.log(`User ${userId} connected to room ${roomName}`);
 
-        socket.userId = userId;
-        socket.join(userId);
+    // Notify admins
+    io.to("admin").emit("user_connected", { userId });
 
-        console.log(`User ${userId} connected and joined room`);
+    // Send chat history to user
+    chatService.getChatHistory(userId).then(history => {
+        socket.emit('chat_history', history);
+    });
 
-        const chatSocketService = new ChatSocketService();
+    socket.on("user_message", async (payload) => {
+      const message = {
+        id: payload.id,
+        message: payload.message,
+        sender: "user",
+        userId,
+      };
 
-        socket.on('user_message', async (payload) => {
-            await chatSocketService.handleMessage(socket, io, payload);
-        });
+      await chatService.createChat(userId, 'user', message.message);
 
-        socket.on('disconnect', () => {
-            console.log(`User ${userId} disconnected`);
-        });
-    } catch (error) {
-        console.error(`Socket auth failed:`, error);
-        socket.emit('auth_error', (error as Error).message || 'Authentication failed');
-        socket.disconnect();
-    }
+      io.to("admin").emit("user_message", message); // To admin
+    });
+
+    socket.on("disconnect", () => {
+      console.log(`User ${userId} disconnected`);
+    });
+  } catch (err) {
+    console.error("User socket error:", err);
+    socket.emit("auth_error", "Authentication failed");
+    socket.disconnect();
+  }
 };
 
 export default registerChatHandlers;

@@ -2,6 +2,7 @@ import { Server } from 'socket.io';
 import registerChatHandlers from './handlers/chatHandler';
 import { Server as HTTPServer } from 'http';
 import registerNotificationHandlers from './handlers/notificationHandler';
+import registerAdminHandlers from './handlers/adminSocketHandlers';
 
 let io: Server;
 
@@ -16,8 +17,14 @@ export const setupSocketIO = function(server: HTTPServer): void {
     });
 
     io.on('connection', (socket) => {
-        registerChatHandlers(socket, io);
-        registerNotificationHandlers(socket);
+        const clientType = socket.handshake.auth.clientType;
+        if (clientType === 'admin') {
+            registerAdminHandlers(socket, io);
+        } else if (clientType === 'user') {
+            registerChatHandlers(socket, io);
+        } else {
+            registerNotificationHandlers(socket);
+        }
     });
 
     console.log(`Socket.IO initialized`);

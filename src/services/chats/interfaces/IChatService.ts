@@ -1,6 +1,8 @@
+import { ChatDTO } from "dtos/chats/chatDTO";
 
 interface IChatService {
-    createChat(accessToken: string, role: 'user' | 'bot', message: string): Promise<string>;
+    createChat(accessToken: string, role: 'user' | 'admin', message: string): Promise<string>;
+    getChatHistory(accessToken: string): Promise<ChatDTO[]>;
 }
 
 export default IChatService;

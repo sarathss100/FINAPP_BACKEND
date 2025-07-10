@@ -1,11 +1,12 @@
-import { decodeAndValidateToken } from 'utils/auth/tokenUtils';
-import { AuthenticationError } from 'error/AppError';
-import { ErrorMessages } from 'constants/errorMessages';
-import { StatusCodes } from 'constants/statusCodes';
+// import { decodeAndValidateToken } from 'utils/auth/tokenUtils';
+// import { AuthenticationError } from 'error/AppError';
+// import { ErrorMessages } from 'constants/errorMessages';
+// import { StatusCodes } from 'constants/statusCodes';
 import IChatService from './interfaces/IChatService';
 import IChatRepository from 'repositories/chats/interfaces/IChatRepository';
 import ChatManagementRepository from 'repositories/chats/ChatManagementRepository';
 import getBotResponse from 'services/openAi/OpenAIService';
+import { ChatDTO } from 'dtos/chats/chatDTO';
 // import ChatbotProvider from 'services/openAi/interfaces/ChatbotProvider';
 // import OpenAIService from 'services/openAi/OpenAIService';
 
@@ -46,24 +47,29 @@ class ChatService implements IChatService {
      * @throws {AuthenticationError} If the access token is invalid or missing user information.
      * @throws {Error} If an unexpected error occurs during the chat creation process.
      */
-    async createChat(accessToken: string, role: 'user' | 'bot', message: string): Promise<string> {
+    async createChat(userId: string, role: 'user' | 'admin', message: string): Promise<string> {
         try {
-            // Decode and validate the access token to extract the user ID associated with it.
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
 
             // Save user message 
-            await this._chatManagementRepository.createChat(userId, 'user', message);
+            await this._chatManagementRepository.createChat(userId, role, message);
 
             // Get bot reply
             const botReply = await getBotResponse(message, userId);
 
-            // Save bot reply
-            await this._chatManagementRepository.createChat(userId, 'bot', botReply);
-
             return botReply;
+        } catch (error) {
+            // Log and rethrow the error for upstream handling
+            console.error('Error creating chat:', error);
+            throw new Error((error as Error).message);
+        }
+    }
+
+    async getChatHistory(userId: string): Promise<ChatDTO[]> {
+        try {
+            // Save user message 
+            const history = await this._chatManagementRepository.getHistory(userId);
+
+            return history;
         } catch (error) {
             // Log and rethrow the error for upstream handling
             console.error('Error creating chat:', error);

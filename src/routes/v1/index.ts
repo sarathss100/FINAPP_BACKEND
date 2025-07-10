@@ -30,7 +30,7 @@ apiV1Router.use('/investment', authorizeRoles(UserRole.USER), investmentRoutes);
 apiV1Router.use('/mutualfund', authorizeRoles(UserRole.USER, UserRole.ADMIN), mutualFundRoutes);
 apiV1Router.use('/insurance', authorizeRoles(UserRole.USER), insuranceRoutes);
 apiV1Router.use('/debt', authorizeRoles(UserRole.USER), debtRoutes);
-apiV1Router.use('/chat', authorizeRoles(UserRole.USER), chatRoutes);
+apiV1Router.use('/chat', authorizeRoles(UserRole.USER, UserRole.ADMIN), chatRoutes);
 apiV1Router.use('/notification', authorizeRoles(UserRole.USER), notificationRoutes);
 
 // Admin-only routes

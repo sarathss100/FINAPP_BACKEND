@@ -33,36 +33,6 @@ export default function registerNotificationHandlers(socket: Socket): void {
             });
         }
     });
-
-    // Event: Mark notification as read
-    // socket.on('mark_notification_read', async (notificationId: string) => {
-    //     try {
-    //         const isUpdated = await NotificationService.instance.updateReadStatus(notificationId);
-    //         if (isUpdated) {
-    //             socket.emit('notification_marked_read', notificationId);
-    //         }
-    //     } catch (error) {
-    //         console.error('Error marking notification as read:', error);
-    //         socket.emit('error', {
-    //             message: 'Failed to mark notification as read',
-    //         });
-    //     }
-    // });
-
-    // Event: Archive notification
-    // socket.on('archive_notification', async (notificationId: string) => {
-    //     try {
-    //         const isArchived = await NotificationService.instance.updateArchieveStatus(notificationId);
-    //         if (isArchived) {
-    //             socket.emit('notification_archived', notificationId);
-    //         }
-    //     } catch (error) {
-    //         console.error('Error archiving notification:', error);
-    //         socket.emit('error', {
-    //             message: 'Failed to archive notification',
-    //         });
-    //     }
-    // });
 }
 
 /**
