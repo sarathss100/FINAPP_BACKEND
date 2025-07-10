@@ -59,6 +59,57 @@ class ChatManagementRepository implements IChatRepository {
             throw new Error(`Failed to create chat: ${(error as Error).message}`);
         }
     }
+
+    async getAllChatSessions(): Promise<
+  { userId: string; chats: ChatDTO[] }[]
+> {
+  try {
+    const sessions = await ChatModel.aggregate([
+      {
+        $sort: { timestamp: 1 } // sort chronologically within each user
+      },
+      {
+        $group: {
+          _id: "$userId",
+          chats: {
+            $push: {
+              _id: "$_id",
+              role: "$role",
+              message: "$message",
+              timestamp: "$timestamp"
+            }
+          }
+        }
+      },
+      {
+        $project: {
+          userId: "$_id",
+          chats: 1,
+          _id: 0
+        }
+      }
+    ]);
+
+    // Format _id to string in each chat
+    const formatted = sessions.map(session => ({
+      userId: session.userId,
+      chats: session.chats.map((chat: { _id: string; userId: string, role: string; message: string; timestamp: Date }) => ({
+        _id: chat._id?.toString() || '',
+        userId: chat.userId,
+        role: chat.role,
+        message: chat.message,
+        timestamp: chat.timestamp
+      }))
+    }));
+
+    return formatted;
+  } catch (error) {
+    console.error("Error getting all chat histories:", error);
+    throw new Error("Failed to get all chat histories");
+  }
+}
+
+
 }
 
 export default ChatManagementRepository;

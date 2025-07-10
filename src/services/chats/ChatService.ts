@@ -76,6 +76,19 @@ class ChatService implements IChatService {
             throw new Error((error as Error).message);
         }
     }
+
+    async getAllChatSessions(): Promise<{ userId: string; chats: ChatDTO[]}[]> {
+        try {
+            // Save user message 
+            const history = await this._chatManagementRepository.getAllChatSessions();
+
+            return history;
+        } catch (error) {
+            // Log and rethrow the error for upstream handling
+            console.error('Error creating chat:', error);
+            throw new Error((error as Error).message);
+        }
+    }
 }
 
 export default ChatService;
