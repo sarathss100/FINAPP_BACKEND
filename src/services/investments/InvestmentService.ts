@@ -15,21 +15,14 @@ import { updateStockPrices } from 'utils/investments/stockcurrencyconverter/upda
 import { updateMutualFundPrices } from 'utils/investments/stockcurrencyconverter/updateMutualFundPrices';
 import { updateGoldPrices } from 'utils/investments/stockcurrencyconverter/updateGoldPrices';
 import { updateBondPrices } from 'utils/investments/stockcurrencyconverter/updateBondPrices';
+import IInvestmentManagementRepository from 'repositories/investments/interfaces/IInvestmentManagementRepository';
 
-/**
- * Service class for managing accounts, including creating, updating, deleting, and retrieving accounts.
- * This class interacts with the account repository to perform database operations.
- */
+
 class InvestmentService implements IInvestmentService {
     private static _instance: InvestmentService;
-    private _investmentRepository: InvestmentManagementRepository;
+    private _investmentRepository: IInvestmentManagementRepository;
 
-    /**
-     * Constructs a new instance of the AccountsService.
-     * 
-     * @param {IAccountsManagementRepository} accountRepository - The repository used for interacting with account data.
-     */
-    constructor(investmentRepository: InvestmentManagementRepository) {
+    constructor(investmentRepository: IInvestmentManagementRepository) {
         this._investmentRepository = investmentRepository;
     }
 

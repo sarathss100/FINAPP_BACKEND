@@ -12,18 +12,10 @@ import { normalizeTransactionObject } from 'utils/transaction/normalizeTransacti
 import crypto from 'crypto';
 import { classifyTransaction } from 'utils/transaction/classifyTransaction';
 
-/**
- * Service class for managing transaction, including creating and retrieving transactions.
- * This class interacts with the transaction repository to perform database operations.
- */
+
 class TransactionService implements ITransactionService {
     private _transactionRepository: ITransactionRepository;
 
-    /**
-     * Constructs a new instance of the TransactionService.
-     * 
-     * @param {ITransactionRepository} TransactionRepository - The repository used for interacting with transaction data.
-     */
     constructor(transactionRepository: ITransactionRepository) {
         this._transactionRepository = transactionRepository;
     }

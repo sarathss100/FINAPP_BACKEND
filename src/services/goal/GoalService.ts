@@ -12,19 +12,10 @@ import { createGeminiPrompt, parseGeminiResponse } from 'utils/transaction/analy
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import GoalManagementRepository from 'repositories/goal/GoalManagementRepository';
 
-/**
- * Service class for managing goals, including creating, updating, deleting, and retrieving goals.
- * This class interacts with the goal repository to perform database operations.
- */
 class GoalService implements IGoalService {
     private static _instance: GoalService;
     private _goalRepository: IGoalManagementRepository;
 
-    /**
-     * Constructs a new instance of the GoalService.
-     * 
-     * @param {IGoalManagementRepository} goalRepository - The repository used for interacting with goal data.
-     */
     constructor(goalRepository: IGoalManagementRepository) {
         this._goalRepository = goalRepository;
     }

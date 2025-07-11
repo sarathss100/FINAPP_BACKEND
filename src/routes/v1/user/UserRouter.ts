@@ -5,7 +5,6 @@ import UserController from 'controller/user/UserController';
 import IUserController from 'controller/user/interfaces/IUserController';
 import multer from 'multer';
 
-// Initialize Multer with the in Memory Storage
 const upload = multer({ storage: multer.memoryStorage() });
 
 const router = Router();

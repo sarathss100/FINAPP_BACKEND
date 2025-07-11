@@ -9,13 +9,7 @@ const chatRepository = new ChatManagementRepository();
 const chatService = new ChatService(chatRepository);
 const chatController: IChatController = new ChatController(chatService);
 
-// CRUD operations
 router.post('/', chatController.createChat.bind(chatController));
 router.get('/token', chatController.getAccessToken.bind(chatController));
-
-router.post('/send');
-router.get('/history/:chatId');
-router.get('/chats');
-router.delete('/:chatId');
 
 export default router;

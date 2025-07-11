@@ -5,21 +5,13 @@ import { StatusCodes } from 'constants/statusCodes';
 import IInsuranceService from './interfaces/IInsuranceService';
 import InsuranceManagementRepository from 'repositories/insurances/InsuranceManagementRepository';
 import { InsuranceDTO } from 'dtos/insurances/insuranceDTO';
+import IInsuranceManagementRepository from 'repositories/insurances/interfaces/IInsuranceManagementRepository';
 
-/**
- * Service class for managing insurance records.
- * Handles business logic and authentication before delegating database operations to the repository.
- */
 class InsuranceService implements IInsuranceService {
     private static _instance: InsuranceService;
-    private _insuranceRepository: InsuranceManagementRepository;
+    private _insuranceRepository: IInsuranceManagementRepository;
 
-    /**
-     * Constructs a new instance of the InsuranceService.
-     *
-     * @param {InsuranceManagementRepository} insuranceRepository - The repository used for interacting with insurance data.
-     */
-    constructor(insuranceRepository: InsuranceManagementRepository) {
+    constructor(insuranceRepository: IInsuranceManagementRepository) {
         this._insuranceRepository = insuranceRepository;
     }
 

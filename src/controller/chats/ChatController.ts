@@ -9,11 +9,6 @@ import IChatController from './interfaces/IChatController';
 import IChatService from 'services/chats/interfaces/IChatService';
 // import { chatDTOSchema } from 'validation/chats/chat.validation';
 
-/**
- * @class ChatController
- * @description Controller class responsible for handling chat-related HTTP requests.
- * Acts as an intermediary between the Express routes and the service layer.
- */
 class ChatController implements IChatController {
     private readonly _chatService: IChatService;
 
