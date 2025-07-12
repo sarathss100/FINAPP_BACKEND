@@ -97,9 +97,6 @@ class AdminController implements IAdminController {
                 const formattedErrors = validationResult.error.errors.map(err => 
                     `${err.path.join('.')}: ${err.message}`
                 );
-
-                console.log(formattedErrors);
-
                 sendErrorResponse(response, StatusCodes.BAD_REQUEST, 'Invalid query parameters', formattedErrors);
                 return;
             } 
