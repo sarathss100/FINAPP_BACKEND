@@ -12,6 +12,7 @@ import { MongoDbHealthCheckService } from './health/mongodb-health';
 import { RedisHealthCheckService } from './health/redis-health';
 import { ServerHealthCheckService } from './health/server-health';
 import { ISystemMetrics } from 'repositories/admin/interfaces/ISystemMetrics';
+import IPaginationMeta from 'dtos/admin/IPaginationMeta';
 
 class AdminService implements IAdminService {
     private _adminRepository: IAdminRepository;
@@ -127,44 +128,24 @@ class AdminService implements IAdminService {
         }
     }
 
-    /**
-     * Fetches all FAQ entries from the database for administrative purposes.
-     *
-     * This method retrieves all FAQs using the admin repository. If no FAQs exist,
-     * it returns an empty array — not `null` — since that is typically preferred
-     * when working with collections in TypeScript.
-     *
-     * @returns {Promise<IFaq[]>} A promise that resolves to an array of FAQ entries (`IFaq[]`).
-     *                           Returns an empty array if no FAQs are found.
-     * 
-     * @throws {ServerError} If there's a failure during the database operation or repository call.
-     * @throws {AppError} If an application-specific error occurs (e.g., validation, business logic).
-     * @throws {Error} If an unexpected or unhandled error occurs.
-     */
-    async getAllFaqsForAdmin(): Promise<IFaq[]> {
+    // Fetches all FAQ entries from the database for administrative purposes.
+    async getAllFaqsForAdmin(page: number, limit: number, search: string): Promise<{ faqDetails: IFaq[], pagination: IPaginationMeta }> {
         try {
-            // Call the repository method to fetch all FAQ entries
-            const faqDetails = await this._adminRepository.getAllFaqsForAdmin();
+            const paginatedFaqData = await this._adminRepository.getAllFaqsForAdmin(page, limit, search);
         
-            // Validate the result; throw an error if no FAQs were found or the operation failed
-            if (!faqDetails) {
+            if (!paginatedFaqData.faqDetails) {
                 throw new ServerError(ErrorMessages.FAILED_TO_FETCH_FAQS, StatusCodes.INTERNAL_SERVER_ERROR);
             }
-        
-            // This condition will never be true because `faqDetails.length < 0` is invalid
-            // Arrays have length >= 0
-            if (faqDetails.length === 0) {
+    
+            if (paginatedFaqData.faqDetails.length === 0) {
                 throw new ServerError(ErrorMessages.NO_FAQ_FOUND, StatusCodes.NOT_FOUND);
             }
         
-            // Return the fetched FAQ details
-            return faqDetails;
+            return paginatedFaqData;
         } catch (error) {
-            // Re-throw the error if it's an instance of AppError (custom application error)
             if (error instanceof AppError) {
                 throw error;
             } else {
-                // Re-throw unexpected errors for further handling
                 throw error;
             }
         }

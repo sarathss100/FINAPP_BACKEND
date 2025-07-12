@@ -6,6 +6,7 @@ import { IFaq } from 'dtos/base/FaqDto';
 import { ISystemMetrics } from './interfaces/ISystemMetrics';
 import osUtils from 'os-utils';
 import checkDiskSpace from 'check-disk-space';
+import IPaginationMeta from 'dtos/admin/IPaginationMeta';
 
 class AdminRepository implements IAdminRepository {
     // Retrieve all users from the database
@@ -74,26 +75,42 @@ class AdminRepository implements IAdminRepository {
         }
     }
 
-    /**
-     * Retrieves all FAQ entries from the database for administrative purposes.
-     *
-     * This function fetches all documents stored in the FaqModel and returns them
-     * as an array of IFaq objects. It is intended for use by admin interfaces or services.
-     *
-     * @returns {Promise<IFaq[]>} A promise that resolves to an array of FAQ objects.
-     * @throws {Error} If an error occurs during the database retrieval, an error is thrown
-     *                 with a descriptive message indicating the failure.
-     */
-    async getAllFaqsForAdmin(): Promise<IFaq[]> {
+    // Function retrieve all Faq details for admin
+    async getAllFaqsForAdmin(page = 1, limit = 10, search = ''): Promise<{ faqDetails: IFaq[], pagination: IPaginationMeta }> {
         try {
-            const result = await FaqModel.find({ isDeleted: false }).sort({ updatedAt: -1 });
-        
-            return result;
+            const query: { isDeleted: boolean, $or?: { [key: string]: { $regex: string, $options: string } }[] } = { isDeleted: false };
+
+            if (search) {
+                query.$or = [
+                    { question: { $regex: search, $options: 'i' } },
+                    { answer: { $regex: search, $options: 'i' } },
+                ];
+            }
+
+            const totalItems = await FaqModel.countDocuments(query);
+            const totalPages = Math.ceil(totalItems / limit);
+
+
+            const faqDetails = await FaqModel.find(query)
+                .sort({ updatedAt: - 1 })
+                .skip((page - 1) * limit)
+                .limit(limit);
+
+            const pagination: IPaginationMeta = {
+                currentPage: page,
+                totalPages,
+                totalItems,
+                itemsPerPage: limit,
+                hasNextPage: page < totalPages,
+                hasPreviousPage: page > 1,
+            }
+            
+            return {
+                faqDetails,
+                pagination
+            }
         } catch (error) {
-            // Log the raw error for debugging purposes
             console.error('Error while fetching FAQs:', error);
-        
-            // Throw a new, user-friendly error with context
             throw new Error(`Failed to retrieve FAQs: ${(error as Error).message}`);
         }
     }

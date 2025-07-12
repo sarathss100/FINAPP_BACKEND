@@ -7,6 +7,7 @@ import { AppError, ValidationError } from 'error/AppError';
 import { ErrorMessages } from 'constants/errorMessages';
 import { SuccessMessages } from 'constants/successMessages';
 import faqSchema from 'validation/base/faq.validation';
+import faqQuerySchema from 'validation/admin/faqQueryValidation';
 
 class AdminController implements IAdminController {
     private readonly _adminService: IAdminService;
@@ -90,15 +91,26 @@ class AdminController implements IAdminController {
 
     async getAllFaqsForAdmin(request: Request, response: Response): Promise<void> {
         try {
-            // Call the getall FAQ details in the adminService
-            const faqDetails = await this._adminService.getAllFaqsForAdmin();
+            const validationResult = faqQuerySchema.safeParse(request.query);
 
-            if (faqDetails) {
-                sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.FAQ_ADDED, { faqDetails });
-            } else {
-                sendErrorResponse(response, StatusCodes.BAD_REQUEST, ErrorMessages.FAILED_TO_ADD_THE_FAQ);
-            }
+            if (!validationResult.success) {
+                const formattedErrors = validationResult.error.errors.map(err => 
+                    `${err.path.join('.')}: ${err.message}`
+                );
+
+                console.log(formattedErrors);
+
+                sendErrorResponse(response, StatusCodes.BAD_REQUEST, 'Invalid query parameters', formattedErrors);
+                return;
+            } 
+
+            const { page, limit, search } = validationResult.data;
+
+            const faqDetails = await this._adminService.getAllFaqsForAdmin(page, limit, search);
+
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.FAQ_FETCHED_SUCCESSFULLY, { ...faqDetails });
         } catch (error) {
+            console.error(`Error fetching FAQs:`, error);
             if (error instanceof AppError) {
                 sendErrorResponse(response, error.statusCode, error.message);
             } else {
