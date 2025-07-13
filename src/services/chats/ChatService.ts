@@ -7,6 +7,7 @@ import IChatRepository from 'repositories/chats/interfaces/IChatRepository';
 import ChatManagementRepository from 'repositories/chats/ChatManagementRepository';
 import getBotResponse from 'services/openAi/OpenAIService';
 import { ChatDTO } from 'dtos/chats/chatDTO';
+
 // import ChatbotProvider from 'services/openAi/interfaces/ChatbotProvider';
 // import OpenAIService from 'services/openAi/OpenAIService';
 
@@ -38,15 +39,8 @@ class ChatService implements IChatService {
         return ChatService._instance;
     }
 
-    /**
-     * Creates a new chat record for the authenticated user.
-     *
-     * @param {string} accessToken - The JWT access token used to authenticate and identify the user.
-     * @param {IChatDTO} chatData - The validated chat data required to create a new chat record.
-     * @returns {Promise<IChatDTO>} A promise that resolves with the created chat object.
-     * @throws {AuthenticationError} If the access token is invalid or missing user information.
-     * @throws {Error} If an unexpected error occurs during the chat creation process.
-     */
+    // Creates a new chat record for the authenticated user.
+     
     async createChat(userId: string, role: 'user' | 'admin', message: string): Promise<string> {
         try {
 
