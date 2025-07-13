@@ -1,8 +1,9 @@
 import cron from 'node-cron';
 import logger from 'config/logger/logger';
 import MutualFundService from 'services/mutualfunds/MutualFundService';
+import IMutualFundService from 'services/mutualfunds/interfaces/IMutualFundService';
 
-const mutualFundService = MutualFundService.instance;
+const mutualFundService: IMutualFundService = MutualFundService.instance;
 
 // Schedule job to run daily at 2 AM
 cron.schedule('0 2 * * *', async () => {

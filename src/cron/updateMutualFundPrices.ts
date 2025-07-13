@@ -1,8 +1,9 @@
 import { CronJob } from "cron";
 import moment from "moment";
+import IInvestmentService from "services/investments/interfaces/IInvestmentService";
 import InvestmentService from "services/investments/InvestmentService";
 
-const investmentService = InvestmentService.instance;
+const investmentService: IInvestmentService = InvestmentService.instance;
 
 /**
  * Cron job that runs hourly to update stock prices for all STOCK-type investments.

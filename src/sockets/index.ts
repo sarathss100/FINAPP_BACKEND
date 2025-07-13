@@ -3,6 +3,7 @@ import registerChatHandlers from './handlers/chatHandler';
 import { Server as HTTPServer } from 'http';
 import registerNotificationHandlers from './handlers/notificationHandler';
 import registerAdminHandlers from './handlers/adminSocketHandlers';
+import NotificationService from 'services/notification/NotificationService';
 
 let io: Server;
 
@@ -23,7 +24,7 @@ export const setupSocketIO = function(server: HTTPServer): void {
         } else if (clientType === 'user') {
             registerChatHandlers(socket, io);
         } else {
-            registerNotificationHandlers(socket);
+            registerNotificationHandlers(socket, NotificationService.instance);
         }
     });
 

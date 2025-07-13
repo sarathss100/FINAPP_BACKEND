@@ -2,6 +2,7 @@ import { Socket, Server } from "socket.io";
 import { decodeAndValidateToken } from "utils/auth/tokenUtils";
 import mongoose from "mongoose";
 import ChatService from "services/chats/ChatService";
+import IChatService from "services/chats/interfaces/IChatService";
 
 declare module "socket.io" {
   interface Socket {
@@ -9,7 +10,7 @@ declare module "socket.io" {
   }
 }
 
-const chatService = ChatService.instance;
+const chatService: IChatService = ChatService.instance;
 
 const registerChatHandlers = (socket: Socket, io: Server): void => {
   const { accessToken } = socket.handshake.auth || {};

@@ -12,30 +12,16 @@ import { NOTIFICATION_TYPES } from 'model/notification/interfaces/INotificaiton'
 import InsuranceService from 'services/insurances/InsuranceService';
 import { io } from 'sockets';
 
-/**
- * Service class responsible for managing notifications.
- * This class handles business logic related to creating, retrieving, and managing notifications.
- * It interacts with the notification repository to perform database operations.
- */
 class NotificationService implements INotificationService {
     // Singleton instance of the service
     private static _instance: NotificationService;
 
-    // Reference to the notification repository used for data access operations
     private _notificationRepository: INotificatonManagementRepository;
 
-    /**
-     * Constructor for NotificationService.
-     * @param notificationRepository - The repository instance that this service will use.
-     */
     constructor(notificationRepository: INotificatonManagementRepository) {
         this._notificationRepository = notificationRepository;
     }
 
-    /**
-     * Gets the singleton instance of the NotificationService.
-     * Ensures only one instance is created and reused throughout the app (Singleton Pattern).
-     */
     public static get instance(): NotificationService {
         if (!NotificationService._instance) {
             const repo = NotificationManagementRepository.instance;
@@ -44,15 +30,7 @@ class NotificationService implements INotificationService {
         return NotificationService._instance;
     }
 
-    /**
-     * Creates a new notification after authenticating the user.
-     *
-     * @param accessToken - The JWT access token of the authenticated user.
-     * @param notificationData - The notification data to be created.
-     * @returns A promise that resolves to the created notification DTO.
-     * @throws AuthenticationError if the token is invalid or user ID is missing.
-     * @throws Error if any other exception occurs during the operation.
-     */
+    // Creates a new notification after authenticating the user.
     async createNotification(
         accessToken: string,
         notificationData: INotificationDTO

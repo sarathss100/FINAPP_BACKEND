@@ -1,8 +1,9 @@
 import { CronJob } from 'cron';
 import moment from 'moment'
 import InsuranceService from 'services/insurances/InsuranceService';
+import IInsuranceService from 'services/insurances/interfaces/IInsuranceService';
 
-const insuranceService = InsuranceService.instance;
+const insuranceService: IInsuranceService = InsuranceService.instance;
 
 // Run daily at 12.00 AM (UTC time)
 const job = new CronJob('0 0 0 * * *', async () => {

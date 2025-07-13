@@ -1,7 +1,8 @@
 import cron from 'node-cron';
+import INotificationService from 'services/notification/interfaces/INotificationService';
 import NotificationService from 'services/notification/NotificationService';
 
-const notificationService = NotificationService.instance;
+const notificationService: INotificationService = NotificationService.instance;
 
 export const startNotificationCronJobs = function() {
     // Run every day at 4AM

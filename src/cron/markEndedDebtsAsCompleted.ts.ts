@@ -1,8 +1,9 @@
 import { CronJob } from 'cron';
 import moment from 'moment';
 import DebtService from 'services/debt/DebtService';
+import IDebtService from 'services/debt/interfaces/IDebtService';
 
-const debtService = DebtService.instance;
+const debtService: IDebtService = DebtService.instance;
 
 /**
  * Cron job that runs daily at midnight (UTC) to check and update expired debts.

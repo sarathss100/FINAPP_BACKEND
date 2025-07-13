@@ -3,12 +3,9 @@ import { decodeAndValidateToken } from '../../utils/auth/tokenUtils';
 import { AuthenticationError } from '../../error/AppError';
 import { ErrorMessages } from 'constants/errorMessages';
 import { StatusCodes } from 'constants/statusCodes';
-import NotificationService from 'services/notification/NotificationService';
+import INotificationService from 'services/notification/interfaces/INotificationService';
 
-/**
- * Handles all notification-related socket events.
- */
-export default function registerNotificationHandlers(socket: Socket): void {
+export default function registerNotificationHandlers(socket: Socket, notificationService: INotificationService): void {
     // Event: Client requests notifications
     socket.on('request_notifications', async () => {
         const accessToken = getAccessTokenFromSocket(socket);
@@ -22,7 +19,7 @@ export default function registerNotificationHandlers(socket: Socket): void {
                 );
             }
 
-            const notifications = await NotificationService.instance.getNotifications(accessToken);
+            const notifications = await notificationService.getNotifications(accessToken);
 
             // Send notifications back
             socket.emit('notifications', notifications);
@@ -35,9 +32,6 @@ export default function registerNotificationHandlers(socket: Socket): void {
     });
 }
 
-/**
- * Helper to extract access token from handshake.auth or handshake.query
- */
 function getAccessTokenFromSocket(socket: Socket): string {
     return (
         socket.handshake.auth?.accessToken ||
