@@ -61,7 +61,7 @@ class NotificationManagementRepository implements INotificatonManagementReposito
     async getNotifications(userId: string): Promise<INotificationDTO[]> {
         try {
             // Fetch all notifications associated with the provided user ID
-            const response = await NotificationModel.find({ user_id: userId, archived: false });
+            const response = await NotificationModel.find({ user_id: userId, archived: false }).sort({ createdAt: -1 });
 
             // Map the database documents to the notification DTO format
             const notifications = response.map((data) => ({

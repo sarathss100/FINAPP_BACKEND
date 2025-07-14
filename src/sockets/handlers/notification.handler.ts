@@ -1,27 +1,34 @@
-import { Socket } from 'socket.io';
-import { decodeAndValidateToken } from '../../utils/auth/tokenUtils';
-import { AuthenticationError } from '../../error/AppError';
-import { ErrorMessages } from 'constants/errorMessages';
-import { StatusCodes } from 'constants/statusCodes';
+import { Socket, Server } from 'socket.io';
 import INotificationService from 'services/notification/interfaces/INotificationService';
 
-export default function registerNotificationHandlers(socket: Socket, notificationService: INotificationService): void {
-    const accessToken = getAccessTokenFromSocket(socket);
+const registerNotificationHandlers = function(io: Server, socket: Socket, notificationService: INotificationService): void {
+    const accessToken = socket.data.accessToken;
+    const userId = socket.data.userId;
 
     try {
-        const userId = decodeAndValidateToken(accessToken);
-        if (!userId) {
-            throw new AuthenticationError(
-                ErrorMessages.USER_ID_MISSING_IN_TOKEN,
-                StatusCodes.BAD_REQUEST
-            );
-        }   
-
-        socket.join(`user_${userId}`);
+        if (!socket.rooms.has(`user_${userId}`)) {
+            const roomName = `user_${userId}`;
+            socket.join(roomName);
+            console.log(`Socket ${socket.id} joined room: ${roomName}`);
+        } 
 
         socket.on('request_notifications', async () => {
             const notifications = await notificationService.getNotifications(accessToken);
             socket.emit('notifications', notifications);
+        });
+
+        socket.on('mark_notification_as_read', async ({ notificationId }) => {
+            const isUpdated = await notificationService.updateReadStatus(accessToken, notificationId);
+            if (isUpdated) {
+                io.of('/notification').to(`user_${userId}`).emit('notification_marked_read', notificationId);
+            }
+        });
+
+        socket.on('mark_all_notification_as_read', async () => {
+            const isUpdated = await notificationService.updateReadStatusAll(accessToken);
+            if (isUpdated) {
+                io.of('/notification').to(`user_${userId}`).emit('all_notifications_marked_read');
+            }
         });
     } catch (error) {
         console.error('Error fetching notifications:', error);
@@ -29,13 +36,7 @@ export default function registerNotificationHandlers(socket: Socket, notificatio
             message: 'Failed to fetch notifications',
         });      
     }
-}
-
-function getAccessTokenFromSocket(socket: Socket): string {
-    return (
-        socket.handshake.auth?.accessToken ||
-        socket.handshake.query?.accessToken ||
-        ''
-    );
 };
+
+export default registerNotificationHandlers;
 

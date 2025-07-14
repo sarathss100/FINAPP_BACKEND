@@ -2,7 +2,6 @@ import NotificationService from 'services/notification/NotificationService';
 import { Server } from 'socket.io';
 import registerAdminHandlers from 'sockets/handlers/admin.handler';
 import registerChatHandlers from 'sockets/handlers/chat.handler';
-
 import registerNotificationHandlers from 'sockets/handlers/notification.handler';
 import { authenticate } from 'sockets/middleware/auth.middleware';
 
@@ -19,7 +18,7 @@ export function setupNamespaces(io: Server): void {
     notificationNamespace.use(authenticate);
     notificationNamespace.on('connection', (socket) => {
         const notificationService = NotificationService.instance;
-        registerNotificationHandlers(socket, notificationService);
+        registerNotificationHandlers(io, socket, notificationService);
     });
 
     // Admin Namespace

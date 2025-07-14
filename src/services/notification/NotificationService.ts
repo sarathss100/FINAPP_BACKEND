@@ -57,7 +57,7 @@ class NotificationService implements INotificationService {
             const createdNotification = await this._notificationRepository.createNotification(notificationData);
 
             // Emit socket event to notify user about new notification
-            io.to(`user_${userId}`).emit('new_notification', createdNotification);
+            io.of('/notification').to(`user_${userId}`).emit('new_notification', createdNotification);
 
             // Return the created notification to the caller
             return createdNotification;
@@ -70,14 +70,7 @@ class NotificationService implements INotificationService {
         }
     }
 
-    /**
-     * Retrieves all notifications for the authenticated user.
-     *
-     * @param accessToken - The JWT access token used to authenticate and identify the user.
-     * @returns A promise that resolves to an array of notification DTOs belonging to the user.
-     * @throws AuthenticationError if the token is invalid or user ID is missing.
-     * @throws Error if any other exception occurs during the operation.
-     */
+    // Retrieves all notifications for the authenticated user.
     async getNotifications(accessToken: string): Promise<INotificationDTO[]> {
         try {
             // Decode and validate the access token to extract the user ID
@@ -94,9 +87,6 @@ class NotificationService implements INotificationService {
             // Delegate the fetching of notifications to the repository layer
             const notifications = await this._notificationRepository.getNotifications(userId);
 
-            // Emit socket event to notify user about new notification
-            io.to(userId!).emit('notifications', notifications);
-
             // Return the list of notifications to the caller
             return notifications;
         } catch (error) {
@@ -108,14 +98,7 @@ class NotificationService implements INotificationService {
         }
     }
 
-    /**
-     * Archives all notifications belonging to the authenticated user.
-     *
-     * @param accessToken - The JWT access token used to authenticate and identify the user.
-     * @returns A promise that resolves to `true` if notifications were successfully archived, otherwise `false`.
-     * @throws AuthenticationError if the token is invalid or user ID is missing.
-     * @throws Error if any other exception occurs during the operation.
-     */
+    // Archives all notifications belonging to the authenticated user.
     async updateArchieveStatus(accessToken: string, notificationId: string): Promise<boolean> {
         try {
             // Decode and validate the access token to extract the user ID
@@ -133,7 +116,7 @@ class NotificationService implements INotificationService {
             const isUpdated = await this._notificationRepository.updateArchieveStatus(notificationId);
 
             // Emit socket event to notify user about new notification
-            io.to(userId!).emit('notification_archieved', notificationId);
+            io.of('/notification').to(`user_${userId}`).emit('notification_archieved', notificationId);
 
             // Return the result indicating whether the update was successful
             return isUpdated;
@@ -146,14 +129,7 @@ class NotificationService implements INotificationService {
         }
     }
 
-    /**
-     * Marks a specific notification as read based on its ID.
-     *
-     * @param notificationId - The ID of the notification to be marked as read.
-     * @returns A promise that resolves to `true` if the notification was found and updated, otherwise `false`.
-     * @throws AuthenticationError if the user could not be authenticated or identified.
-     * @throws Error if any exception occurs during the operation.
-     */
+    // Marks a specific notification as read based on its ID.
     async updateReadStatus(accessToken: string, notificationId: string): Promise<boolean> {
         try {
             // Decode and validate the access token to extract the user ID
@@ -169,9 +145,7 @@ class NotificationService implements INotificationService {
 
             // Delegate the 'mark as read' operation to the repository layer
             const isUpdated = await this._notificationRepository.updateReadStatus(notificationId);
-
-            // Emit socket event to notify user about new notification
-            io.to(userId!).emit('notification_marked_read', notificationId);
+            
 
             // Return the result indicating whether the update was successful
             return isUpdated;
@@ -184,18 +158,7 @@ class NotificationService implements INotificationService {
         }
     }
 
-    /**
-     * Marks all notifications for the authenticated user as read.
-     *
-     * This method decodes the provided access token to identify the user,
-     * delegates the update operation to the repository layer,
-     * and emits a WebSocket event to notify the client.
-     *
-     * @param accessToken - The JWT access token used to authenticate and identify the user.
-     * @returns A promise that resolves to `true` if any notifications were updated, otherwise `false`.
-     * @throws AuthenticationError if the token is invalid or missing user information.
-     * @throws Error if an exception occurs during the update process.
-     */
+    // Marks all notifications for the authenticated user as read.
     async updateReadStatusAll(accessToken: string): Promise<boolean> {
         try {
             // Decode and validate the access token to extract the user ID
@@ -212,9 +175,6 @@ class NotificationService implements INotificationService {
             // Delegate the 'mark all as read' operation to the repository layer
             const isUpdated = await this._notificationRepository.updateReadStatusAll(userId);
 
-            // Emit socket event to notify user that all notifications are marked as read
-            io.to(userId!).emit('all_notifications_marked_read');
-
             // Return result indicating success or failure
             return isUpdated;
         } catch (error) {
@@ -226,15 +186,7 @@ class NotificationService implements INotificationService {
         }
     }
 
-    /**
-     * Checks for upcoming debt payments and creates notifications for users.
-     *
-     * This method retrieves debts that are due soon and generates a notification
-     * for each associated user to alert them about the upcoming payment.
-     *
-     * @returns {Promise<void>} A promise that resolves when the operation is complete.
-     * @throws {Error} If an error occurs during debt retrieval or notification creation.
-     */
+    // Checks for upcoming debt payments and creates notifications for users.
     async checkAndNotifyUpcomingDebtPayments(): Promise<void> {
         try {
             const debtService = DebtService.instance;
