@@ -11,6 +11,7 @@ import GoalService from 'services/goal/GoalService';
 import { NOTIFICATION_TYPES } from 'model/notification/interfaces/INotificaiton';
 import InsuranceService from 'services/insurances/InsuranceService';
 import { io } from 'sockets/socket.server';
+import { eventBus } from 'events/eventBus';
 
 class NotificationService implements INotificationService {
     // Singleton instance of the service
@@ -57,7 +58,7 @@ class NotificationService implements INotificationService {
             const createdNotification = await this._notificationRepository.createNotification(notificationData);
 
             // Emit socket event to notify user about new notification
-            io.of('/notification').to(`user_${userId}`).emit('new_notification', createdNotification);
+            eventBus.emit('notification_created', createdNotification);
 
             // Return the created notification to the caller
             return createdNotification;

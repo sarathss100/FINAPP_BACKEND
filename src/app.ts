@@ -16,6 +16,7 @@ import updateMutualFundPrice from 'cron/updateMutualFundPrices';
 import updateBondPricesCron from 'cron/updateBondPrices';
 import { startNotificationCronJobs } from 'cron/notificationCron';
 import { startGoalNotificationCronJob } from 'cron/notificationCron';
+import { setupSocketListeners } from 'sockets/listeners';
 
 const app = express();
 expireJob.start();
@@ -26,6 +27,7 @@ updateMutualFundPrice.start();
 updateBondPricesCron.start();
 startNotificationCronJobs();
 startGoalNotificationCronJob();
+setupSocketListeners();
 
 // Middleware
 app.use(express.json());
