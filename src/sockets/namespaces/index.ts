@@ -3,6 +3,7 @@ import { Server } from 'socket.io';
 import registerAccountsHandlers from 'sockets/handlers/accounts.handler';
 import registerAdminHandlers from 'sockets/handlers/admin.handler';
 import registerChatHandlers from 'sockets/handlers/chat.handler';
+import registerGoalsHandlers from 'sockets/handlers/goals.handler';
 import registerNotificationHandlers from 'sockets/handlers/notification.handler';
 import { authenticate } from 'sockets/middleware/auth.middleware';
 
@@ -38,5 +39,16 @@ export function setupNamespaces(io: Server): void {
         socket.join(roomName);
         console.log(`Account Socket ${socket.id} auto-joined room: ${roomName}`);
         registerAccountsHandlers(io, socket);
+    });
+
+    // Goal Namespace
+    const goalsNamespace = io.of('/goals');
+    goalsNamespace.use(authenticate);
+    goalsNamespace.on('connection', (socket) => {
+        const userId = socket.data.userId;
+        const roomName = `user_${userId}`;
+        socket.join(roomName);
+        console.log(`Goal Socket ${socket.id} auto-joined room: ${roomName}`);
+        registerGoalsHandlers(io, socket);
     });
 }

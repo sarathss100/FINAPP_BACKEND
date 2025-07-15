@@ -11,6 +11,7 @@ import IGoalCategory from './interfaces/IGoalCategory';
 import { createGeminiPrompt, parseGeminiResponse } from 'utils/transaction/analyzeWithGemini';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import GoalManagementRepository from 'repositories/goal/GoalManagementRepository';
+import { eventBus } from 'events/eventBus';
 
 class GoalService implements IGoalService {
     private static _instance: GoalService;
@@ -28,15 +29,7 @@ class GoalService implements IGoalService {
         return GoalService._instance;
     }
 
-    /**
-     * Creates a new goal for the authenticated user.
-     * 
-     * @param {string} accessToken - The access token used to authenticate the user and extract their ID.
-     * @param {IGoalDTO} goalData - The data required to create the goal.
-     * @returns {Promise<IGoalDTO>} - A promise resolving to the created goal object.
-     * @throws {AuthenticationError} - Throws an error if the access token is invalid or missing the user ID.
-     * @throws {Error} - Throws an error if the database operation fails.
-     */
+    // Creates a new goal for the authenticated user.
     async createGoal(accessToken: string, goalData: IGoalDTO): Promise<IGoalDTO> {
         try {
             // Decode and validate the access token to extract the user ID associated with it.
@@ -51,6 +44,9 @@ class GoalService implements IGoalService {
             // Call the repository to create the goal using the extracted user ID and provided goal data.
             const createdGoal = await this._goalRepository.createGoal(updatedGoalData);
 
+            // Emit socket event to notify user about new goal created
+            eventBus.emit('goal_created', createdGoal);
+
             return createdGoal;
         } catch (error) {
             // Log and re-throw the error to propagate it to the caller.
@@ -59,16 +55,7 @@ class GoalService implements IGoalService {
         }
     }
 
-    /**
-     * Updates an existing goal for the authenticated user.
-     * 
-     * @param {string} accessToken - The access token used to authenticate the user and extract their ID.
-     * @param {string} goalId - The unique identifier of the goal to be updated.
-     * @param {Partial<IGoalDTO>} goalData - The partial data to update the goal with.
-     * @returns {Promise<IGoalDTO>} - A promise resolving to the updated goal object.
-     * @throws {AuthenticationError} - Throws an error if the access token is invalid or missing the user ID.
-     * @throws {Error} - Throws an error if the database operation fails.
-     */
+    // Updates an existing goal for the authenticated user.
     async updateGoal(accessToken: string, goalId: string, goalData: Partial<IGoalDTO>): Promise<IGoalDTO> {
         try {
             // Decode and validate the access token to extract the user ID associated with it.
@@ -83,6 +70,9 @@ class GoalService implements IGoalService {
             // Call the repository to update the goal using the extracted user ID, goal ID, and provided goal data.
             const updatedGoal = await this._goalRepository.updateGoal(goalId, updatedGoalData);
 
+            // Emit socket event to notify user about goal updation
+            eventBus.emit('goal_updated', updatedGoal);
+
             return updatedGoal;
         } catch (error) {
             // Log and re-throw the error to propagate it to the caller.
@@ -91,19 +81,16 @@ class GoalService implements IGoalService {
         }
     }
 
-    /**
-     * Removes an existing goal by its unique identifier.
-     * 
-     * @param {string} goalId - The unique identifier of the goal to be removed.
-     * @returns {Promise<boolean>} - A promise resolving to `true` if the goal was successfully removed.
-     * @throws {Error} - Throws an error if the database operation fails.
-     */
+    // Removes an existing goal by its unique identifier.
     async removeGoal(goalId: string): Promise<boolean> {
         try {
             // Call the repository to remove the goal using the provided goal ID.
-            const isRemoved = await this._goalRepository.removeGoal(goalId);
+            const removedGoal = await this._goalRepository.removeGoal(goalId);
 
-            return isRemoved;
+            // Emit socket event to notify user about goal updation
+            eventBus.emit('goal_removed', removedGoal);
+
+            return removedGoal._id ? true : false;
         } catch (error) {
             // Log and re-throw the error to propagate it to the caller.
             console.error('Error removing goal:', error);
@@ -111,14 +98,7 @@ class GoalService implements IGoalService {
         }
     }
 
-    /**
-     * Retrieves all goals associated with the authenticated user.
-     * 
-     * @param {string} accessToken - The access token used to authenticate the user and extract their ID.
-     * @returns {Promise<IGoalDTO[]>} - A promise resolving to an array of goal objects associated with the user.
-     * @throws {AuthenticationError} - Throws an error if the access token is invalid or missing the user ID.
-     * @throws {Error} - Throws an error if the database operation fails.
-     */
+    // Retrieves all goals associated with the authenticated user.
     async getUserGoals(accessToken: string): Promise<IGoalDTO[]> {
         try {
             // Decode and validate the access token to extract the user ID associated with it.
@@ -138,14 +118,7 @@ class GoalService implements IGoalService {
         }
     }
 
-    /**
-     * Retrieves all goals associated with the authenticated user.
-     * 
-     * @param {string} accessToken - The access token used to authenticate the user and extract their ID.
-     * @returns {Promise<IGoalDTO[]>} - A promise resolving to an array of goal objects associated with the user.
-     * @throws {AuthenticationError} - Throws an error if the access token is invalid or missing the user ID.
-     * @throws {Error} - Throws an error if the database operation fails.
-     */
+    // Retrieves all goals associated with the authenticated user.
     async getTotalActiveGoalAmount(accessToken: string): Promise<number> {
         try {
             // Decode and validate the access token to extract the user ID associated with it.
@@ -156,6 +129,10 @@ class GoalService implements IGoalService {
 
             // Call the repository to retrieve the goals associated with the extracted user ID.
             const goalDetails = await this._goalRepository.getUserGoals(userId);
+
+            if (goalDetails.length === 0) {
+                throw new NotFoundError(ErrorMessages.NO_GOALS_FOUND, StatusCodes.NOT_FOUND);
+            }
 
             const totalActiveGoalAmount = goalDetails.reduce((sum, goal) => {
                 if (!goal.is_completed) {
@@ -172,15 +149,8 @@ class GoalService implements IGoalService {
         }
     }
 
-    /**
-     * Calculates the total initial (target) amount of all incomplete goals 
-     * associated with the authenticated user.
-     * 
-     * @param {string} accessToken - The access token used to authenticate the user and extract their ID.
-     * @returns {Promise<number>} - A promise resolving to the total target amount of all incomplete goals.
-     * @throws {AuthenticationError} - Throws an error if the access token is invalid or missing the user ID.
-     * @throws {Error} - Throws an error if the database operation fails.
-     */
+    // Calculates the total initial (target) amount of all incomplete goals 
+    // associated with the authenticated user.
     async getTotalInitialGoalAmount(accessToken: string): Promise<number> {
         try {
             // Decode and validate the access token to extract the user ID associated with it.
@@ -191,6 +161,10 @@ class GoalService implements IGoalService {
 
             // Call the repository to retrieve the goals associated with the extracted user ID.
             const goalDetails = await this._goalRepository.getUserGoals(userId);
+
+            if (goalDetails.length === 0) {
+                throw new NotFoundError(ErrorMessages.NO_GOALS_FOUND, StatusCodes.NOT_FOUND);
+            }
 
             // Calculate the total target amount for incomplete goals
             const totalInitialGoalAmount = goalDetails.reduce((sum, goal) => {
@@ -208,14 +182,7 @@ class GoalService implements IGoalService {
         }
     }
 
-    /**
-    * Retrieves the longest target time period among incomplete goals associated with the authenticated user.
-    * 
-    * @param {string} accessToken - The access token used to authenticate the user and extract their ID.
-    * @returns {Promise<void>} - A promise that resolves when the operation completes. Logs the longest time period.
-    * @throws {AuthenticationError} - Throws an error if the access token is invalid or missing the user ID.
-    * @throws {Error} - Throws an error if the database operation fails or if there is an issue processing the goals.
-    */
+    // Retrieves the longest target time period among incomplete goals associated with the authenticated user.
     async findLongestTimePeriod(accessToken: string): Promise<string> {
         try {
             // Decode and validate the access token to extract the user ID associated with it.
@@ -263,11 +230,7 @@ class GoalService implements IGoalService {
         }
     }
 
-    /**
-     * Performs manual SMART analysis when Gemini API is unavailable
-     * @param {any[]} goals - Array of user goals to analyze
-     * @returns {ISmartAnalysisResult} - Manual analysis result
-     */
+    // Performs manual SMART analysis when Gemini API is unavailable
     private performManualAnalysis(goals: IGoalDTO[]): ISmartAnalysisResult {
         // Initialize aggregates for overall analysis.
         let totalSpecificScore = 0,
@@ -411,15 +374,7 @@ class GoalService implements IGoalService {
         }
     }
 
-    /**
-    * Analyzes the SMART compliance of existing goals for the authenticated user.
-    * 
-    * @param {string} accessToken - The access token used to authenticate the user and extract their ID.
-    * @returns {Promise<ISmartAnalysisResult>} - A promise resolving to an analysis result object containing SMART scores, feedback, and suggestions.
-    * @throws {AuthenticationError} - Throws an error if the access token is invalid or missing the user ID.
-    * @throws {NotFoundError} - Throws an error if no goals are found for the user.
-    * @throws {Error} - Throws an error if the database operation fails or an unexpected error occurs during analysis.
-    */
+    // Analyzes the SMART compliance of existing goals for the authenticated user.
     async analyzeGoal(accessToken: string): Promise<ISmartAnalysisResult> {
         try {
             // Decode and validate the access token to extract the user ID associated with it.
@@ -469,8 +424,6 @@ class GoalService implements IGoalService {
                 const model = geminiApi.getGenerativeModel({ model: geminiModel });
                 const result = await model.generateContent(prompt);
                 const response = result.response.text();
-
-                console.log('Gemini API response:', response);
 
                 // Parse the response
                 const analysis = parseGeminiResponse(response);
@@ -653,9 +606,12 @@ class GoalService implements IGoalService {
             }
 
             // Call the repository to update the goal contribution by its ID.
-            const isUpdated = await this._goalRepository.updateTransaction(goalId, transactionData);
+            const updatedGoal = await this._goalRepository.updateTransaction(goalId, transactionData);
 
-            return isUpdated;
+            // Emit socket event to notify user about goal updation
+            eventBus.emit('goal_updated', updatedGoal);
+
+            return updatedGoal._id ? true : false;
         } catch (error) {
             // Log and re-throw the error to propagate it to the caller.
             console.error('Error updating transaction ID:', error);
@@ -663,15 +619,7 @@ class GoalService implements IGoalService {
         }
     }
 
-    /**
-     * Retrieves all active goals that require monthly payment notifications.
-     *
-     * This method is typically used by a scheduled job or notification system
-     * to identify goals that need a monthly payment reminder based on their schedule.
-     *
-     * @returns {Promise<IGoalDTO[]>} A promise resolving to an array of goal DTOs that are eligible for monthly payment alerts.
-     * @throws {Error} If an error occurs during the repository call or data retrieval process.
-     */
+    // Retrieves all active goals that require monthly payment notifications.
     async getGoalsForNotifyMonthlyGoalPayments(): Promise<IGoalDTO[]> {
         try {
             // Fetch goals that are due for monthly payment reminders

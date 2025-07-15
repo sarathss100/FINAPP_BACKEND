@@ -2,10 +2,13 @@ import { eventBus } from "events/eventBus";
 import { io } from "sockets/socket.server";
 
 export const setupSocketListeners = function() {
+
+    // Notifications
     eventBus.on('notification_created', (createdNotification) => {
         io.of('/notification').to(`user_${createdNotification.user_id}`).emit('new_notification', createdNotification);
     });
 
+    // Accounts
     eventBus.on('account_created', (createdAccount) => {
         try {
             io.of('/accounts').to(`user_${createdAccount.user_id}`).emit('new_account_created', createdAccount);
@@ -27,6 +30,31 @@ export const setupSocketListeners = function() {
             io.of('/accounts').to(`user_${account.user_id}`).emit('account_updated', account);
         } catch (error) {
             console.error('Error emitting account_updated:', error);
+        }
+    });
+
+    // Goals
+    eventBus.on('goal_created', (createdGoal) => {
+        try {
+            io.of('/goals').to(`user_${createdGoal.user_id}`).emit('new_goal_created', createdGoal);
+        } catch (error) {
+            console.error('Error emitting goal_created:', error);
+        }
+    });
+
+    eventBus.on('goal_updated', (goal) => {
+        try {
+            io.of('/goals').to(`user_${goal.user_id}`).emit('goal_updated', goal);
+        } catch (error) {
+            console.error('Error emitting goal_updated:', error);
+        }
+    });
+
+    eventBus.on('goal_removed', (goal) => {
+        try {
+            io.of('/goals').to(`user_${goal.user_id}`).emit('goal_removed', goal);
+        } catch (error) {
+            console.error('Error emitting goal_removed:', error);
         }
     });
 };
