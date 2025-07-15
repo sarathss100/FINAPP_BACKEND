@@ -10,7 +10,7 @@ interface IDebtRepository {
     getDebtCategorized(userId: string, category: string): Promise<IDebtDTO[]>;
     getRepaymentStrategyComparison(userId: string): Promise<Debt[]>;
     getAllDebts(userId: string): Promise<IDebtDTO[]>;
-    deleteDebt(debtId: string): Promise<boolean>;
+    deleteDebt(debtId: string): Promise<IDebtDTO>;
     updateExpiry(): Promise<void>;
     markEndedDebtsAsCompleted(): Promise<void>;
     markAsPaid(debtId: string): Promise<boolean>;

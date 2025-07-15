@@ -57,4 +57,21 @@ export const setupSocketListeners = function() {
             console.error('Error emitting goal_removed:', error);
         }
     });
+
+    // Debts
+    eventBus.on('debt_created', (debt) => {
+        try {
+            io.of('/debts').to(`user_${debt.userId}`).emit('debt_created', debt);
+        } catch (error) {
+            console.error('Error emitting debt_created:', error);
+        }
+    });
+
+    eventBus.on('debt_removed', (debt) => {
+        try {
+            io.of('/debts').to(`user_${debt.userId}`).emit('debt_removed', debt);
+        } catch (error) {
+            console.error('Error emitting debt_removed:', error);
+        }
+    });
 };

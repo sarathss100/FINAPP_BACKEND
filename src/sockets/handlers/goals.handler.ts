@@ -8,7 +8,6 @@ const registerGoalsHandlers = function(io: Server, socket: Socket): void {
     const userId = socket.data.userId;
 
     try {
-        console.log(accessToken);
         if (!socket.rooms.has(`user_${userId}`)) {
             const roomName = `user_${userId}`;
             socket.join(roomName);
@@ -23,7 +22,7 @@ const registerGoalsHandlers = function(io: Server, socket: Socket): void {
                 console.error(`Error fetch goals:`, error);
 
                 if (error instanceof Error && error.message.includes('No goals found for the specified user')) {
-                    io.of('/goals').to(`user_${userId}`).emit('all_goals', {});
+                    io.of('/goals').to(`user_${userId}`).emit('all_goals', []);
                 } else {
                     socket.emit('error', {
                         message: 'Failed to fetch all goals',

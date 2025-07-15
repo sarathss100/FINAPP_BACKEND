@@ -5,23 +5,10 @@ import { DebtModel } from 'model/debt/model/DebtModel';
 import { Debt } from 'utils/debt/simulateResult';
 import calculateLoanBreakdown from 'utils/debt/emiCalculator';
 
-/**
- * @class DebtManagementRepository
- * @description Repository class responsible for handling database operations related to debts.
- */
 class DebtManagementRepository implements IDebtRepository {
     private static _instance: DebtManagementRepository;
-
-    /**
-     * Private constructor to enforce singleton pattern.
-     */
     public constructor() {}
 
-    /**
-     * Gets the singleton instance of DebtManagementRepository.
-     *
-     * @returns {DebtManagementRepository}
-     */
     public static get instance(): DebtManagementRepository {
         if (!DebtManagementRepository._instance) {
             DebtManagementRepository._instance = new DebtManagementRepository();
@@ -29,14 +16,7 @@ class DebtManagementRepository implements IDebtRepository {
         return DebtManagementRepository._instance;
     }
 
-    /**
-     * Creates a new debt record in the database.
-     *
-     * @param {IDebtDTO} debtData - The validated debt data from the frontend.
-     * @param {string} userId - The ID of the user creating the debt (as a string).
-     * @returns {Promise<IDebtDTO>} - A promise resolving to the created debt data.
-     * @throws {Error} - Throws an error if the database operation fails.
-     */
+    // Creates a new debt record in the database.
     async createDebt(debtData: IDebtDTO, userId: string): Promise<IDebtDTO> {
         try {
             const mongooseUserId = new mongoose.Types.ObjectId(userId);
@@ -78,17 +58,7 @@ class DebtManagementRepository implements IDebtRepository {
         }
     }
 
-    /**
-     * Calculates the total outstanding debt amount for a user.
-     *
-     * This function aggregates all active (non-completed, non-deleted) debts
-     * associated with the given userId and sums up their current outstanding balances.
-     * Only debts that are still active contribute to the total.
-     *
-     * @param {string} userId - The ID of the user whose outstanding debt is being calculated.
-     * @returns {Promise<number>} - A promise resolving to the total outstanding debt amount.
-     * @throws {Error} - Throws an error if the database operation fails.
-     */
+    // Calculates the total outstanding debt amount for a user.
     async getTotalDebt(userId: string): Promise<number> {
         try {
             const result = await DebtModel.aggregate([
@@ -116,16 +86,7 @@ class DebtManagementRepository implements IDebtRepository {
         }
     }
 
-    /**
-     * Calculates the total outstanding debt amount for a user.
-     *
-     * This function aggregates all active (non-completed, non-deleted) debts
-     * associated with the given userId and sums up their current balances.
-     *
-     * @param {string} userId - The ID of the user whose outstanding debt is being calculated.
-     * @returns {Promise<number>} - A promise resolving to the total outstanding debt amount.
-     * @throws {Error} - Throws an error if the database operation fails.
-     */
+    // Calculates the total outstanding debt amount for a user.
     async getTotalOutstandingDebt(userId: string): Promise<number> {
         try {
             const result = await DebtModel.aggregate([
@@ -153,16 +114,7 @@ class DebtManagementRepository implements IDebtRepository {
         }
     }
 
-    /**
-     * Calculates the total monthly payment across all active debts for a user.
-     *
-     * This function aggregates all non-completed, non-deleted debts
-     * associated with the given userId and sums up their monthly payment values.
-     *
-     * @param {string} userId - The ID of the user whose total monthly payment is being calculated.
-     * @returns {Promise<number>} - A promise resolving to the total monthly payment amount.
-     * @throws {Error} - Throws an error if the database operation fails.
-     */
+    // Calculates the total monthly payment across all active debts for a user.
     async getTotalMonthlyPayment(userId: string): Promise<number> {
         try {
             const result = await DebtModel.aggregate([
@@ -190,16 +142,7 @@ class DebtManagementRepository implements IDebtRepository {
         }
     }
 
-    /**
-     * Calculates the total monthly payment across all active debts for a user.
-     *
-     * This function aggregates all non-completed, non-deleted debts
-     * associated with the given userId and sums up their monthly payment values.
-     *
-     * @param {string} userId - The ID of the user whose total monthly payment is being calculated.
-     * @returns {Promise<number>} - A promise resolving to the total monthly payment amount.
-     * @throws {Error} - Throws an error if the database operation fails.
-     */
+    // Calculates the total monthly payment across all active debts for a user.
     async getLongestTenure(userId: string): Promise<number> {
         try {
             const result = await DebtModel.aggregate([
@@ -240,19 +183,7 @@ class DebtManagementRepository implements IDebtRepository {
         }
     }
 
-    /**
-     * Retrieves debts categorized as either 'Good Debt' or 'Bad Debt' for the specified user.
-     *
-     * This function filters active (non-completed, non-deleted) debts associated with the given userId,
-     * and returns a list of debts filtered by the provided category:
-     * - 'Good Debt' (isGoodDebt: true)
-     * - 'Bad Debt' (isGoodDebt: false)
-     *
-     * @param {string} userId - The ID of the user whose debts are being categorized.
-     * @param {string} category - The category to filter by ('Good Debt' or 'Bad Debt').
-     * @returns {Promise<IDebtDTO[]>} A promise resolving to an array of categorized debt DTOs.
-     * @throws {Error} Throws an error if the database operation fails.
-     */
+    // Retrieves debts categorized as either 'Good Debt' or 'Bad Debt' for the specified user.
     async getDebtCategorized(userId: string, category: string): Promise<IDebtDTO[]> {
         try {
             const isGoodDebt = category.toLowerCase() === 'good';
@@ -276,17 +207,7 @@ class DebtManagementRepository implements IDebtRepository {
         }
     }
 
-    /**
-     * Retrieves all active (non-completed, non-deleted) debts for the specified user.
-     *
-     * This function fetches debts associated with the given userId,
-     * excluding completed or deleted records, and maps them to a simplified structure
-     * suitable for debt repayment strategy simulations (e.g., Avalanche vs Snowball).
-     *
-     * @param {string} userId - The ID of the user whose active debts are being retrieved.
-     * @returns {Promise<Debt[]>} A promise resolving to an array of simplified debt objects.
-     * @throws {Error} Throws an error if the database operation fails.
-     */
+    // Retrieves all active (non-completed, non-deleted) debts for the specified user.
     async getRepaymentStrategyComparison(userId: string): Promise<Debt[]> {
         try {
             const result = await DebtModel.aggregate([
@@ -318,19 +239,7 @@ class DebtManagementRepository implements IDebtRepository {
         }
     }
 
-    /**
-     * Retrieves all active (non-completed and non-deleted) debts for the specified user.
-     *
-     * This function fetches debt records associated with the given userId from the database
-     * using a MongoDB aggregation pipeline. It filters out completed or deleted debts,
-     * and returns them in a simplified structure suitable for use in debt repayment strategy simulations,
-     * such as Avalanche or Snowball methods.
-     *
-     * @param {string} userId - The unique identifier of the user whose active debts are to be retrieved.
-     * @returns {Promise<IDebtDTO[]>} A promise that resolves to an array of simplified debt objects (DTOs).
-     * @throws {Error} If the database operation fails during aggregation, an error is thrown
-     *                 with a descriptive message indicating the failure.
-     */
+    // Retrieves all active (non-completed and non-deleted) debts for the specified user.
     async getAllDebts(userId: string): Promise<IDebtDTO[]> {
         try {
             // Use MongoDB aggregation to find debts matching the provided userId
@@ -345,7 +254,6 @@ class DebtManagementRepository implements IDebtRepository {
         
             // Return the filtered list of debts
             return result;
-        
         } catch (error) {
             // Log the raw error for debugging purposes
             console.error('Error fetching and refining debts:', error);
@@ -355,18 +263,8 @@ class DebtManagementRepository implements IDebtRepository {
         }
     }
 
-    /**
-     * Soft deletes a specific debt record by its ID.
-     *
-     * This function updates the specified debt document in the database by setting the 'isDeleted' flag to true,
-     * effectively removing it from active use without permanently deleting the record.
-     *
-     * @param {string} debtId - The unique identifier of the debt to be soft-deleted.
-     * @returns {Promise<boolean>} A promise that resolves to `true` if the debt was successfully deleted, or `false` otherwise.
-     * @throws {Error} If the database operation fails during the update, an error is thrown
-     *                 with a descriptive message indicating the failure.
-     */
-    async deleteDebt(debtId: string): Promise<boolean> {
+    // Soft deletes a specific debt record by its ID
+    async deleteDebt(debtId: string): Promise<IDebtDTO> {
         try {
             // Update the debt document by setting isDeleted to true
             const result = await DebtModel.findByIdAndUpdate(
@@ -374,9 +272,41 @@ class DebtManagementRepository implements IDebtRepository {
                 { $set: { isDeleted: true } },
                 { new: true } // Optional: return updated document
             );
+
+            if (!result) {
+                throw new Error('Debt not found');
+            }
+
+            const refinedData: IDebtDTO = {
+                _id: String(result._id),
+                userId: String(result.userId),
+                accountId: result.accountId ? String(result.accountId) : result.accountId,
+                debtName: result.debtName,
+                initialAmount: result.initialAmount,
+                currency: result.currency,
+                interestRate: result.interestRate,
+                interestType: result.interestType,
+                tenureMonths: result.tenureMonths,
+                monthlyPayment: result.monthlyPayment,
+                monthlyPrincipalPayment: result.monthlyPrincipalPayment,
+                montlyInterestPayment: result.montlyInterestPayment,
+                startDate: result.startDate,
+                nextDueDate: result.nextDueDate,
+                endDate: result.endDate,
+                status: result.status,
+                currentBalance: result.currentBalance,
+                totalInterestPaid: result.totalInterestPaid,
+                totalPrincipalPaid: result.totalPrincipalPaid,
+                additionalCharges: result.additionalCharges,
+                notes: result.notes,
+                isDeleted: result.isDeleted,
+                isGoodDebt: result.isGoodDebt,
+                isCompleted: result.isCompleted,
+                isExpired: result.isExpired,
+            };
         
             // Return true if the debt was found and updated; false otherwise
-            return !!result;
+            return refinedData;
         } catch (error) {
             // Log the raw error for debugging purposes
             console.error('Error during debt deletion:', error);
@@ -386,16 +316,7 @@ class DebtManagementRepository implements IDebtRepository {
         }
     }
 
-    /**
-     * Updates the expiry status of debts by marking those with past due dates as expired.
-     *
-     * This function checks all active, non-completed, and non-deleted debts. If their 'nextDueDate'
-     * is earlier than the current date and time, they are marked with 'isExpired: true'.
-     *
-     * @returns {Promise<void>} A promise that resolves once the operation is complete.
-     * @throws {Error} If an error occurs during the database operation, an error is thrown
-     *                 with a descriptive message indicating the failure.
-     */
+    // Updates the expiry status of debts by marking those with past due dates as expired.
     async updateExpiry(): Promise<void> {
         try {
             const now = new Date();
@@ -426,20 +347,7 @@ class DebtManagementRepository implements IDebtRepository {
         }
     }
 
-    /**
-     * Marks debts as completed if their end date has passed.
-     *
-     * This function identifies active, non-deleted, and non-completed debts whose 'endDate'
-     * is earlier than the current date and time. These debts are then updated to reflect
-     * a completed status by setting:
-     * - isExpired: false
-     * - isCompleted: true
-     * - status: 'Completed'
-     *
-     * @returns {Promise<void>} A promise that resolves once the operation is complete.
-     * @throws {Error} If an error occurs during the database operation, an error is thrown
-     *                 with a descriptive message indicating the failure.
-     */
+    // Marks debts as completed if their end date has passed.
     async markEndedDebtsAsCompleted(): Promise<void> {
         try {
             const now = new Date();
@@ -476,17 +384,7 @@ class DebtManagementRepository implements IDebtRepository {
         }
     }
 
-    /**
-     * Updates a debt's due date to the same day next month and clears the expired flag.
-     *
-     * This function is typically used when a user manually marks a debt as paid.
-     * It finds the specified debt, updates its 'nextDueDate' to the same day of the next month,
-     * and sets 'isExpired' to false.
-     *
-     * @param {string} debtId - The unique identifier of the debt to be updated.
-     * @returns {Promise<boolean>} A promise resolving to `true` if the update was successful, or `false` otherwise.
-     * @throws {Error} If an error occurs during the update process.
-     */
+    // Updates a debt's due date to the same day next month and clears the expired flag.
     async markAsPaid(debtId: string): Promise<boolean> {
         try {
             // Get current nextDueDate from the document
@@ -555,15 +453,7 @@ class DebtManagementRepository implements IDebtRepository {
         }
     }
 
-    /**
-     * Retrieves all active debts for checking upcoming debt payments.
-     *
-     * This method fetches non-deleted, non-completed debts from the database
-     * to determine which ones are due soon and require a notification.
-     *
-     * @returns {Promise<IDebtDTO[]>} A promise resolving to an array of debt DTOs that need to be checked for upcoming due dates.
-     * @throws {Error} If an error occurs during the database query or data transformation.
-     */
+    // Retrieves all active debts for checking upcoming debt payments.
     async getDebtForNotifyUpcomingDebtPayments(): Promise<IDebtDTO[]> {
         try {
             // Fetch all active debts (not deleted or completed)
