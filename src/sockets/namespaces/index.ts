@@ -1,5 +1,6 @@
 import NotificationService from 'services/notification/NotificationService';
 import { Server } from 'socket.io';
+import registerAccountsHandlers from 'sockets/handlers/accounts.handler';
 import registerAdminHandlers from 'sockets/handlers/admin.handler';
 import registerChatHandlers from 'sockets/handlers/chat.handler';
 import registerNotificationHandlers from 'sockets/handlers/notification.handler';
@@ -26,5 +27,16 @@ export function setupNamespaces(io: Server): void {
     adminNamespace.use(authenticate);
     adminNamespace.on('connection', (socket) => {
         registerAdminHandlers(socket, io);
+    });
+
+    // Accounts Namespace
+    const accountsNamespace = io.of('/accounts');
+    accountsNamespace.use(authenticate);
+    accountsNamespace.on('connection', (socket) => {
+        const userId = socket.data.userId;
+        const roomName = `user_${userId}`;
+        socket.join(roomName);
+        console.log(`Account Socket ${socket.id} auto-joined room: ${roomName}`);
+        registerAccountsHandlers(io, socket);
     });
 }

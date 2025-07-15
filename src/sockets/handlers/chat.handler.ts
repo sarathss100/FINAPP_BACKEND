@@ -95,7 +95,7 @@ const registerChatHandlers = (socket: Socket, io: Server): void => {
     if (!socket.rooms.has(`chat_${userId}`)) {
       const roomName = `user_${userId}`;
       socket.join(roomName);
-      console.log(`Socket ${socket.id} joined room: ${roomName}`);
+      console.log(`Chat Socket ${socket.id} joined room: ${roomName}`);
       notifyAdminOfUserConnection(io, userId);
     }
 

@@ -9,12 +9,12 @@ const registerNotificationHandlers = function(io: Server, socket: Socket, notifi
         if (!socket.rooms.has(`user_${userId}`)) {
             const roomName = `user_${userId}`;
             socket.join(roomName);
-            console.log(`Socket ${socket.id} joined room: ${roomName}`);
+            console.log(`Notification Socket ${socket.id} joined room: ${roomName}`);
         } 
 
         socket.on('request_notifications', async () => {
             const notifications = await notificationService.getNotifications(accessToken);
-            socket.emit('notifications', notifications);
+            io.of('/notification').to(`user_${userId}`).emit('notifications', notifications);
         });
 
         socket.on('mark_notification_as_read', async ({ notificationId }) => {
