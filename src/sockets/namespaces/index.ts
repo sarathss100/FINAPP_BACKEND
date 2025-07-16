@@ -5,6 +5,7 @@ import registerAdminHandlers from 'sockets/handlers/admin.handler';
 import registerChatHandlers from 'sockets/handlers/chat.handler';
 import registerDebtsHandlers from 'sockets/handlers/debts.handler';
 import registerGoalsHandlers from 'sockets/handlers/goals.handler';
+import registerInsurancesHandlers from 'sockets/handlers/insurances.handler';
 import registerNotificationHandlers from 'sockets/handlers/notification.handler';
 import { authenticate } from 'sockets/middleware/auth.middleware';
 
@@ -62,5 +63,16 @@ export function setupNamespaces(io: Server): void {
         socket.join(roomName);
         console.log(`Debt Socket ${socket.id} auto-joined room: ${roomName}`);
         registerDebtsHandlers(io, socket);
+    });
+
+    // Insurances Namespace
+    const insurancesNamespace = io.of('/insurances');
+    insurancesNamespace.use(authenticate);
+    insurancesNamespace.on('connection', (socket) => {
+        const userId = socket.data.userId;
+        const roomName = `user_${userId}`;
+        socket.join(roomName);
+        console.log(`Insurance Socket ${socket.id} auto-joined room: ${roomName}`);
+        registerInsurancesHandlers(io, socket);
     });
 }

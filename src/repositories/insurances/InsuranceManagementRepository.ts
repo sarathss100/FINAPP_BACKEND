@@ -14,14 +14,7 @@ class InsuranceManagementRepository implements IInsuranceManagementRepository {
         return InsuranceManagementRepository._instance;
     }
 
-    /**
-     * Creates a new insurance record in the database.
-     *
-     * @param {InsuranceDTO} insuranceData - The validated insurance data from the frontend.
-     * @param {string} userId - The ID of the user creating the insurance (as a string).
-     * @returns {Promise<InsuranceDTO>} - A promise resolving to the created insurance data.
-     * @throws {Error} - Throws an error if the database operation fails.
-     */
+    // Creates a new insurance record in the database.
     async createInsurance(insuranceData: InsuranceDTO, userId: string): Promise<InsuranceDTO> {
         try {
             const mongooseUserId = new mongoose.Types.ObjectId(userId);
@@ -44,30 +37,34 @@ class InsuranceManagementRepository implements IInsuranceManagementRepository {
         }
     }
 
-    /**
-     * Removes an existing insurance record from the database by its ID.
-     *
-     * @param {string} insuranceId - The ID of the insurance record to delete.
-     * @returns {Promise<boolean>} - A promise resolving to `true` if the insurance was deleted, or `false` if not found.
-     * @throws {Error} - Throws an error if the database operation fails.
-     */
-    async removeInsurance(insuranceId: string): Promise<boolean> {
+    // Removes an existing insurance record from the database by its ID.
+    async removeInsurance(insuranceId: string): Promise<InsuranceDTO | null> {
         try {
-            const result = await InsuranceModel.findByIdAndDelete({ _id: insuranceId });
-            return result ? true : false;
+            const result = await InsuranceModel.findByIdAndDelete(insuranceId).exec();
+
+            if (!result) {
+                return null;
+            }
+
+            const refinedData: InsuranceDTO = {
+                _id: String(result._id),
+                userId: String(result.userId),
+                type: result.type,
+                coverage: result.coverage,
+                premium: result.premium,
+                next_payment_date: result.next_payment_date,
+                payment_status: result.payment_status,
+                status: result.status,
+            };
+
+            return refinedData;
         } catch (error) {
             console.error('Error deleting insurance:', error);
             throw new Error(`Failed to delete insurance: ${(error as Error).message}`);
         }
     }
 
-    /**
-     * Calculates the total coverage amount from all active insurance policies for a given user.
-     *
-     * @param {string} userId - The ID of the user whose insurance coverage is being calculated.
-     * @returns {Promise<number>} - A promise resolving to the total coverage amount.
-     * @throws {Error} - Throws an error if the database operation fails.
-     */
+    // Calculates the total coverage amount from all active insurance policies for a given user.
     async getUserInsuranceCoverageTotal(userId: string): Promise<number> {
         try {
             const result = await InsuranceModel.aggregate([
@@ -91,17 +88,11 @@ class InsuranceManagementRepository implements IInsuranceManagementRepository {
             return result[0]?.totalCoverage || 0;
         } catch (error) {
             console.error('Error calculating total insurance coverage:', error);
-            throw new Error(`Failed to calculate insurance coverage: ${(error as Error).message}`);
+            throw new Error(`Failed to calculate insurance coverage`);
         }
     }
 
-    /**
-     * Calculates the total premium amount from all active insurance policies for a given user.
-     *
-     * @param {string} userId - The ID of the user whose insurance premiums are being summed.
-     * @returns {Promise<number>} - A promise resolving to the total premium amount of active insurance policies.
-     * @throws {Error} - Throws an error if the database operation fails.
-     */
+    // Calculates the total premium amount from all active insurance policies for a given user.
     async getUserTotalPremiumAmount(userId: string): Promise<number> {
         try {
             const result = await InsuranceModel.aggregate([
@@ -124,18 +115,12 @@ class InsuranceManagementRepository implements IInsuranceManagementRepository {
             // Return the total premium or 0 if no active policies found
             return result[0]?.totalPremium || 0;
         } catch (error) {
-            console.error('Error calculating total insurance coverage:', error);
-            throw new Error(`Failed to calculate insurance coverage: ${(error as Error).message}`);
+            console.error('Error calculating total insurance annual premium:', error);
+            throw new Error(`Failed to calculate insurance annual premium`);
         }
     }
 
-    /**
-     * Retrieves all insurance records for a given user from the database.
-     *
-     * @param {string} userId - The ID of the user whose insurance records are being fetched.
-     * @returns {Promise<InsuranceDTO[]>} - A promise resolving to an array of insurance DTOs.
-     * @throws {Error} - Throws an error if the database operation fails.
-     */
+    // Retrieves all insurance records for a given user from the database.
     async getAllInsurances(userId: string): Promise<InsuranceDTO[]> {
         try {
             const result = await InsuranceModel.find({ userId });
@@ -154,17 +139,11 @@ class InsuranceManagementRepository implements IInsuranceManagementRepository {
             return refinedData;
         } catch (error) {
             console.error('Error fetching insurances:', error);
-            throw new Error(`Failed to fetch insurance records: ${(error as Error).message}`);
+            throw new Error(`Failed to fetch insurance records`);
         }
     }
 
-    /**
-     * Retrieves the insurance policy with the closest upcoming next payment date from all active policies for a given user.
-     *
-     * @param {string} userId - The ID of the user whose active insurance policies are being checked.
-     * @returns {Promise<InsuranceDTO | null>} A promise resolving to the DTO of the insurance policy with the nearest upcoming next payment date, or null if no such policy exists.
-     * @throws {Error} Throws an error if the database operation fails.
-     */
+    // Retrieves the insurance policy with the closest upcoming next payment date from all active policies for a given user.
     async getClosestNextPaymentDate(userId: string): Promise<InsuranceDTO | null> {
         try {
             const results = await InsuranceModel.aggregate([
@@ -211,43 +190,54 @@ class InsuranceManagementRepository implements IInsuranceManagementRepository {
             return insuranceDTO;
        } catch (error) {
             console.error('Error fetching closest next payment insurance:', error);
-            throw new Error(`Failed to fetch closest next payment insurance: ${(error as Error).message}`);
+            throw new Error(`Failed to fetch closest next payment insurance`);
         }
     }
 
-    /**
-     * Updates the payment status of an insurance policy to "paid" and revises the next payment date to 365 days ahead.
-     *
-     * @param {string} insuranceId - The ID of the insurance policy to update.
-     * @returns {Promise<boolean>} A promise resolving to true if the payment status and next payment date were successfully updated, false otherwise.
-     * @throws {Error} Throws an error if the database operation fails.
-     */
-    async markPaymentAsPaid(insuranceId: string): Promise<boolean> {
+    // Updates the payment status of an insurance policy to "paid" and revises the next payment date to 365 days ahead.
+    async markPaymentAsPaid(insuranceId: string): Promise<InsuranceDTO> {
         try {
             // Fetch the current document to get the current next_payment_date
             const insurance = await InsuranceModel.findById(insuranceId);
             if (!insurance) {
                 throw new Error('Insurance policy not found');
             }
-        
+
             // Calculate next payment date: add 365 days to the current next_payment_date
             const currentNextPaymentDate = insurance.next_payment_date;
             const newNextPaymentDate = new Date(currentNextPaymentDate);
             newNextPaymentDate.setDate(newNextPaymentDate.getDate() + 365);
-        
+
             // Update both the payment status and the next payment date
-            const result = await InsuranceModel.updateOne(
-                { _id: insuranceId },
+            const updatedInsurance = await InsuranceModel.findByIdAndUpdate(
+                insuranceId,
                 {
                     $set: {
                         payment_status: "paid",
                         status: "active",
                         next_payment_date: newNextPaymentDate
                     }
-                }
+                },
+                { new: true }
             );
-        
-            return result.modifiedCount > 0 ? true : false;
+
+            if (!updatedInsurance) {
+                throw new Error('Failed to update insurance policy');
+            }
+
+            // Convert Mongoose document to InsuranceDTO
+            const refinedData: InsuranceDTO = {
+                _id: String(updatedInsurance._id),
+                userId: String(updatedInsurance.userId),
+                type: updatedInsurance.type,
+                coverage: updatedInsurance.coverage,
+                premium: updatedInsurance.premium,
+                next_payment_date: updatedInsurance.next_payment_date,
+                payment_status: updatedInsurance.payment_status,
+                status: updatedInsurance.status,
+            };
+
+            return refinedData;
         } catch (error) {
             console.error('Error updating insurance payment status:', error);
             throw new Error(`Failed to update payment status: ${(error as Error).message}`);
@@ -257,9 +247,6 @@ class InsuranceManagementRepository implements IInsuranceManagementRepository {
     /**
      * Marks insurance policies as expired if their next payment date has passed and they are still marked as paid.
      * Updates the payment status to "unpaid" and the policy status to "expired".
-     *
-     * @returns {Promise<void>} A promise that resolves when the update operation is complete.
-     * @throws {Error} Throws an error if the database operation fails.
      */
     async markExpiredInsurances(): Promise<void> {
         try {
@@ -283,12 +270,7 @@ class InsuranceManagementRepository implements IInsuranceManagementRepository {
         }
     }
 
-    /**
-     * Retrieves insurance policies whose next payment date is within the next 2 days.
-     *
-     * @returns {Promise<InsuranceDTO[]>} A promise that resolves with a list of insurance policies due for payment soon.
-     * @throws {Error} Throws an error if the database fetch operation fails.
-     */
+    // Retrieves insurance policies whose next payment date is within the next 2 days.
     async getInsuranceForNotifyInsurancePayments(): Promise<InsuranceDTO[]> {
         try {
             const now = new Date();

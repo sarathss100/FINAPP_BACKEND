@@ -6,6 +6,7 @@ import IInsuranceService from './interfaces/IInsuranceService';
 import InsuranceManagementRepository from 'repositories/insurances/InsuranceManagementRepository';
 import { InsuranceDTO } from 'dtos/insurances/insuranceDTO';
 import IInsuranceManagementRepository from 'repositories/insurances/interfaces/IInsuranceManagementRepository';
+import { eventBus } from 'events/eventBus';
 
 class InsuranceService implements IInsuranceService {
     private static _instance: InsuranceService;
@@ -23,15 +24,7 @@ class InsuranceService implements IInsuranceService {
         return InsuranceService._instance;
     }
 
-    /**
-     * Creates a new insurance record for the authenticated user.
-     *
-     * @param {string} accessToken - The JWT access token used to authenticate and identify the user.
-     * @param {InsuranceDTO} insuranceData - The validated insurance data required to create a new insurance record.
-     * @returns {Promise<InsuranceDTO>} A promise that resolves with the created insurance object.
-     * @throws {AuthenticationError} If the access token is invalid or missing user information.
-     * @throws {Error} If an unexpected error occurs during the insurance creation process.
-     */
+    // Creates a new insurance record for the authenticated user.
     async createInsurance(accessToken: string, insuranceData: InsuranceDTO): Promise<InsuranceDTO> {
         try {
             // Decode and validate the access token to extract the user ID
@@ -45,6 +38,9 @@ class InsuranceService implements IInsuranceService {
             // Delegate to the repository to create the insurance record
             const insuranceDetails = await this._insuranceRepository.createInsurance(refinedData, userId);
 
+            // Emit socket event to notify user about debt Creation
+            eventBus.emit('insurance_created', insuranceDetails);
+
             return insuranceDetails;
         } catch (error) {
             // Log and rethrow the error for upstream handling
@@ -53,19 +49,16 @@ class InsuranceService implements IInsuranceService {
         }
     }
 
-    /**
-     * Removes an existing insurance record from the database.
-     *
-     * @param {string} insuranceId - The ID of the insurance record to be deleted.
-     * @returns {Promise<boolean>} A promise that resolves to `true` if the insurance was successfully deleted, or `false` if not found.
-     * @throws {Error} If an unexpected error occurs during the deletion process.
-     */
+    // Removes an existing insurance record from the database.
     async removeInsurance(insuranceId: string): Promise<boolean> {
         try {
             // Delegate to the repository to delete the insurance record
-            const isRemoved = await this._insuranceRepository.removeInsurance(insuranceId);
+            const insuranceDetails = await this._insuranceRepository.removeInsurance(insuranceId);
 
-            return isRemoved;
+            // Emit socket event to notify user about debt Creation
+            eventBus.emit('insurance_removed', insuranceDetails);
+
+            return insuranceDetails ? true : false;
         } catch (error) {
             // Log and rethrow the error for upstream handling
             console.error('Error deleting insurance:', error);
@@ -73,14 +66,7 @@ class InsuranceService implements IInsuranceService {
         }
     }
 
-    /**
-     * Calculates the total coverage amount from all active insurance policies for the authenticated user.
-     *
-     * @param {string} accessToken - The JWT access token used to authenticate and identify the user.
-     * @returns {Promise<number>} A promise resolving to the total coverage amount of active insurance policies.
-     * @throws {AuthenticationError} If the access token is invalid or missing user information.
-     * @throws {Error} If an unexpected error occurs during the coverage calculation process.
-     */
+    // Calculates the total coverage amount from all active insurance policies for the authenticated user.
     async getUserInsuranceCoverageTotal(accessToken: string): Promise<number> {
         try {
             // Decode and validate the access token to extract the user ID
@@ -100,14 +86,7 @@ class InsuranceService implements IInsuranceService {
         }
     }
 
-    /**
-     * Calculates the total premium amount from all active insurance policies for the authenticated user.
-     *
-     * @param {string} accessToken - The JWT access token used to authenticate and identify the user.
-     * @returns {Promise<number>} A promise resolving to the total premium amount of active insurance policies.
-     * @throws {AuthenticationError} If the access token is invalid or missing user information.
-     * @throws {Error} If an unexpected error occurs during the premium calculation process.
-     */
+    // Calculates the total premium amount from all active insurance policies for the authenticated user.
     async getUserTotalPremiumAmount(accessToken: string): Promise<number> {
         try {
             // Decode and validate the access token to extract the user ID
@@ -127,14 +106,7 @@ class InsuranceService implements IInsuranceService {
         }
     }
 
-    /**
-     * Retrieves all insurance records for the authenticated user.
-     *
-     * @param {string} accessToken - The JWT access token used to authenticate and identify the user.
-     * @returns {Promise<InsuranceDTO[]>} A promise resolving to an array of insurance DTOs belonging to the user.
-     * @throws {AuthenticationError} If the access token is invalid or missing user information.
-     * @throws {Error} If an unexpected error occurs during data retrieval.
-     */
+    // Retrieves all insurance records for the authenticated user.
     async getAllInsurances(accessToken: string): Promise<InsuranceDTO[]> {
         try {
             // Decode and validate the access token to extract the user ID
@@ -154,14 +126,7 @@ class InsuranceService implements IInsuranceService {
         }
     }
 
-    /**
-     * Retrieves the closest upcoming next payment date among all insurance records for the authenticated user.
-     *
-     * @param {string} accessToken - The JWT access token used to authenticate and identify the user.
-     * @returns {Promise<Date | null>} A promise resolving to the closest upcoming next payment date, or null if none exist.
-     * @throws {AuthenticationError} If the access token is invalid or missing user information.
-     * @throws {Error} If an unexpected error occurs during data retrieval.
-     */
+    // Retrieves the closest upcoming next payment date among all insurance records for the authenticated user.
     async getClosestNextPaymentDate(accessToken: string): Promise<InsuranceDTO | null> {
         try {
             // Decode and validate the access token to extract the user ID
@@ -181,19 +146,16 @@ class InsuranceService implements IInsuranceService {
         }
     }
 
-    /**
-     * Marks the payment status of the specified insurance policy as paid.
-     *
-     * @param {string} insuranceId - The ID of the insurance policy to update.
-     * @returns {Promise<boolean>} A promise resolving to true if the payment status was successfully updated, false otherwise.
-     * @throws {Error} If an unexpected error occurs during the update operation.
-     */
+    // Marks the payment status of the specified insurance policy as paid.
     async markPaymentAsPaid(insuranceId: string): Promise<boolean> {
         try {
             // Delegate the update operation to the repository
-            const isPaymentStatusUpdated = await this._insuranceRepository.markPaymentAsPaid(insuranceId);
+            const insuranceDetails = await this._insuranceRepository.markPaymentAsPaid(insuranceId);
+
+            // Emit socket event to notify user about debt Creation
+            eventBus.emit('insurance_paid', insuranceDetails);
         
-            return isPaymentStatusUpdated;
+            return insuranceDetails._id ? true : false;
         } catch (error) {
             // Log and rethrow the error for upstream handling
             console.error('Error updating insurance payment status:', error);
@@ -204,9 +166,6 @@ class InsuranceService implements IInsuranceService {
     /**
      * Marks expired insurance policies by delegating the operation to the repository.
      * This typically involves updating policies whose next payment date has passed and are still active.
-     *
-     * @returns {Promise<void>} A promise that resolves when the expiration operation is complete.
-     * @throws {Error} If an unexpected error occurs during the update operation.
      */
     async markExpired(): Promise<void> {
         try {
@@ -222,16 +181,13 @@ class InsuranceService implements IInsuranceService {
     /**
      * Retrieves insurance policies that require payment notifications.
      * This typically includes policies where the next payment date is approaching or overdue.
-     *
-     * @returns {Promise<InsuranceDTO[]>} A promise that resolves with a list of insurance policies requiring payment attention.
-     * @throws {Error} If an unexpected error occurs during the fetch operation.
      */
     async getInsuranceForNotifyInsurancePayments(): Promise<InsuranceDTO[]> {
         try {
             // Delegate the fetch operation to the repository
             const insurances = await this._insuranceRepository.getInsuranceForNotifyInsurancePayments();
 
-            return insurances;
+            return insurances; 
         } catch (error) {
             // Log and rethrow the error for upstream handling
             console.error('Error fetching insurance records for payment notification:', error);

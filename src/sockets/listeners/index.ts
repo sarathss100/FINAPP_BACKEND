@@ -74,4 +74,29 @@ export const setupSocketListeners = function() {
             console.error('Error emitting debt_removed:', error);
         }
     });
+
+    // Insurances
+    eventBus.on('insurance_created', (insurance) => {
+        try {
+            io.of('/insurances').to(`user_${insurance.userId}`).emit('insurance_created', insurance);
+        } catch (error) {
+            console.error('Error emitting insurance_created:', error);
+        }
+    });
+
+    eventBus.on('insurance_removed', (insurance) => {
+        try {
+            io.of('/insurances').to(`user_${insurance.userId}`).emit('insurance_removed', insurance);
+        } catch (error) {
+            console.error('Error emitting insurance_removed:', error);
+        }
+    });
+
+    eventBus.on('insurance_paid', (insurance) => {
+        try {
+            io.of('/insurances').to(`user_${insurance.userId}`).emit('insurance_paid', insurance);
+        } catch (error) {
+            console.error('Error emitting insurance_paid:', error);
+        }
+    });
 };
