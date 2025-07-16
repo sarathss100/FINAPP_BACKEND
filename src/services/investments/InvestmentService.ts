@@ -16,6 +16,7 @@ import { updateMutualFundPrices } from 'utils/investments/stockcurrencyconverter
 import { updateGoldPrices } from 'utils/investments/stockcurrencyconverter/updateGoldPrices';
 import { updateBondPrices } from 'utils/investments/stockcurrencyconverter/updateBondPrices';
 import IInvestmentManagementRepository from 'repositories/investments/interfaces/IInvestmentManagementRepository';
+import { eventBus } from 'events/eventBus';
 
 
 class InvestmentService implements IInvestmentService {
@@ -34,13 +35,7 @@ class InvestmentService implements IInvestmentService {
         return InvestmentService._instance;
     }
 
-    /**
-     * Searches for stocks based on a keyword using the Alpha Vantage API.
-     *
-     * @param {string} keyword - The keyword or symbol to search for stocks.
-     * @returns {Promise<IStock[]>} - A promise resolving to an array of matching stock data.
-     * @throws {Error} - Throws an error if the API request fails or returns a non-200 status code.
-     */
+    // Searches for stocks based on a keyword using the Alpha Vantage API.
     async searchStocks(keyword: string): Promise<IStock[]> {
         try {
             const apiKey = process.env.ALPHA_VANTAGE_API_KEY;
@@ -59,15 +54,7 @@ class InvestmentService implements IInvestmentService {
         }
     }
 
-    /**
-     * Creates a new investment for the authenticated user.
-     *
-     * @param {string} accessToken - The JWT access token used to authenticate the user.
-     * @param {InvestmentDTO} investmentData - The validated data required to create an investment.
-     * @returns {Promise<InvestmentDTO>} A promise that resolves with the created investment object.
-     * @throws {AuthenticationError} If the access token is invalid or missing user information.
-     * @throws {Error} If an unexpected error occurs during the investment creation process.
-     */
+    // Creates a new investment for the authenticated user.
     async createInvestment(accessToken: string, investmentData: InvestmentDTO): Promise<InvestmentDTO> {
         try {
             // Decode and validate the access token to extract the user ID
@@ -119,6 +106,9 @@ class InvestmentService implements IInvestmentService {
             // Delegate to the repository to create the investment for the user
             const investment = await this._investmentRepository.createInvestment(investmentData, userId);
 
+            // Emit socket event to notify user about investment Creation
+            eventBus.emit('investment_created', investment);
+
             return investment;
         } catch (error) {
             // Log and rethrow the error for upstream handling
@@ -130,9 +120,6 @@ class InvestmentService implements IInvestmentService {
     /**
      * Updates current prices for all STOCK-type investments by fetching live data from external APIs 
      * and performing a bulk update in the database.
-     *
-     * @returns {Promise<void>}
-     * @throws {Error} If there's a failure in fetching or updating investment data.
      */
     async updateStockPrice(): Promise<void> {
         try {
@@ -160,9 +147,6 @@ class InvestmentService implements IInvestmentService {
     /**
      * Updates current NAV values for all MUTUAL_FUND-type investments by fetching live data from external APIs 
      * and performing a bulk update in the database.
-     *
-     * @returns {Promise<void>}
-     * @throws {Error} If there's a failure in fetching or updating mutual fund investment data.
      */
     async updateMutualFundPrice(): Promise<void> {
         try {
@@ -190,9 +174,6 @@ class InvestmentService implements IInvestmentService {
     /**
      * Updates current price per gram and value for all GOLD-type investments by fetching live data 
      * and performing a bulk update in the database.
-     *
-     * @returns {Promise<void>}
-     * @throws {Error} If there's a failure in fetching or updating investment data.
      */
     async updateGoldPrice(): Promise<void> {
         try {
@@ -220,9 +201,6 @@ class InvestmentService implements IInvestmentService {
     /**
      * Recalculates current value and profit/loss for all BOND-type investments 
      * and performs a bulk update in the database.
-     *
-     * @returns {Promise<void>}
-     * @throws {Error} If there's a failure during calculation or DB update
      */
     async updateBondPrice(): Promise<void> {
         try {
@@ -247,14 +225,7 @@ class InvestmentService implements IInvestmentService {
         }
     }
 
-    /**
-     * Fetches the total initial investment amount for the authenticated user across all investment types.
-     *
-     * @param {string} accessToken - The JWT access token used to authenticate the user.
-     * @returns {Promise<number>} A promise resolving to the total initial investment amount.
-     * @throws {AuthenticationError} If the access token is invalid or missing user information.
-     * @throws {Error} If there's a failure during database query or summation.
-     */
+    // Fetches the total initial investment amount for the authenticated user across all investment types
     async totalInvestment(accessToken: string): Promise<number> {
         try {
             // Decode and validate the access token to extract the user ID
@@ -264,6 +235,7 @@ class InvestmentService implements IInvestmentService {
             }
 
             const totalInvestedAmount = await this._investmentRepository.totalInvestment(userId);
+
             return totalInvestedAmount;
         } catch (error) {
             // Log and rethrow the error for upstream handling
@@ -272,14 +244,7 @@ class InvestmentService implements IInvestmentService {
         }
     }
 
-    /**
-     * Fetches the current total value of all investments for the authenticated user.
-     *
-     * @param {string} accessToken - The JWT access token used to authenticate the user.
-     * @returns {Promise<number>} A promise resolving to the current total value of all investments.
-     * @throws {AuthenticationError} If the access token is invalid or missing user information.
-     * @throws {Error} If there's a failure during database query or summation.
-     */
+    // Fetches the current total value of all investments for the authenticated user.
     async currentTotalValue(accessToken: string): Promise<number> {
         try {
             // Decode and validate the access token to extract the user ID
@@ -289,6 +254,7 @@ class InvestmentService implements IInvestmentService {
             }
 
             const currentTotalValue = await this._investmentRepository.currentTotalValue(userId);
+
             return currentTotalValue;
         } catch (error) {
             // Log and rethrow the error for upstream handling
@@ -297,17 +263,7 @@ class InvestmentService implements IInvestmentService {
         }
     }
 
-    /**
-     * Fetches the total returns (profit or loss) from all investments for the authenticated user.
-     *
-     * This method decodes the provided JWT access token to extract the user ID,
-     * then retrieves the aggregated returns (e.g., total profit or loss) across all investment types.
-     *
-     * @param {string} accessToken - The JWT access token used to authenticate the user.
-     * @returns {Promise<number>} A promise resolving to the total returns (profit or loss) from all investments.
-     * @throws {AuthenticationError} If the access token is invalid or missing user information.
-     * @throws {Error} If there's a failure during token decoding or database query.
-     */
+    // Fetches the total returns (profit or loss) from all investments for the authenticated user
     async getTotalReturns(accessToken: string): Promise<number> {
         try {
             // Decode and validate the access token to extract the user ID
@@ -325,18 +281,7 @@ class InvestmentService implements IInvestmentService {
         }
     }
 
-    /**
-     * Fetches all investments for the authenticated user and categorizes them by investment type.
-     *
-     * This method decodes the provided JWT access token to extract the user ID,
-     * retrieves all investment records for that user, and organizes them into categories
-     * based on their investment type (e.g., STOCK, MUTUAL_FUND).
-     *
-     * @param {string} accessToken - The JWT access token used to authenticate the user.
-     * @returns {Promise<Record<string, InvestmentDTO[]>>} A promise resolving to an object where keys are investment types and values are arrays of corresponding investments.
-     * @throws {AuthenticationError} If the access token is invalid or missing user information.
-     * @throws {Error} If there's a failure during token decoding or database query.
-     */
+    // Fetches all investments for the authenticated user and categorizes them by investment type
     async getCategorizedInvestments(accessToken: string): Promise<Record<string, InvestmentDTO[]>> {
         try {
             // Decode and validate the access token to extract the user ID
@@ -366,17 +311,13 @@ class InvestmentService implements IInvestmentService {
         }
     }
 
-    /**
-     * Removes an investment document of the specified type and ID from the database.
-     *
-     * @param {string} investmentType - The type of investment (e.g., STOCK, MUTUAL_FUND).
-     * @param {string} investmentId - The ID of the investment to be deleted.
-     * @returns {Promise<void>} A promise that resolves when the deletion is successful.
-     * @throws {Error} If the investment type is invalid or the deletion operation fails.
-     */
+    // Removes an investment document of the specified type and ID from the database.
     async removeInvestment(investmentType: string, investmentId: string): Promise<void> {
         try {
-            await this._investmentRepository.removeInvestment(investmentType, investmentId);
+            const investment = await this._investmentRepository.removeInvestment(investmentType, investmentId);
+
+            // Emit socket event to notify user about investment Deletion
+            eventBus.emit('investment_removed', investment);
         } catch (error) {
             // Log and rethrow the error for upstream handling
             console.error('Failed to delete investment:', error);

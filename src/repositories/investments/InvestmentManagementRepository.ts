@@ -17,17 +17,8 @@ const modelMap = {
 
 class InvestmentManagementRepository implements IInvestmentManagementRepository {
     private static _instance: IInvestmentManagementRepository;
-
-    /**
-     * Private constructor to enforce singleton pattern.
-     */
     public constructor() {}
 
-    /**
-     * Gets the singleton instance of InvestmentManagementRepository
-     * 
-     * @returns {IInvestmentManagementRepository}
-     */
     public static get instance(): IInvestmentManagementRepository {
         if (!InvestmentManagementRepository._instance) {
             InvestmentManagementRepository._instance = new InvestmentManagementRepository();
@@ -35,14 +26,7 @@ class InvestmentManagementRepository implements IInvestmentManagementRepository 
         return InvestmentManagementRepository._instance;
     }
     
-    /**
-     * Creates a new investment in the database.
-     *
-     * @param {InvestmentDTO} investmentData - The validated investment data from the frontend.
-     * @param {string} userId - The ID of the user creating the investment.
-     * @returns {Promise<IInvestmentDocument>} - A promise resolving to the created investment document.
-     * @throws {Error} - Throws an error if the database operation fails.
-     */
+    // Creates a new investment in the database.
     async createInvestment(investmentData: InvestmentDTO, userId: string): Promise<InvestmentDTO> {
         try {
             const mongooseUserId = new mongoose.Types.ObjectId(userId);
@@ -66,13 +50,7 @@ class InvestmentManagementRepository implements IInvestmentManagementRepository 
         }
     }
 
-    /**
-     * Fetches all investments of a specific type from the database.
-     *
-     * @param {string} investmentType - The type of investment to retrieve (e.g., STOCK, MUTUAL_FUND).
-     * @returns {Promise<InvestmentDTO[]>} - A promise resolving to an array of investment DTOs.
-     * @throws {Error} - Throws an error if the investment type is invalid or the database operation fails.
-     */
+    // Fetches all investments of a specific type from the database.
     async getInvestments(investmentType: string): Promise<InvestmentDTO[]> {
         try {
             const Model = modelMap[investmentType as keyof typeof modelMap];
@@ -90,17 +68,11 @@ class InvestmentManagementRepository implements IInvestmentManagementRepository 
             return plainInvestments as unknown as InvestmentDTO[];
         } catch (error) {
             console.error('Error fetching investments:', error);
-            throw new Error(`Failed to fetch investments: ${(error as Error).message}`);
+            throw new Error(`Failed to fetch investments`);
         }
     }
 
-    /**
-     * Updates multiple investment documents in bulk for the same investment type.
-     *
-     * @param {InvestmentDTO[]} investments - An array of investment DTOs to be updated.
-     * @returns {Promise<void>}
-     * @throws {Error} - Throws an error if the investment type is invalid or the database operation fails.
-     */
+    // Updates multiple investment documents in bulk for the same investment type.
     async updateInvestmentBulk(investments: InvestmentDTO[]): Promise<void> {
         try {
             if (!investments.length) return;
@@ -125,13 +97,7 @@ class InvestmentManagementRepository implements IInvestmentManagementRepository 
         }
     }
 
-    /**
-     * Calculates the total initial investment amount across all investment types for a given user.
-     *
-     * @param {string} userId - The ID of the user whose investments are to be summed.
-     * @returns {Promise<number>} A promise resolving to the total initial investment amount.
-     * @throws {Error} If there's a failure during database query or summation.
-     */
+    // Calculates the total initial investment amount across all investment types for a given user.
     async totalInvestment(userId: string): Promise<number> {
         try {
             let total = 0;
@@ -153,17 +119,11 @@ class InvestmentManagementRepository implements IInvestmentManagementRepository 
 
         } catch (error) {
             console.error('Error calculating total investment:', error);
-            throw new Error(`Failed to calculate total investment: ${(error as Error).message}`);
+            throw new Error(`Failed to calculate total investment`);
         }
     }
 
-    /**
-     * Calculates the current total value across all investment types for a given user.
-     *
-     * @param {string} userId - The ID of the user whose investments are to be summed.
-     * @returns {Promise<number>} A promise resolving to the current total value of all investments.
-     * @throws {Error} If there's a failure during database query or summation.
-     */
+    // Calculates the current total value across all investment types for a given user.
     async currentTotalValue(userId: string): Promise<number> {
         try {
             let total = 0;
@@ -185,21 +145,11 @@ class InvestmentManagementRepository implements IInvestmentManagementRepository 
 
         } catch (error) {
             console.error('Error calculating current total value:', error);
-            throw new Error(`Failed to calculate current total value: ${(error as Error).message}`);
+            throw new Error(`Failed to calculate current total value`);
         }
     }
 
-    /**
-     * Calculates the total returns (profit or loss) across all investment types for a given user.
-     *
-     * This function iterates over all investment models mapped in `modelMap`, performs an aggregation
-     * to sum the 'totalProfitOrLoss' field for investments belonging to the specified user,
-     * and returns the combined total.
-     *
-     * @param {string} userId - The ID of the user whose investment returns are to be summed.
-     * @returns {Promise<number>} A promise resolving to the total returns (profit or loss) from all investments.
-     * @throws {Error} If there's a failure during database query or summation.
-     */
+    // Calculates the total returns (profit or loss) across all investment types for a given user.
     async getTotalReturns(userId: string): Promise<number> {
         try {
             let total = 0;
@@ -230,24 +180,11 @@ class InvestmentManagementRepository implements IInvestmentManagementRepository 
         } catch (error) {
             // Log detailed error and re-throw with context
             console.error('Error calculating total returns (profit or loss):', error);
-            throw new Error(`Failed to calculate total returns: ${(error as Error).message}`);
+            throw new Error(`Failed to calculate total returns`);
         }
     }
 
-    /**
- * Fetches all investment records for a given user across all investment types.
- *
- * @param {string} userId - The ID of the user whose investments are to be fetched.
- * @returns {Promise<InvestmentDTO[]>} A promise resolving to an array of investment DTOs.
- * @throws {Error} If there's a failure during database query or mapping.
- */
-/**
-     * Fetches all investments for a given user and categorizes them by investment type.
-     *
-     * @param userId - The ID of the user whose investments are to be fetched and categorized.
-     * @returns A promise resolving to an object where keys are investment types and values are arrays of corresponding investments.
-     * @throws Error if the database query fails.
-     */
+    // Fetches all investments for a given user and categorizes them by investment type.
     async getCategorizedInvestments(userId: string): Promise<Record<string, InvestmentDTO[]>> {
         try {
             const categorizedInvestments: Record<string, InvestmentDTO[]> = {};
@@ -292,19 +229,12 @@ class InvestmentManagementRepository implements IInvestmentManagementRepository 
 
         } catch (error) {
             console.error('Error fetching and categorizing investments:', error);
-            throw new Error(`Failed to fetch and categorize investments: ${(error as Error).message}`);
+            throw new Error(`Failed to fetch and categorize investments`);
         }
     }
 
-    /**
-     * Deletes a single investment document by ID for a given investment type.
-     *
-     * @param {string} investmentType - The type of investment (e.g., STOCK, MUTUAL_FUND).
-     * @param {string} investmentId - The ID of the investment document to delete.
-     * @returns {Promise<void>}
-     * @throws {Error} If the investment type is invalid or database operation fails.
-     */
-    async removeInvestment(investmentType: string, investmentId: string): Promise<void> {
+    // Deletes a single investment document by ID for a given investment type.
+    async removeInvestment(investmentType: string, investmentId: string): Promise<InvestmentDTO> {
         try {
             const Model = modelMap[investmentType as keyof typeof modelMap];
             if (!Model) {
@@ -314,12 +244,22 @@ class InvestmentManagementRepository implements IInvestmentManagementRepository 
             // Convert investmentId to ObjectId
             const mongooseId = new mongoose.Types.ObjectId(investmentId);
 
+            // Find the document before deletion
+            const investment = await Model.findById(mongooseId);
+            if (!investment) {
+                throw new Error(`No investment found with ID: ${investmentId}`);
+            }
+
             // Delete the document
             const result = await Model.deleteOne({ _id: mongooseId });
 
             if (result.deletedCount === 0) {
-                throw new Error(`No investment found with ID: ${investmentId}`);
-            } 
+                throw new Error(`Failed to delete investment with ID: ${investmentId}`);
+            }
+
+            const plainInvestment = investment.toObject();
+
+            return plainInvestment as unknown as InvestmentDTO;
         } catch (error) {
             console.error('Error deleting investment:', error);
             throw new Error(`Failed to delete investment: ${(error as Error).message}`);

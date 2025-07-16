@@ -99,4 +99,21 @@ export const setupSocketListeners = function() {
             console.error('Error emitting insurance_paid:', error);
         }
     });
+
+    // Investments
+    eventBus.on('investment_created', (investment) => {
+        try {
+            io.of('/investments').to(`user_${investment.userId}`).emit('investment_created', investment);
+        } catch (error) {
+            console.error('Error emitting investment_created:', error);
+        }
+    });
+
+    eventBus.on('investment_removed', (investment) => {
+        try {
+            io.of('/investments').to(`user_${investment.userId}`).emit('investment_removed', investment);
+        } catch (error) {
+            console.error('Error emitting investment_removed:', error);
+        }
+    });
 };
