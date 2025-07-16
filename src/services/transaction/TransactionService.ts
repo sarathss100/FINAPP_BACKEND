@@ -11,21 +11,29 @@ import { extractTransactionTable } from 'utils/transaction/extractTransactionTab
 import { normalizeTransactionObject } from 'utils/transaction/normalizeTransaction';
 import crypto from 'crypto';
 import { classifyTransaction } from 'utils/transaction/classifyTransaction';
-
+import TransactionRepository from 'repositories/transaction/TransactionRepository';
+import { eventBus } from 'events/eventBus';
 
 class TransactionService implements ITransactionService {
+    private static _instance: TransactionService;
     private _transactionRepository: ITransactionRepository;
 
     constructor(transactionRepository: ITransactionRepository) {
         this._transactionRepository = transactionRepository;
     }
 
+    public static get instance(): TransactionService {
+        if (!TransactionService._instance) {
+            const repo = TransactionRepository.instance;
+            TransactionService._instance = new TransactionService(repo);
+        }
+
+        return TransactionService._instance;
+    }
+
     /**
      * Normalizes a date string to ensure consistent format for hash generation
      * Handles different date input formats and types
-     * 
-     * @param {string | Date} date - The date to normalize
-     * @returns {string} - Normalized date string in YYYY-MM-DD format
      */
     private normalizeDate(date: string | Date): string {
         if (date instanceof Date) {
@@ -47,14 +55,7 @@ class TransactionService implements ITransactionService {
         return String(date).trim();
     }
 
-    /**
-     * Generates a unique hash for a transaction based on date, description, and amount
-     * 
-     * @param {string} date - The transaction date
-     * @param {string} description - The transaction description
-     * @param {number} amount - The transaction amount
-     * @returns {string} - A SHA-1 hash of the transaction details
-     */
+    // Generates a unique hash for a transaction based on date, description, and amount
     private generateHash(date: string, description: string, amount: number): string {
         const input = `${date.trim()}|${description.trim()}|${amount.toFixed(2)}`;
         return crypto.createHash('sha1').update(input).digest('hex');
@@ -63,12 +64,6 @@ class TransactionService implements ITransactionService {
     /**
      * Record transaction(s) for the authenticated user, either single transaction or bulk.
      * Prevents duplicate transactions by checking transaction hash.
-     * 
-     * @param {string} accessToken - The access token used to authenticate the user and extract their ID
-     * @param {ITransactionDTO | ITransactionDTO[]} data - The data required to create a single transaction or an array of transactions
-     * @returns {Promise<ITransactionDTO | ITransactionDTO[]>} - A promise resolving to the created transaction object(s)
-     * @throws {AuthenticationError} - Throws an error if the access token is invalid or missing the user ID
-     * @throws {Error} - Throws an error if the database operation fails
      */
     async createTransaction(accessToken: string, data: ITransactionDTO | ITransactionDTO[]): Promise<ITransactionDTO | ITransactionDTO[]> {
         try {
@@ -81,10 +76,20 @@ class TransactionService implements ITransactionService {
             // Handle whether data is a single transaction or an array
             if (Array.isArray(data)) {
                 // Process bulk transactions
-                return await this.processBulkTransactions(userId, data);
+                const response = await this.processBulkTransactions(userId, data);
+
+                // Emit socket event to notify user about transaction Creation
+                eventBus.emit('transaction_created', userId);
+
+                return response;
             } else {
                 // Process single transaction
-                return await this.processSingleTransaction(userId, data);
+                const response = await this.processSingleTransaction(userId, data);
+
+                // Emit socket event to notify user about transaction Creation
+                eventBus.emit('transaction_created', userId);
+
+                return response;
             }
         } catch (error) {
             // Log and re-throw the error to propagate it to the caller
@@ -93,13 +98,7 @@ class TransactionService implements ITransactionService {
         }
     }
 
-    /**
-     * Process a single transaction with hash checking
-     * 
-     * @param {string} userId - User ID from decoded token
-     * @param {ITransactionDTO} data - Transaction data
-     * @returns {Promise<ITransactionDTO>} - Created transaction
-     */
+    // Process a single transaction with hash checking
     private async processSingleTransaction(userId: string, data: ITransactionDTO): Promise<ITransactionDTO> {
         try {
            // Normalize date and handle potential undefined description
@@ -190,11 +189,6 @@ class TransactionService implements ITransactionService {
 
     /**
      * Retrieves all transactions associated with the authenticated user.
-     * 
-     * @param {string} accessToken - The access token used to authenticate the user and extract their ID.
-     * @returns {Promise<ITransactionDTO[]>} - A promise resolving to an array of transaction objects associated with the user.
-     * @throws {AuthenticationError} - Throws an error if the access token is invalid or missing the user ID.
-     * @throws {Error} - Throws an error if the database operation fails.
      */
     async getUserTransactions(accessToken: string): Promise<ITransactionDTO[]> {
         try {
@@ -218,18 +212,6 @@ class TransactionService implements ITransactionService {
     /**
      * Calculates and returns the total income for the current and previous month 
      * for the authenticated user based on their access token.
-     *
-     * This method ensures:
-     * - The user is authenticated via a valid JWT access token.
-     * - Only relevant transaction data (e.g., income from dividends) is considered in the calculation.
-     * - The calculated totals are returned as numerical values for both the current and previous month.
-     *
-     * @param {string} accessToken - The JWT access token used to authenticate the user and extract their ID.
-     * @returns {Promise<{ currentMonthTotal: number, previousMonthTotal: number }>} 
-     *   A promise resolving to an object containing the total income for the current and previous month.
-     *
-     * @throws {AuthenticationError} If the access token is invalid or does not contain a valid user ID.
-     * @throws {Error} If there's an internal error during the transaction retrieval or calculation process.
      */
     async getMonthlyTotalIncome(accessToken: string): Promise<{ currentMonthTotal: number, previousMonthTotal: number }> {
         try {
@@ -261,18 +243,6 @@ class TransactionService implements ITransactionService {
     /**
      * Calculates and returns the total income for the latest week
      * for the authenticated user based on their access token.
-     *
-     * This method ensures:
-     * - The user is authenticated via a valid JWT access token.
-     * - Only INCOME-type transactions are considered for the calculation.
-     * - The result represents the sum of all qualifying transactions from the most recent calendar week.
-     *
-     * @param {string} accessToken - The JWT access token used to authenticate the user and extract their ID.
-     * @returns {Promise<number>} 
-     *   A promise resolving to the total income for the latest week.
-     *
-     * @throws {AuthenticationError} If the access token is invalid or does not contain a valid user ID.
-     * @throws {Error} If there's an internal error during transaction retrieval or aggregation.
      */
     async getWeeklyTotalIncome(accessToken: string): Promise<number> {
         try {
@@ -301,18 +271,6 @@ class TransactionService implements ITransactionService {
     /**
      * Retrieves and calculates the total amount of expenses for the current month 
      * for the authenticated user based on their access token.
-     *
-     * This method ensures:
-     * - The user is authenticated via a valid JWT access token.
-     * - Only EXPENSE-type transactions are considered.
-     * - The total expense amount for the current month is returned.
-     *
-     * @param {string} accessToken - The JWT access token used to authenticate the user and extract their ID.
-     * @returns {Promise<number>} 
-     *   A promise resolving to the total expense amount for the current month.
-     *
-     * @throws {AuthenticationError} If the access token is invalid or does not contain a valid user ID.
-     * @throws {Error} If there's an internal error during the transaction retrieval or calculation process.
      */
     async getMonthlyTotalExpense(accessToken: string): Promise<{ currentMonthExpenseTotal: number, previousMonthExpenseTotal: number }> {
         try {
@@ -343,18 +301,6 @@ class TransactionService implements ITransactionService {
     /**
      * Retrieves and calculates the total amount of expenses for the current month 
      * for the authenticated user based on their access token.
-     *
-     * This method ensures:
-     * - The user is authenticated via a valid JWT access token.
-     * - Only EXPENSE-type transactions are considered.
-     * - The total expense amount for the current month is returned.
-     *
-     * @param {string} accessToken - The JWT access token used to authenticate the user and extract their ID.
-     * @returns {Promise<number>} 
-     *   A promise resolving to the total expense amount for the current month.
-     *
-     * @throws {AuthenticationError} If the access token is invalid or does not contain a valid user ID.
-     * @throws {Error} If there's an internal error during the transaction retrieval or calculation process.
      */
     async getCategoryWiseExpense(accessToken: string): Promise<{category: string, value: number}[]> {
         try {
@@ -384,23 +330,8 @@ class TransactionService implements ITransactionService {
     }
 
     /**
-    * Extracts and processes transaction data from an uploaded file (CSV or Excel).
+     * Extracts and processes transaction data from an uploaded file (CSV or Excel).
      * Converts the file into a standardized array of parsed transactions.
-     *
-     * Supported file formats:
-     * - CSV
-     * - XLSX, XLS, XLSM (Excel formats)
-     *
-     * This method ensures:
-     * - The file buffer is correctly read based on its format.
-     * - CSV data is extracted from Excel files if needed.
-     * - Raw CSV data is parsed and normalized into consistent transaction objects.
-     *
-     * @param {Express.Multer.File} file - The uploaded file containing transaction data.
-     * @returns {Promise<IParsedTransaction[]>}
-     *   A promise resolving to an array of normalized transaction objects.
-     *
-     * @throws {Error} If the file format is unsupported or if parsing fails.
      */
     async extractTransactionData(file: Express.Multer.File): Promise<IParsedTransaction[]> {
         try {
@@ -478,19 +409,6 @@ class TransactionService implements ITransactionService {
     /**
      * Retrieves all INCOME-type transactions for the authenticated user 
      * for the current year based on their access token.
-     *
-     * This method ensures:
-     * - The user is authenticated via a valid JWT access token.
-     * - Only INCOME-type transactions are retrieved.
-     * - Transactions are filtered to include only those from the current year.
-     *
-     * @param {string} accessToken - The JWT access token used to authenticate the user and extract their ID.
-     * @returns {Promise<ITransactionDTO[]>} 
-     *   A promise resolving to an array of `ITransactionDTO` objects representing the user's income transactions for the current year.
-     *   Returns an empty array if no transactions are found.
-     *
-     * @throws {AuthenticationError} If the access token is invalid or does not contain a valid user ID.
-     * @throws {Error} If there's an internal error during the transaction retrieval process.
      */
     async getAllIncomeTransactionsByCategory(accessToken: string): Promise<{category: string, total: number}[]> {
         try {
@@ -521,22 +439,6 @@ class TransactionService implements ITransactionService {
     /**
      * Retrieves all EXPENSE-type transactions grouped by category for the authenticated user 
      * for the current year based on their access token.
-     *
-     * This method ensures:
-     * - The user is authenticated via a valid JWT access token.
-     * - Only EXPENSE-type transactions are retrieved.
-     * - Transactions are grouped by category and summed by amount.
-     * - Data is filtered to include only those from the current year.
-     *
-     * @param {string} accessToken - The JWT access token used to authenticate the user and extract their ID.
-     * @returns {Promise<{ category: string, total: number }[]>}
-     *   A promise resolving to an array of objects where each object contains:
-     *   - `category`: the name of the transaction category
-     *   - `total`: the total amount spent in that category during the year
-     *   Returns an empty array if no expense transactions are found.
-     *
-     * @throws {AuthenticationError} If the access token is invalid or does not contain a valid user ID.
-     * @throws {Error} If there's an internal error during the transaction retrieval process.
      */
     async getAllExpenseTransactionsByCategory(accessToken: string): Promise<{ category: string, total: number }[]> {
         try {
@@ -564,25 +466,7 @@ class TransactionService implements ITransactionService {
         }
     }
 
-    /**
-     * Retrieves month-wise income data for the current year for the authenticated user.
-     * 
-     * This method:
-     * - Extracts the user ID from the provided JWT access token to authenticate the request.
-     * - Fetches month-wise income data using the transaction repository.
-     * - Returns an array of objects containing each month and its corresponding total income amount.
-     * - Ensures all 12 months are included, even if no income was recorded in some months.
-     *
-     * @param {string} accessToken - The JWT access token used to authenticate the user and extract their ID.
-     * @returns {Promise<{ month: string; amount: number }[]>}
-     *   A promise resolving to an array of objects where each object contains:
-     *   - `month`: The abbreviated name of the month (e.g., "Jan", "Feb").
-     *   - `amount`: The total income for that month.
-     *   Returns data for all 12 months, with `0` for months with no income.
-     *
-     * @throws {AuthenticationError} If the access token is invalid or does not contain a valid user ID.
-     * @throws {Error} If there's an internal error during the data retrieval process.
-     */
+    // Retrieves month-wise income data for the current year for the authenticated user.
     async getMonthlyIncomeForChart(accessToken: string): Promise<{ month: string, amount: number }[]> {
         try {
             // Extract the authenticated user's ID from the provided access token.

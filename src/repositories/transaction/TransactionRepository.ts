@@ -3,16 +3,17 @@ import ITransactionRepository from './interfaces/ITransactionRepository';
 import { TransactionModel } from 'model/transaction/model/TransactionModel';
 
 class TransactionRepository implements ITransactionRepository {
-    /**
-    * Creates a new transaction history in the database and returns the created transaction in ITransactionDTO format.
-    * 
-    * This method takes an input object (`transactionData`) containing transaction details, inserts it into the database using the `TransactionModel`,
-    * and maps the result to the `ITransactionDTO` format. MongoDB ObjectIds are converted to strings for consistency in the DTO.
-    * 
-    * @param {ITransactionDTO} transactionData - The input data representing the transaction to be created. Must conform to the ITransactionDTO structure.
-    * @returns {Promise<ITransactionDTO>} - A promise resolving to the created transaction in ITransactionDTO format, with ObjectIds converted to strings.
-    * @throws {Error} - Throws an error if the database operation fails or if invalid data is provided.
-    */
+    private static _instance: TransactionRepository;
+    public constructor() {};
+
+    public static get instance(): TransactionRepository {
+        if (!TransactionRepository._instance) {
+            TransactionRepository._instance = new TransactionRepository();
+        }
+        return TransactionRepository._instance;
+    }
+
+    // Creates a new transaction history in the database and returns the created transaction in ITransactionDTO format.
     async createTransaction(data: ITransactionDTO): Promise<ITransactionDTO> { 
         try {
             const result = await TransactionModel.create(data);
@@ -50,17 +51,7 @@ class TransactionRepository implements ITransactionRepository {
         }
     }
 
-    /**
-     * Creates multiple new transaction histories in the database in a single operation.
-     * 
-     * This method takes an array of transaction objects, performs a bulk insert using `insertMany`,
-     * and maps the results to the `ITransactionDTO` format. MongoDB ObjectIds are converted to strings
-     * for consistency in the DTOs.
-     * 
-     * @param {ITransactionDTO[]} dataArray - An array of input data representing transactions to be created.
-     * @returns {Promise<ITransactionDTO[]>} - A promise resolving to an array of created transactions in ITransactionDTO format.
-     * @throws {Error} - Throws an error if the database operation fails or if invalid data is provided.
-     */
+    // Creates multiple new transaction histories in the database in a single operation.
     async createBulkTransactions(dataArray: ITransactionDTO[]): Promise<ITransactionDTO[]> {
         try {
             // Use insertMany for bulk insertion (more efficient than multiple create operations)
@@ -104,13 +95,7 @@ class TransactionRepository implements ITransactionRepository {
         }
     }
 
-    /**
-     * Retrieves all transactions associated with a specific user from the database.
-     * 
-     * @param {string} userId - The unique identifier of the user whose transactions are being retrieved.
-     * @returns {Promise<ITransactionDTO[]>} - A promise resolving to an array of `ITransactionDTO` objects representing the user's transactions.
-     * @throws {Error} - Throws an error if the database operation fails or no transactions are found for the given user.
-     */
+    // Retrieves all transactions associated with a specific user from the database.
     async getExistingTransaction(userId: string, transactionHash: string): Promise<boolean> {
         try {
             // Query the database to retrieve all transactions associated with the given `userId`.
@@ -130,13 +115,7 @@ class TransactionRepository implements ITransactionRepository {
         }
     }
 
-    /**
-     * Retrieves all transactions associated with a specific user from the database.
-     * 
-     * @param {string} userId - The unique identifier of the user whose transactions are being retrieved.
-     * @returns {Promise<ITransactionDTO[]>} - A promise resolving to an array of `ITransactionDTO` objects representing the user's transactions.
-     * @throws {Error} - Throws an error if the database operation fails or no transactions are found for the given user.
-     */
+    // Retrieves all transactions associated with a specific user from the database.
     async getExistingTransactions(allHashes: string[]): Promise<ITransactionDTO[] | undefined> {
         try {
             // Query the database to retrieve all transactions associated with the given `userId`.
@@ -178,13 +157,7 @@ class TransactionRepository implements ITransactionRepository {
         }
     }
 
-    /**
-     * Retrieves income transaction totals grouped by category for the current year for a specific user.
-     * 
-     * @param {string} userId - The unique identifier of the user whose income totals are being retrieved.
-     * @returns {Promise<{category: string, total: number}[]>} - A promise resolving to an array of objects containing category and total amount.
-     * @throws {Error} - Throws an error if the database operation fails.
-     */
+    // Retrieves income transaction totals grouped by category for the current year for a specific user.
     async getAllIncomeTransactionsByCategory(userId: string): Promise<{category: string, total: number}[]> {
         try {
             const startOfYear = new Date(new Date().getFullYear(), 0, 1);
@@ -222,24 +195,11 @@ class TransactionRepository implements ITransactionRepository {
             return categoryTotals || [];
         } catch (error) {
             console.error('Error retrieving income totals by category:', error);
-            return []; // Always return empty array on error
+            throw new Error('Error retrieving income totals by category')
         }
     }
 
-    /**
-     * Retrieves expense transaction totals grouped by category for the current year for a specific user.
-     *
-     * This method filters all expense transactions for the current calendar year,
-     * groups them by their category, and calculates the total amount spent in each category.
-     *
-     * @param {string} userId - The unique identifier of the user whose expense totals are being retrieved.
-     * @returns {Promise<{ category: string, total: number }[]>}
-     *   A promise resolving to an array of objects where each object contains:
-     *   - `category`: the name of the transaction category
-     *   - `total`: the total amount spent in that category during the year
-     *
-     * @throws {Error} Throws an error if the database operation fails.
-     */
+    // Retrieves expense transaction totals grouped by category for the current year for a specific user.
     async getAllExpenseTransactionsByCategory(userId: string): Promise<{ category: string, total: number }[]> {
         try {
             const startOfYear = new Date(new Date().getFullYear(), 0, 1);
@@ -277,17 +237,11 @@ class TransactionRepository implements ITransactionRepository {
             return categoryTotals || [];
         } catch (error) {
             console.error('Error retrieving expense totals by category:', error);
-            return []; // Always return empty array on error
+            throw new Error('Error retrieving expense totals by category')
         }
     }
 
-    /**
-     * Retrieves all transactions associated with a specific user from the database.
-     * 
-     * @param {string} userId - The unique identifier of the user whose transactions are being retrieved.
-     * @returns {Promise<ITransactionDTO[]>} - A promise resolving to an array of `ITransactionDTO` objects representing the user's transactions.
-     * @throws {Error} - Throws an error if the database operation fails or no transactions are found for the given user.
-     */
+    // Retrieves all transactions associated with a specific user from the database.
     async getUserTransactions(userId: string): Promise<ITransactionDTO[]> {
         try {
             // Query the database to retrieve all transactions associated with the given `userId`.
@@ -309,13 +263,7 @@ class TransactionRepository implements ITransactionRepository {
         }
     }
 
-    /**
-     * Retrieves all transactions associated with a specific user from the database.
-     * 
-     * @param {string} userId - The unique identifier of the user whose transactions are being retrieved.
-     * @returns {Promise<ITransactionDTO[]>} - A promise resolving to an array of `ITransactionDTO` objects representing the user's transactions.
-     * @throws {Error} - Throws an error if the database operation fails or no transactions are found for the given user.
-     */
+    // Retrieves all transactions associated with a specific user from the database.
     async getMonthlyTotalIncome(userId: string): Promise<{currentMonthTotal: number, previousMonthTotal: number }> {
         try {
             // Query the database to retrieve all transactions associated with the given `userId`.
@@ -357,17 +305,11 @@ class TransactionRepository implements ITransactionRepository {
             console.error('Error retrieving transaction details:', error);
 
             // Re-throw the error with a more descriptive message, ensuring the caller is informed of the issue.
-            throw new Error((error as Error).message);
+            throw new Error('Error retrieving transaction details');
         }
     }
 
-    /**
-     * Retrieves the total income for the latest calendar week (Sunday - Saturday) for a specific user.
-     *
-     * @param {string} userId - The unique identifier of the user whose weekly income is being retrieved.
-     * @returns {Promise<number>} - A promise resolving to the total income of the latest calendar week.
-     * @throws {Error} - Throws an error if the database operation fails.
-     */
+    // Retrieves the total income for the latest calendar week (Sunday - Saturday) for a specific user.
     async getWeeklyTotalIncome(userId: string): Promise<number> {
         try {
             const result = await TransactionModel.aggregate([
@@ -416,13 +358,6 @@ class TransactionRepository implements ITransactionRepository {
     /**
      * Retrieves and calculates the total amount of EXPENSE-type transactions 
      * made by a specific user in the current calendar month.
-     *
-     * Only transactions marked as type 'EXPENSE' and occurring in the current month 
-     * are considered in the total calculation.
-     *
-     * @param {string} userId - The unique identifier of the user whose expense data is being retrieved.
-     * @returns {Promise<number>} A promise resolving to the total expense amount for the current month.
-     * @throws {Error} Throws an error if the database operation fails or if no matching transactions are found.
      */
     async getMonthlyTotalExpense(userId: string): Promise<{ currentMonthExpenseTotal: number, previousMonthExpenseTotal: number }> {
         try {
@@ -471,20 +406,13 @@ class TransactionRepository implements ITransactionRepository {
             console.error('Error calculating monthly expense total:', error);
         
             // Re-throw the error with a descriptive message
-            throw new Error(`Failed to retrieve monthly expense total: ${(error as Error).message}`);
+            throw new Error(`Failed to retrieve monthly expense total`);
         }
     }
 
     /**
      * Retrieves and calculates the total amount of EXPENSE-type transactions 
      * made by a specific user in the current calendar month.
-     *
-     * Only transactions marked as type 'EXPENSE' and occurring in the current month 
-     * are considered in the total calculation.
-     *
-     * @param {string} userId - The unique identifier of the user whose expense data is being retrieved.
-     * @returns {Promise<number>} A promise resolving to the total expense amount for the current month.
-     * @throws {Error} Throws an error if the database operation fails or if no matching transactions are found.
      */
     async getCategoryWiseExpense(userId: string): Promise<{category: string, value: number}[]> {
         try {
@@ -533,26 +461,11 @@ class TransactionRepository implements ITransactionRepository {
             console.error('Error calculating monthly expense total:', error);
         
             // Re-throw the error with a descriptive message
-            throw new Error(`Failed to retrieve monthly expense total: ${(error as Error).message}`);
+            throw new Error(`Failed to retrieve monthly expense total`);
         }
     }
 
-    /**
-     * Retrieves month-wise income data for the current year for a specific user, suitable for charting.
-     * 
-     * This method:
-     * - Filters INCOME-type transactions for the given user and current year.
-     * - Groups transactions by month using MongoDB aggregation.
-     * - Sums the total amount per month.
-     * - Fills in missing months with zero to ensure all 12 months are included.
-     *
-     * @param {string} userId - The unique identifier of the user whose monthly income data is being retrieved.
-     * @returns {Promise<{ month: string; amount: number }[]>} 
-     *   A promise resolving to an array of objects where each object contains the month (e.g., "Jan") and the total income amount for that month.
-     *   Returns all 12 months, even if some have zero income.
-     *
-     * @throws {Error} - Throws an error if the database operation fails.
-     */
+    // Retrieves month-wise income data for the current year for a specific user, suitable for charting.
     async getMonthlyIncomeForChart(userId: string): Promise<{ month: string, amount: number }[]> {
         try {
             const startOfYear = new Date(new Date().getFullYear(), 0, 1);
@@ -611,30 +524,11 @@ class TransactionRepository implements ITransactionRepository {
             console.error('Error retrieving transaction details:', error);
 
             // Re-throw the error with a more descriptive message, ensuring the caller is informed of the issue.
-            throw new Error((error as Error).message);
+            throw new Error('Error retrieving transaction details');
         }
     }
 
-    /**
-     * Retrieves month-wise expense data for the current year for a specific user, suitable for charting.
-     * 
-     * This method:
-     * - Filters EXPENSE-type transactions for the given user and current year.
-     * - Groups transactions by month using MongoDB aggregation.
-     * - Sums the total amount per month.
-     * - Fills in missing months with zero to ensure all 12 months are included in the result.
-     *
-     * Useful for rendering charts that require consistent monthly data (e.g., bar charts or line graphs).
-     *
-     * @param {string} userId - The unique identifier of the user whose monthly expense data is being retrieved.
-     * @returns {Promise<{ month: string; amount: number }[]>}
-     *   A promise resolving to an array of objects where each object contains:
-     *   - `month`: The abbreviated month name (e.g., "Jan", "Feb").
-     *   - `amount`: The total expense amount for that month.
-     *   Returns data for all 12 months, even if some months have no recorded expenses.
-     *
-     * @throws {Error} If the database operation fails during aggregation or data processing.
-     */
+    // Retrieves month-wise expense data for the current year for a specific user, suitable for charting.
     async getMonthlyExpenseForChart(userId: string): Promise<{ month: string, amount: number }[]> {
         try {
             const startOfYear = new Date(new Date().getFullYear(), 0, 1);
@@ -693,36 +587,11 @@ class TransactionRepository implements ITransactionRepository {
             console.error('Error retrieving monthly expense data:', error);
         
             // Re-throw the error with a descriptive message
-            throw new Error((error as Error).message);
+            throw new Error('Error retrieving monthly expense data');
         }
     }
 
-    /**
-     * Retrieves paginated income transactions for a specific user based on various filters.
-     * 
-     * This method supports:
-     * - Filtering by time range (last day, week, current month/year)
-     * - Filtering by category and smart_category
-     * - Search in description and tags
-     * - Pagination using $skip and $limit
-     *
-     * @param {string} userId - The unique identifier of the user whose income transactions are being retrieved.
-     * @param {number} [page=1] - The page number for pagination.
-     * @param {number} [limit=10] - Number of items per page.
-     * @param {'day'|'week'|'month'|'year'} [timeRange] - Optional time range filter.
-     * @param {string} [category] - Optional category filter.
-     * @param {string} [smartCategory] - Optional smart category filter.
-     * @param {string} [searchText] - Optional text to search in description or tags.
-     *
-     * @returns {Promise<{ data: ITransactionDTO[], total: number, currentPage: number, totalPages: number }>}
-     *   A promise resolving to:
-     *   - `data`: Paginated list of matched income transactions
-     *   - `total`: Total number of matching documents
-     *   - `currentPage`: Current page number
-     *   - `totalPages`: Total number of pages available
-     *
-     * @throws {Error} - Throws an error if the database operation fails.
-     */
+    // Retrieves paginated income transactions for a specific user based on various filters.
     async getPaginatedIncomeTransactions(
         userId: string,
         page: number,
@@ -831,33 +700,7 @@ class TransactionRepository implements ITransactionRepository {
         }
     }
 
-    /**
-     * Retrieves paginated expense transactions for a specific user based on various filters.
-     * 
-     * This method supports:
-     * - Filtering by time range (last day, week, current month/year)
-     * - Filtering by category
-     * - Search in description and tags
-     * - Pagination using page and limit parameters
-     *
-     * @param {string} userId - The unique identifier of the user whose expense transactions are being retrieved.
-     * @param {number} [page=1] - The page number for pagination (1-based index).
-     * @param {number} [limit=10] - Number of items per page.
-     * @param {'day'|'week'|'month'|'year'} [timeRange] - Optional time range filter to narrow down results.
-     * @param {string} [category] - Optional category filter to refine results.
-     * @param {string} [searchText] - Optional text to search within transaction description or tags (case-insensitive).
-     *
-     * @returns {Promise<{ data: ITransactionDTO[], total: number, currentPage: number, totalPages: number }>}
-     *   A promise resolving to an object containing:
-     *   - `data`: Paginated list of matched expense transactions.
-     *   - `total`: Total number of matching transactions across all pages.
-     *   - `currentPage`: Current page number being returned.
-     *   - `totalPages`: Total number of pages available based on the provided limit.
-     *
-     * @throws {Error}
-     *   If there's a failure during the database operation or aggregation pipeline execution,
-     *   an error will be thrown with a descriptive message.
-     */
+    // Retrieves paginated expense transactions for a specific user based on various filters.
     async getPaginatedExpenseTransactions(
         userId: string,
         page: number = 1,
@@ -966,33 +809,7 @@ class TransactionRepository implements ITransactionRepository {
         }
     }
 
-    /**
-    * Retrieves paginated income or expense transactions for a specific user based on various filters.
-    * 
-    * This method supports:
-    * - Filtering by time range (last day, week, current month/year)
-    * - Filtering by category
-    * - Filtering by transaction type (Income/Expense)
-    * - Search in description and tags
-    * - Pagination using page and limit
-    *
-    * @param {string} userId - The unique identifier of the user whose transactions are being retrieved.
-    * @param {number} [page=1] - The page number for pagination.
-    * @param {number} [limit=10] - Number of items per page.
-    * @param {'day'|'week'|'month'|'year'} [timeRange] - Optional time range filter.
-    * @param {string} [category] - Optional category filter.
-    * @param {string} [transactionType] - Optional transaction type filter ('Income' or 'Expense').
-    * @param {string} [searchText] - Optional text to search in description or tags.
-    *
-    * @returns {Promise<{ data: ITransactionDTO[], total: number, currentPage: number, totalPages: number }>}
-    *   A promise resolving to:
-    *   - `data`: Paginated list of matched transactions
-    *   - `total`: Total number of matching documents
-    *   - `currentPage`: Current page number
-    *   - `totalPages`: Total number of pages available
-    *
-    * @throws {Error} - Throws an error if the database operation fails.
-    */
+    // Retrieves paginated income or expense transactions for a specific user based on various filters.
     async getPaginatedTransactions(
         userId: string,
         page: number,

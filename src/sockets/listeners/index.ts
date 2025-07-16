@@ -116,4 +116,13 @@ export const setupSocketListeners = function() {
             console.error('Error emitting investment_removed:', error);
         }
     });
+
+    // Transactions
+    eventBus.on('transaction_created', (userId) => {
+        try {
+            io.of('/transactions').to(`user_${userId}`).emit('transaction_created');
+        } catch (error) {
+            console.error('Error emitting transaction_created:', error);
+        }
+    });
 };

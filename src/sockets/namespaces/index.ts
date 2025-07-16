@@ -8,6 +8,7 @@ import registerGoalsHandlers from 'sockets/handlers/goals.handler';
 import registerInsurancesHandlers from 'sockets/handlers/insurances.handler';
 import registerInvestmentsHandlers from 'sockets/handlers/investments.handler';
 import registerNotificationHandlers from 'sockets/handlers/notification.handler';
+import registerTransactionsHandlers from 'sockets/handlers/transactions.handler';
 import { authenticate } from 'sockets/middleware/auth.middleware';
 
 export function setupNamespaces(io: Server): void {
@@ -87,4 +88,15 @@ export function setupNamespaces(io: Server): void {
         console.log(`Investment Socket ${socket.id} auto-joined room: ${roomName}`);
         registerInvestmentsHandlers(io, socket);
     });
-}
+
+    // Transaction Namespace
+    const transactionsNamespace = io.of('/transactions');
+    transactionsNamespace.use(authenticate);
+    transactionsNamespace.on('connection', (socket) => {
+        const userId = socket.data.userId;
+        const roomName = `user_${userId}`;
+        socket.join(roomName);
+        console.log(`Transaction Socket ${socket.id} auto-joined room: ${roomName}`);
+        registerTransactionsHandlers(io, socket);
+    });
+};
