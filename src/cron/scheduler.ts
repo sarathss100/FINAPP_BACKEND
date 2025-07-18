@@ -2,6 +2,7 @@ import cron from 'node-cron';
 import logger from 'config/logger/logger';
 import MutualFundService from 'services/mutualfunds/MutualFundService';
 import IMutualFundService from 'services/mutualfunds/interfaces/IMutualFundService';
+import { checkAndExpireSubscriptions } from './checkSubscriptions';
 
 const mutualFundService: IMutualFundService = MutualFundService.instance;
 
@@ -19,4 +20,9 @@ cron.schedule('0 2 * * *', async () => {
     } catch (error) {
         logger.error(`Error during NAV synchronization: ${( error as Error).message}`)
     }
+});
+
+cron.schedule('0 0 * * *', async () => {
+    console.log(`Running scheduled task: checkAndExpireSubscriptions`);
+    await checkAndExpireSubscriptions();
 });

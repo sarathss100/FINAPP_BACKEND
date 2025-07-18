@@ -17,6 +17,7 @@ import updateBondPricesCron from 'cron/updateBondPrices';
 import { startNotificationCronJobs } from 'cron/notificationCron';
 import { startGoalNotificationCronJob } from 'cron/notificationCron';
 import { setupSocketListeners } from 'sockets/listeners';
+import WebhookController from 'controller/webhook/WebhookController';
 
 const app = express();
 expireJob.start();
@@ -30,13 +31,23 @@ startGoalNotificationCronJob();
 setupSocketListeners();
 
 // Middleware
-app.use(express.json());
+
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(loggingMiddleware); 
 app.use(cors(corsOptions));
 app.use(helmet());
 // app.use(rateLimiter);
+
+const webhookController = new WebhookController();
+app.post(
+  '/api/v1/webhook',
+  express.raw({ type: 'application/json' }),
+  webhookController.stripeWebhook.bind(webhookController)
+);
+
+app.use(express.json());
+
 app.use('/api', router);
 
 // Server Health Check

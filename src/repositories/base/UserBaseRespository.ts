@@ -67,6 +67,36 @@ class UserBaseRepository implements IUserBaseRespository {
         }
     }
 
+    async updateSubscriptionStatus(userId: string): Promise<boolean> {
+        try {
+            // Fetch the user's current subscription status
+            const user = await UserModel.findOne({ _id: userId }, { subscription_status: 1 });
+
+            if (!user) {
+                throw new Error(`User with ID ${userId} not found.`);
+            }
+
+            // Determine the new subscription status by toggling the current value
+            const newSubscriptionStatus = !user.subscription_status;
+
+            // Update the user's subscription status in the database
+            const result = await UserModel.updateOne(
+                { _id: userId },
+                { $set: { subscription_status: newSubscriptionStatus } }
+            );
+
+            if (result.modifiedCount === 0) {
+                throw new Error(`Failed to update subscription status for user ID ${userId}`);
+            }
+
+            // Return the updated subscription status
+            return newSubscriptionStatus;
+        } catch (error) {
+            console.error(`Error updating subscription status for user ID ${userId}:`, error);
+            throw error; // Re-throw the error for upstream handling
+        }
+    }
+
     /**
      * Fetches all FAQ entries from the database for administrative purposes.
      *
