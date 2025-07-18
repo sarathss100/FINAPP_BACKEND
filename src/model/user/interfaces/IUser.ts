@@ -9,6 +9,7 @@ interface IUser extends Document {
     status: boolean;
     is2FA: boolean;
     isDeleted: boolean;
+    subscription_status: boolean;
     profile_picture_url: string;
     profile_picture_id: string;
     createdAt?: Date;

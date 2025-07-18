@@ -9,6 +9,7 @@ const UserSchema = new Schema({
     is2FA: { type: Boolean, default: false },
     isDeleted: { type: Boolean, default: false },
     status: { type: Boolean, default: true },
+    subscription_status: { type: Boolean, default: false }, 
     profile_picture_url: { type: String, default: './user.png' },
     profile_picture_id: { type: String, default: null },
 }, { timestamps: true });
