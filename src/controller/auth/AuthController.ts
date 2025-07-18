@@ -72,8 +72,10 @@ class AuthController implements IAuthController {
             if (!verificationStatus) {
                 throw new AuthenticationError(ErrorMessages.TOKEN_VERIFICATION_FAILED, StatusCodes.UNAUTHORIZED);
             }
+
+            const userDetails = await this._authService.getUserDetails(accessToken);
             
-            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.TOKEN_VERIFIED, { valid: true, status: verificationStatus.status });
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.TOKEN_VERIFIED, { valid: true, status: verificationStatus.status, subscription_status: userDetails.subscription_status });
         } catch (error) {
             if (error instanceof AppError) {
                 sendErrorResponse(response, error.statusCode, error.message);

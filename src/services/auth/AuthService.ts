@@ -14,6 +14,7 @@ import { StatusCodes } from 'constants/statusCodes';
 import { SignupSchema } from 'validation/auth/signup.validation';
 import { ResetPasswordSchema } from 'validation/auth/resetPassword.validation';
 import { SigninSchema } from 'validation/auth/signin.validation';
+import IUser from 'dtos/base/UserDto';
 
 class AuthService implements IAuthService {
     private _authRepository: IAuthRepository;
@@ -181,6 +182,30 @@ class AuthService implements IAuthService {
             const userDetails = await this._authRepository.findByPhoneNumber(phoneNumber);
             if (userDetails?.status === false) throw new ForbiddenError(ErrorMessages.USER_IS_BLOCKED);
             return !!userDetails?.status;
+        } catch (error) {
+            if (error instanceof AppError) {
+                throw error;
+            } else {
+                throw error;
+            }
+        }
+    }
+
+    async getUserDetails(accessToken: string): Promise<IUser> {
+        try {
+            const verifiedUserDetails = await this.verifyToken(accessToken);
+
+            const userId = verifiedUserDetails.userId; 
+            
+            if (!userId) {
+                throw new ServerError(ErrorMessages.STATUS_CHECK_FAILED, StatusCodes.INTERNAL_SERVER_ERROR);
+            }
+
+            const userDetails = await this._authRepository.getUserDetails(userId);
+
+            if (userDetails?.status === false) throw new ForbiddenError(ErrorMessages.USER_IS_BLOCKED);
+
+            return userDetails;
         } catch (error) {
             if (error instanceof AppError) {
                 throw error;
