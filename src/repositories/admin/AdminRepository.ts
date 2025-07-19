@@ -9,14 +9,24 @@ import checkDiskSpace from 'check-disk-space';
 import IPaginationMeta from 'dtos/admin/IPaginationMeta';
 
 class AdminRepository implements IAdminRepository {
+    private static _instance: AdminRepository;
+    public constructor() {};
+
+    public static get instance(): AdminRepository {
+        if (!AdminRepository._instance) {
+            AdminRepository._instance = new AdminRepository();
+        }
+        return AdminRepository._instance;
+    }
     // Retrieve all users from the database
     async findAllUsers(): Promise<IUserDetails[] | null> {
-        const users = await UserModel.find({}).lean();
+        const users = await UserModel.find({ role: 'user' }).lean();
         const userDetails: IUserDetails[] = users.map((user) => ({
             userId: String(user._id),
             firstName: user.first_name,
             lastName: user.last_name,
             phoneNumber: user.phone_number,
+            is2FA: user.is2FA,
             status: user.status,
             role: user.role
         }));

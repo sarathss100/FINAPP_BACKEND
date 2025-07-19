@@ -7,6 +7,7 @@ interface IUserDetails {
     role: string;
     status: boolean;
     email?: string;
+    is2FA?: boolean;
     lastPasswordChange?: Date;
     twoFactorEnabled?: boolean;
     connectedAccounts?: string[];

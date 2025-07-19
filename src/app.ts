@@ -18,6 +18,7 @@ import { startNotificationCronJobs } from 'cron/notificationCron';
 import { startGoalNotificationCronJob } from 'cron/notificationCron';
 import { setupSocketListeners } from 'sockets/listeners';
 import WebhookController from 'controller/webhook/WebhookController';
+import { startTransactionGenerator } from 'aa-simulator/src/cron/startTransactionGenerator';
 
 const app = express();
 expireJob.start();
@@ -29,9 +30,9 @@ updateBondPricesCron.start();
 startNotificationCronJobs();
 startGoalNotificationCronJob();
 setupSocketListeners();
+startTransactionGenerator();
 
 // Middleware
-
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(loggingMiddleware); 

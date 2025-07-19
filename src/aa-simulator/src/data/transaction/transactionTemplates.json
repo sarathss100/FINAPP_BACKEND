@@ -1,0 +1,232 @@
+{
+  "templates": [
+    {
+      "transaction_type": "EXPENSE",
+      "type": "PURCHASE", 
+      "category": "FOOD",
+      "descriptions": [
+        "Swiggy food delivery",
+        "Zomato order",
+        "Big Bazaar grocery",
+        "Local restaurant bill",
+        "Coffee at CCD",
+        "McDonald's order",
+        "Street food purchase",
+        "Vegetable market",
+        "Bread and milk",
+        "Domino's pizza"
+      ],
+      "amountRange": [45, 1800],
+      "tags": ["food", "dining", "grocery"]
+    },
+    {
+      "transaction_type": "EXPENSE",
+      "type": "PAYMENT",
+      "category": "TRANSPORT", 
+      "descriptions": [
+        "Ola cab ride",
+        "Uber booking", 
+        "Metro card recharge",
+        "Petrol pump",
+        "Auto rickshaw",
+        "Bus ticket",
+        "Parking charges",
+        "Toll payment",
+        "Bike service",
+        "Car maintenance"
+      ],
+      "amountRange": [25, 1200],
+      "tags": ["transport", "commute", "fuel"]
+    },
+    {
+      "transaction_type": "EXPENSE",
+      "type": "PAYMENT",
+      "category": "BILLS",
+      "descriptions": [
+        "Electricity bill - BESCOM",
+        "Jio mobile recharge", 
+        "Airtel broadband",
+        "Water bill payment",
+        "Gas cylinder booking",
+        "DTH recharge",
+        "Society maintenance",
+        "Phone bill payment",
+        "Internet bill",
+        "Cable TV bill"
+      ],
+      "amountRange": [150, 4500],
+      "tags": ["bills", "utilities", "recharge"]
+    },
+    {
+      "transaction_type": "EXPENSE",
+      "type": "PURCHASE",
+      "category": "SHOPPING",
+      "descriptions": [
+        "Amazon order",
+        "Flipkart purchase",
+        "Myntra clothing", 
+        "Reliance Digital",
+        "Nike shoes",
+        "Local clothes shop",
+        "Electronics purchase",
+        "Book purchase",
+        "Home appliances",
+        "Mobile accessories"
+      ],
+      "amountRange": [299, 25000],
+      "tags": ["shopping", "online", "retail"]
+    },
+    {
+      "transaction_type": "INCOME",
+      "type": "DEPOSIT",
+      "category": "SAVINGS",
+      "descriptions": [
+        "Salary credit",
+        "Freelance payment received", 
+        "Investment return",
+        "Bonus credit",
+        "Fixed deposit maturity",
+        "Dividend received",
+        "Rental income",
+        "Side project payment",
+        "Consulting fees",
+        "Business income"
+      ],
+      "amountRange": [5000, 125000],
+      "tags": ["income", "salary", "earning"]
+    },
+    {
+      "transaction_type": "EXPENSE", 
+      "type": "PAYMENT",
+      "category": "ENTERTAINMENT",
+      "descriptions": [
+        "BookMyShow tickets",
+        "Netflix subscription",
+        "Spotify premium",
+        "Gaming purchase",
+        "YouTube Premium",
+        "Amazon Prime",
+        "Concert tickets", 
+        "Amusement park",
+        "Sports event",
+        "Club entry"
+      ],
+      "amountRange": [99, 3500],
+      "tags": ["entertainment", "streaming", "events"]
+    },
+    {
+      "transaction_type": "EXPENSE",
+      "type": "PAYMENT", 
+      "category": "HEALTH",
+      "descriptions": [
+        "Apollo Pharmacy",
+        "Doctor consultation",
+        "Diagnostic test",
+        "Gym membership",
+        "Health insurance premium",
+        "Dental treatment",
+        "Eye checkup",
+        "Physiotherapy",
+        "Health supplements",
+        "Medical equipment"
+      ],
+      "amountRange": [250, 8500],
+      "tags": ["health", "medical", "fitness"]
+    },
+    {
+      "transaction_type": "EXPENSE",
+      "type": "PAYMENT",
+      "category": "EDUCATION",
+      "descriptions": [
+        "Course fee payment",
+        "Book purchase",
+        "Online course subscription", 
+        "Exam fee",
+        "Tuition fee",
+        "Educational material",
+        "Certification fee",
+        "Workshop registration",
+        "Skill development",
+        "Training program"
+      ],
+      "amountRange": [500, 15000],
+      "tags": ["education", "learning", "skill"]
+    },
+    {
+      "transaction_type": "EXPENSE",
+      "type": "PURCHASE",
+      "category": "GIFTS",
+      "descriptions": [
+        "Surprise gift",
+        "Birthday gift",
+        "Anniversary present",
+        "Wedding gift",
+        "Festival gift",
+        "Thank you gift",
+        "Holiday present",
+        "Celebration gift",
+        "Special occasion gift",
+        "Return gift"
+      ],
+      "amountRange": [200, 10000],
+      "tags": ["gifts", "celebration", "present"]
+    },
+    {
+      "transaction_type": "EXPENSE",
+      "type": "FEE",
+      "category": "HEALTH",
+      "descriptions": [
+        "Hospital registration fee",
+        "Consultation fee",
+        "OPD charges",
+        "Ambulance service fee",
+        "Health checkup fee",
+        "Dental consultation",
+        "Physiotherapy fee",
+        "Emergency room fee",
+        "Vaccination fee",
+        "Lab test fee"
+      ],
+      "amountRange": [100, 4000],
+      "tags": ["fee", "health", "hospital"]
+    },
+    {
+      "transaction_type": "EXPENSE",
+      "type": "SUBSCRIPTION",
+      "category": "SUBSCRIPTIONS",
+      "descriptions": [
+        "Apple Music subscription",
+        "Disney+ Hotstar",
+        "Hulu subscription",
+        "HBO Max",
+        "Adobe Creative Cloud",
+        "Canva Pro",
+        "Grammarly Premium",
+        "Google One",
+        "Dropbox Plus",
+        "LinkedIn Premium"
+      ],
+      "amountRange": [99, 1500],
+      "tags": ["subscription", "software", "media"]
+    },
+    {
+      "transaction_type": "INCOME",
+      "type": "INVESTMENT",
+      "category": "INVESTMENTS",
+      "descriptions": [
+        "Stock purchase",
+        "Mutual fund investment",
+        "SIP contribution",
+        "Direct equity buy",
+        "Gold ETF purchase",
+        "Cryptocurrency buy",
+        "NPS contribution",
+        "PPF deposit",
+        "ELSS investment",
+        "Fixed deposit investment"
+      ],
+      "amountRange": [500, 500000],
+      "tags": ["investment", "stocks", "mutual funds"]
+    }
+  ]
+}
