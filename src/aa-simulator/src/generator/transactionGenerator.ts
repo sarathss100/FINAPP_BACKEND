@@ -74,7 +74,7 @@ export class TransactionGenerator {
                 status: statusRandom,
                 transactionHash: '',
                 isDeleted: false,
-            }
+            };
 
             // Submit transaction to main application
             await TransactionGeneratorService.submitTransaction(transactionData, randomUser);

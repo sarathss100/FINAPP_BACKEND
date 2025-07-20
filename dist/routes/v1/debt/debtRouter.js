@@ -1,0 +1,24 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const DebtManagementRepository_1 = __importDefault(require("repositories/debt/DebtManagementRepository"));
+const DebtService_1 = __importDefault(require("services/debt/DebtService"));
+const DebtController_1 = __importDefault(require("controller/debt/DebtController"));
+const router = (0, express_1.Router)();
+const debtManagementRepository = new DebtManagementRepository_1.default();
+const debtService = new DebtService_1.default(debtManagementRepository);
+const debtController = new DebtController_1.default(debtService);
+router.post('/', debtController.createDebt.bind(debtController));
+router.get('/', debtController.getDebtCategorized.bind(debtController));
+router.get('/all', debtController.getAllDebts.bind(debtController));
+router.delete('/:id', debtController.deleteDebt.bind(debtController));
+router.patch('/:id', debtController.markAsPaid.bind(debtController));
+router.get('/total', debtController.getTotalDebt.bind(debtController));
+router.get('/summary', debtController.getTotalOutstandingDebt.bind(debtController));
+router.get('/monthly-payment', debtController.getTotalMonthlyPayment.bind(debtController));
+router.get('/tenure', debtController.getLongestTenure.bind(debtController));
+router.get('/simulation', debtController.getRepaymentStrategyComparison.bind(debtController));
+exports.default = router;

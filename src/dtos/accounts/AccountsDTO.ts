@@ -1,7 +1,3 @@
-
-/**
- * Enums
- */
 type Currency = 'INR';
 
 type AccountType = 'Bank' | 'Debt' | 'Investment' | 'Cash';
@@ -17,9 +13,6 @@ type LoanType =
 
 type LocationType = 'Home' | 'Safe' | 'Wallet' | 'Office';
 
-/**
- * IAccountDTO Interface
- */
 export interface IAccountDTO {
     _id?: string;
     user_id?: string;

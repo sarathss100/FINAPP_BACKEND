@@ -63,6 +63,8 @@ class DebtService implements IDebtService {
                 isGoodDebt
             };
 
+            delete refinedData._id;
+
             // Delegate to the repository to create the debt record
             const debtDetails = await this._debtManagementRepository.createDebt(refinedData, userId);
 

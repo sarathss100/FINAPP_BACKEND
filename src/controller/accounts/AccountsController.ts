@@ -33,7 +33,6 @@ class AccountsController implements IAccountsController {
                 }
             }
 
-            // Now assert it to IAccountDTO only when passing it to Zod for validation
             const parsedBody = accountValidationSchema.safeParse(formData);
 
             if (!parsedBody || !parsedBody.success) {

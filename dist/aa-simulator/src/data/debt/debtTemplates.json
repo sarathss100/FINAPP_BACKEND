@@ -1,0 +1,326 @@
+{
+    "templates": [
+        {
+            "debtType": "PERSONAL_LOAN",
+            "debtNameOptions": [
+                "Personal Loan - Axis Bank",
+                "SBI Personal Loan",
+                "HDFC Personal Loan",
+                "Loan from ICICI",
+                "Kotak Personal Loan"
+            ],
+            "amountRange": [50000, 2000000],
+            "interestRateRange": [8.5, 18.5],
+            "tenureRange": [12, 60],
+            "currency": "INR",
+            "interestTypeOptions": ["Flat", "Diminishing"],
+            "isGoodDebtOptions": [false, true],
+            "notesOptions": [
+                "Emergency loan",
+                "Medical loan",
+                "Wedding loan",
+                "Vacation loan",
+                "Home improvement loan"
+            ]
+        },
+        {
+            "debtType": "HOME_LOAN",
+            "debtNameOptions": [
+                "Home Loan - SBI",
+                "Axis Home Loan",
+                "HDFC Home Loan",
+                "PNB Home Loan",
+                "ICICI Home Loan"
+            ],
+            "amountRange": [1000000, 20000000],
+            "interestRateRange": [6.5, 9.5],
+            "tenureRange": [120, 360],
+            "currency": "INR",
+            "interestTypeOptions": ["Diminishing"],
+            "isGoodDebtOptions": [true],
+            "notesOptions": [
+                "First home purchase",
+                "Property investment",
+                "Land loan",
+                "Construction loan",
+                "Resale property loan"
+            ]
+        },
+        {
+            "debtType": "CAR_LOAN",
+            "debtNameOptions": [
+                "Car Loan - HDFC",
+                "Maruti Finance Loan",
+                "Axis Car Loan",
+                "ICICI Car Loan",
+                "Tata Motors Finance"
+            ],
+            "amountRange": [300000, 2000000],
+            "interestRateRange": [7.5, 12.0],
+            "tenureRange": [24, 84],
+            "currency": "INR",
+            "interestTypeOptions": ["Flat", "Diminishing"],
+            "isGoodDebtOptions": [false],
+            "notesOptions": [
+                "New car purchase",
+                "Used car finance",
+                "Family car loan",
+                "SUV loan",
+                "Loan for office commute"
+            ]
+        },
+        {
+            "debtType": "PERSONAL_LOAN",
+            "debtNameOptions": [
+                "Personal Loan - Axis Bank",
+                "SBI Personal Loan",
+                "HDFC Personal Loan",
+                "Loan from ICICI",
+                "Kotak Personal Loan"
+            ],
+            "amountRange": [50000, 2000000],
+            "interestRateRange": [8.5, 18.5],
+            "tenureRange": [12, 60],
+            "currency": "INR",
+            "interestTypeOptions": ["Flat", "Diminishing"],
+            "isGoodDebtOptions": [false, true],
+            "notesOptions": [
+                "Emergency loan",
+                "Medical loan",
+                "Wedding loan",
+                "Vacation loan",
+                "Home improvement loan"
+            ]
+        },
+        {
+            "debtType": "HOME_LOAN",
+            "debtNameOptions": [
+                "Home Loan - SBI",
+                "Axis Home Loan",
+                "HDFC Home Loan",
+                "PNB Home Loan",
+                "ICICI Home Loan"
+            ],
+            "amountRange": [1000000, 20000000],
+            "interestRateRange": [6.5, 9.5],
+            "tenureRange": [120, 360],
+            "currency": "INR",
+            "interestTypeOptions": ["Diminishing"],
+            "isGoodDebtOptions": [true],
+            "notesOptions": [
+                "First home purchase",
+                "Property investment",
+                "Land loan",
+                "Construction loan",
+                "Resale property loan"
+            ]
+        },
+        {
+            "debtType": "CAR_LOAN",
+            "debtNameOptions": [
+                "Car Loan - HDFC",
+                "Maruti Finance Loan",
+                "Axis Car Loan",
+                "ICICI Car Loan",
+                "Tata Motors Finance"
+            ],
+            "amountRange": [300000, 2000000],
+            "interestRateRange": [7.5, 12.0],
+            "tenureRange": [24, 84],
+            "currency": "INR",
+            "interestTypeOptions": ["Flat", "Diminishing"],
+            "isGoodDebtOptions": [false],
+            "notesOptions": [
+                "New car purchase",
+                "Used car finance",
+                "Family car loan",
+                "SUV loan",
+                "Loan for office commute"
+            ]
+        },
+        {
+            "debtType": "EDUCATION_LOAN",
+            "debtNameOptions": [
+                "Education Loan - SBI",
+                "Axis Education Loan",
+                "HDFC Education Loan",
+                "ICICI Education Loan",
+                "Avanse Education Loan"
+            ],
+            "amountRange": [100000, 5000000],
+            "interestRateRange": [8.0, 13.0],
+            "tenureRange": [24, 240],
+            "currency": "INR",
+            "interestTypeOptions": ["Flat", "Diminishing"],
+            "isGoodDebtOptions": [true],
+            "notesOptions": [
+                "Undergraduate study",
+                "Postgraduate study",
+                "Study abroad loan",
+                "Engineering education",
+                "Medical education"
+            ]
+        },
+        {
+            "debtType": "BUSINESS_LOAN",
+            "debtNameOptions": [
+                "Business Loan - SBI",
+                "Axis Business Loan",
+                "HDFC Business Loan",
+                "ICICI Business Loan",
+                "Loan from MSME Bank"
+            ],
+            "amountRange": [500000, 10000000],
+            "interestRateRange": [10.0, 18.0],
+            "tenureRange": [12, 120],
+            "currency": "INR",
+            "interestTypeOptions": ["Flat", "Diminishing"],
+            "isGoodDebtOptions": [true],
+            "notesOptions": [
+                "Startup funding",
+                "Working capital loan",
+                "Expansion loan",
+                "Inventory loan",
+                "Equipment purchase"
+            ]
+        },
+        {
+            "debtType": "GOLD_LOAN",
+            "debtNameOptions": [
+                "Gold Loan - Muthoot",
+                "Gold Loan - Manappuram",
+                "Gold Loan - Srei",
+                "Gold Loan - HDFC",
+                "Gold Loan - Axis"
+            ],
+            "amountRange": [20000, 1000000],
+            "interestRateRange": [10.0, 20.0],
+            "tenureRange": [3, 24],
+            "currency": "INR",
+            "interestTypeOptions": ["Flat"],
+            "isGoodDebtOptions": [false],
+            "notesOptions": [
+                "Urgent cash requirement",
+                "Festival expenses",
+                "Medical emergency",
+                "Marriage expenses",
+                "Debt consolidation"
+            ]
+        },
+        {
+            "debtType": "CREDIT_LINE",
+            "debtNameOptions": [
+                "Credit Line - SBI",
+                "Overdraft - ICICI",
+                "Flexi Loan - Axis",
+                "Cash Credit - HDFC",
+                "Business Credit Line - Kotak"
+            ],
+            "amountRange": [100000, 5000000],
+            "interestRateRange": [9.5, 15.0],
+            "tenureRange": [12, 60],
+            "currency": "INR",
+            "interestTypeOptions": ["Flat", "Diminishing"],
+            "isGoodDebtOptions": [true],
+            "notesOptions": [
+                "Working capital line",
+                "Seasonal cash flow",
+                "Contingency fund",
+                "Small business credit",
+                "Freelancer credit line"
+            ]
+        },
+        {
+            "debtType": "LOAN_AGAINST_PROPERTY",
+            "debtNameOptions": [
+                "Loan Against Property - SBI",
+                "LAP - HDFC",
+                "LAP - ICICI",
+                "Property Loan - Axis",
+                "LAP - PNB"
+            ],
+            "amountRange": [1000000, 20000000],
+            "interestRateRange": [8.5, 12.0],
+            "tenureRange": [60, 360],
+            "currency": "INR",
+            "interestTypeOptions": ["Diminishing"],
+            "isGoodDebtOptions": [true],
+            "notesOptions": [
+                "Business expansion",
+                "Consolidate debt",
+                "Home renovation",
+                "Medical emergency",
+                "Education funding"
+            ]
+        },
+        {
+            "debtType": "MORTGAGE_LOAN",
+            "debtNameOptions": [
+                "Mortgage Loan - SBI",
+                "Mortgage - HDFC",
+                "Mortgage - ICICI",
+                "Mortgage - Axis",
+                "Mortgage - Kotak"
+            ],
+            "amountRange": [5000000, 100000000],
+            "interestRateRange": [7.5, 10.5],
+            "tenureRange": [120, 360],
+            "currency": "INR",
+            "interestTypeOptions": ["Diminishing"],
+            "isGoodDebtOptions": [true],
+            "notesOptions": [
+                "Commercial property purchase",
+                "Residential mortgage",
+                "Second home mortgage",
+                "Land mortgage",
+                "Refinance mortgage"
+            ]
+        },
+        {
+            "debtType": "LOAN_AGAINST_SECURITY",
+            "debtNameOptions": [
+                "Loan Against Shares - ICICI",
+                "Loan Against FD - SBI",
+                "Loan Against Mutual Funds - HDFC",
+                "Loan Against Insurance - Axis",
+                "Secured Loan - Kotak"
+            ],
+            "amountRange": [100000, 10000000],
+            "interestRateRange": [7.5, 14.0],
+            "tenureRange": [6, 60],
+            "currency": "INR",
+            "interestTypeOptions": ["Flat", "Diminishing"],
+            "isGoodDebtOptions": [true],
+            "notesOptions": [
+                "Short-term funding",
+                "Business cash flow",
+                "Emergency loan",
+                "Investment opportunity",
+                "Personal use"
+            ]
+        },
+        {
+            "debtType": "STUDENT_LOAN",
+            "debtNameOptions": [
+                "Student Loan - SBI",
+                "Axis Student Loan",
+                "HDFC Student Loan",
+                "ICICI Student Loan",
+                "Avanse Student Loan"
+            ],
+            "amountRange": [50000, 3000000],
+            "interestRateRange": [7.0, 12.0],
+            "tenureRange": [24, 240],
+            "currency": "INR",
+            "interestTypeOptions": ["Flat", "Diminishing"],
+            "isGoodDebtOptions": [true],
+            "notesOptions": [
+                "Higher education loan",
+                "Study abroad",
+                "Vocational training",
+                "Technical education",
+                "Medical education"
+            ]
+        }
+    ]
+}
