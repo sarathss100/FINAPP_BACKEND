@@ -47,8 +47,6 @@ class UserService implements IUserService {
             // Upload the image to Cloudinary
             const cloudinaryUrl = await uploadToCloudinary(file.buffer, file.originalname);
 
-            
-
             // Generate unique image ID 
             const imageId = generateUniqueId();
 

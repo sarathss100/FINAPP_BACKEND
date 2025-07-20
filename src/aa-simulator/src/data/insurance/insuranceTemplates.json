@@ -1,0 +1,109 @@
+{
+  "templates": [
+    {
+      "type": "LIFE_INSURANCE",
+      "coverageRange": [500000, 5000000],
+      "premiumRange": [1000, 20000],
+      "paymentCycleOptions": ["Monthly", "Quarterly", "Half-Yearly", "Yearly"],
+      "statusOptions": ["Active", "Pending", "Expired", "Cancelled"],
+      "paymentStatusOptions": ["Paid", "Unpaid", "Overdue"],
+      "notesOptions": [
+        "Term insurance",
+        "Whole life insurance",
+        "Endowment plan",
+        "Unit Linked Insurance Plan",
+        "Child insurance plan"
+      ]
+    },
+    {
+      "type": "HEALTH_INSURANCE",
+      "coverageRange": [100000, 2000000],
+      "premiumRange": [500, 10000],
+      "paymentCycleOptions": ["Yearly", "Half-Yearly"],
+      "statusOptions": ["Active", "Pending", "Expired", "Cancelled"],
+      "paymentStatusOptions": ["Paid", "Unpaid", "Overdue"],
+      "notesOptions": [
+        "Family floater plan",
+        "Individual plan",
+        "Senior citizen plan",
+        "Critical illness cover",
+        "Hospital cash plan"
+      ]
+    },
+    {
+      "type": "MOTOR_INSURANCE",
+      "coverageRange": [50000, 1000000],
+      "premiumRange": [500, 15000],
+      "paymentCycleOptions": ["Yearly"],
+      "statusOptions": ["Active", "Pending", "Expired", "Cancelled"],
+      "paymentStatusOptions": ["Paid", "Unpaid", "Overdue"],
+      "notesOptions": [
+        "Two-wheeler insurance",
+        "Four-wheeler insurance",
+        "Commercial vehicle insurance",
+        "Third-party insurance",
+        "Comprehensive insurance"
+      ]
+    },
+    {
+      "type": "PROPERTY_INSURANCE",
+      "coverageRange": [500000, 10000000],
+      "premiumRange": [1000, 50000],
+      "paymentCycleOptions": ["Yearly"],
+      "statusOptions": ["Active", "Pending", "Expired", "Cancelled"],
+      "paymentStatusOptions": ["Paid", "Unpaid", "Overdue"],
+      "notesOptions": [
+        "Home insurance",
+        "Office insurance",
+        "Industrial insurance",
+        "Fire insurance",
+        "Flood insurance"
+      ]
+    },
+    {
+      "type": "TRAVEL_INSURANCE",
+      "coverageRange": [100000, 5000000],
+      "premiumRange": [200, 5000],
+      "paymentCycleOptions": ["Trip", "Annual"],
+      "statusOptions": ["Active", "Pending", "Expired", "Cancelled"],
+      "paymentStatusOptions": ["Paid", "Unpaid", "Overdue"],
+      "notesOptions": [
+        "International travel insurance",
+        "Domestic travel insurance",
+        "Student travel insurance",
+        "Family travel plan",
+        "Single trip insurance"
+      ]
+    },
+    {
+      "type": "INVESTMENT_INSURANCE",
+      "coverageRange": [200000, 5000000],
+      "premiumRange": [1000, 50000],
+      "paymentCycleOptions": ["Monthly", "Yearly"],
+      "statusOptions": ["Active", "Pending", "Expired", "Cancelled"],
+      "paymentStatusOptions": ["Paid", "Unpaid", "Overdue"],
+      "notesOptions": [
+        "ULIP plan",
+        "Money back plan",
+        "Pension plan",
+        "Investment-linked insurance",
+        "Retirement plan"
+      ]
+    },
+    {
+      "type": "PERSONAL_ACCIDENT_INSURANCE",
+      "coverageRange": [100000, 2000000],
+      "premiumRange": [100, 3000],
+      "paymentCycleOptions": ["Yearly"],
+      "statusOptions": ["Active", "Pending", "Expired", "Cancelled"],
+      "paymentStatusOptions": ["Paid", "Unpaid", "Overdue"],
+      "notesOptions": [
+        "Accidental death cover",
+        "Permanent disability cover",
+        "Daily hospital allowance",
+        "Road accident insurance",
+        "Work-related accident cover"
+      ]
+    }
+  ]
+}
