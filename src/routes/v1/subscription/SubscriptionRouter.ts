@@ -1,14 +1,12 @@
 import { Router } from 'express';
-import SubscriptionManagementRepository from 'repositories/subscriptions/SubscriptionManagementRepository';
-import SubscriptionService from 'services/subscriptions/SubscriptionService';
 import ISubscriptionController from 'controller/subscriptions/interfaces/ISubscriptionController';
-import SubscriptionController from 'controller/subscriptions/SubscriptionController';
 
-const router = Router();
-const subscriptionRepository = new SubscriptionManagementRepository();
-const subscriptionService = new SubscriptionService(subscriptionRepository);
-const subscriptionController: ISubscriptionController = new SubscriptionController(subscriptionService);
+const createSubscriptionRouter = function(subscriptionController: ISubscriptionController): Router {
+    const router = Router();
 
-router.post('/checkout', subscriptionController.initiatePayment.bind(subscriptionController));
+    router.post('/checkout', subscriptionController.initiatePayment.bind(subscriptionController));
 
-export default router;
+    return router;
+};
+
+export default createSubscriptionRouter;
