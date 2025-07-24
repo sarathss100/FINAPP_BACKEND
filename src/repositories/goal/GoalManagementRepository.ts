@@ -143,8 +143,31 @@ class GoalManagementRepository implements IGoalManagementRepository {
                 throw new Error('No goals found for the specified user');
             }
 
+            const mappedData: IGoalDTO[] = result.map((data) => ({
+                _id: data._id?.toString(),
+                user_id: data.user_id?.toString(),
+                tenant_id: data.tenant_id?.toString(),
+                goal_name: data.goal_name,
+                goal_category: data.goal_category,
+                target_amount: data.target_amount,
+                initial_investment: data.initial_investment,
+                current_amount: data.current_amount,
+                currency: data.currency,
+                target_date: data.target_date,
+                contribution_frequency: data.contribution_frequency,
+                priority_level: data.priority_level,
+                description: data.description,
+                reminder_frequency: data.reminder_frequency,
+                goal_type: data.goal_type,
+                tags: data.tags,
+                dependencies: data.dependencies?.map(dep => dep.toString()),
+                is_completed: data.is_completed,
+                created_by: data.created_by?.toString(),
+                last_updated_by: data.last_updated_by?.toString(),
+            }));
+
             // Return the retrieved goals as an array of `IGoalDTO` objects.
-            return result;
+            return mappedData;
         } catch (error) {
             // Log the error for debugging purposes.
             console.error('Error retrieving goal details:', error);
@@ -166,8 +189,32 @@ class GoalManagementRepository implements IGoalManagementRepository {
                 throw new Error('No goal found for the specified ID');
             }
 
+            // Map the updated result to IGoalDTO format
+            const updatedGoal: IGoalDTO = {
+                _id: result._id?.toString(),
+                user_id: result.user_id?.toString(),
+                tenant_id: result.tenant_id?.toString(),
+                goal_name: result.goal_name,
+                goal_category: result.goal_category,
+                target_amount: result.target_amount,
+                initial_investment: result.initial_investment,
+                current_amount: result.current_amount,
+                currency: result.currency,
+                target_date: result.target_date,
+                contribution_frequency: result.contribution_frequency,
+                priority_level: result.priority_level,
+                description: result.description,
+                reminder_frequency: result.reminder_frequency,
+                goal_type: result.goal_type,
+                tags: result.tags,
+                dependencies: result.dependencies?.map(dep => dep.toString()),
+                is_completed: result.is_completed,
+                created_by: result.created_by?.toString(),
+                last_updated_by: result.last_updated_by?.toString(),
+            };
+
             // Return the retrieved goal as an `IGoalDTO` object.
-           return result;
+           return updatedGoal;
         } catch (error) {
             // Log the error for debugging purposes.
             console.error('Error retrieving goal details:', error);

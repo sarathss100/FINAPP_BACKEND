@@ -175,7 +175,7 @@ class AccountManagementRepository implements IAccountsManagementRepository {
         }
     }
 
-    //Retrieves all accounts associated with a specific user from the database.
+    // Retrieves all accounts associated with a specific user from the database.
     async getUserAccounts(userId: string): Promise<IAccountDTO[]> {
         try {
             // Query the database to retrieve all accounts associated with the given `userId`.
@@ -186,8 +186,32 @@ class AccountManagementRepository implements IAccountsManagementRepository {
                 throw new Error('No accounts found for the specified user');
             }
 
+            const mappedAccounts: IAccountDTO[] = result.map((data) => ({
+                _id: data._id?.toString(),
+                user_id: data.user_id?.toString(),
+                account_name: data.account_name,
+                currency: data.currency,
+                description: data.description,
+                is_active: data.is_active,
+                created_by: data.created_by?.toString(),
+                last_updated_by: data.last_updated_by?.toString(),
+                account_type: data.account_type,
+                current_balance: data.current_balance,
+                institution: data.institution,
+                account_number: data.account_number,
+                account_subtype: data.account_subtype,
+                loan_type: data.loan_type,
+                interest_rate: data.interest_rate,
+                monthly_payment: data.monthly_payment,
+                due_date: data.due_date,
+                term_months: data.term_months,
+                investment_platform: data.investment_platform,
+                portfolio_value: data.portfolio_value,
+                location: data.location
+            }));
+
             // Return the retrieved accounts as an array of `IAccountDTO` objects.
-            return result;
+            return mappedAccounts;
         } catch (error) {
             // Log the error for debugging purposes.
             console.error('Error retrieving account details:', error);

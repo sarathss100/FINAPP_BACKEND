@@ -1,13 +1,27 @@
-import { IFaq } from 'dtos/base/FaqDto';
+import { IFaqDTO } from 'dtos/base/FaqDto';
 import IPublicRepository from './interfaces/IPublicRepository';
 import { FaqModel } from 'model/admin/model/FaqModel';
 
 class PublicRepository implements IPublicRepository {
 
     // Fetches All published and non-deleted FAQ entries from the database
-    async getFaqs(): Promise<IFaq[] | null> {
+    async getFaqs(): Promise<IFaqDTO[] | null> {
         const result = await FaqModel.find({ isPublished: true, isDeleted: false });
-        return result;
+
+        if (result.length) {
+            const mappedData: IFaqDTO[] = result.map((data) => ({
+                question: data.question,
+                answer: data.answer,
+                isDeleted: data.isDeleted,
+                isPublished: data.isPublished,
+                createdAt: data.createdAt,
+                updatedAt: data.updatedAt
+            }));
+
+            return mappedData;
+        } else {
+            return null;
+        }
     }
 }
 

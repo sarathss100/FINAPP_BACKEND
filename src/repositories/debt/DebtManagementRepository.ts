@@ -251,9 +251,41 @@ class DebtManagementRepository implements IDebtRepository {
                     }
                 }
             ]);
+
+            let mappedData: IDebtDTO[] = [];
+ 
+            if (result.length) {
+                mappedData = result.map((data) => ({
+                    _id: String(data._id),
+                    userId: String(data.userId),
+                    accountId: data.accountId ? String(data.accountId) : data.accountId,
+                    debtName: data.debtName,
+                    initialAmount: data.initialAmount,
+                    currency: data.currency,
+                    interestRate: data.interestRate,
+                    interestType: data.interestType,
+                    tenureMonths: data.tenureMonths,
+                    monthlyPayment: data.monthlyPayment,
+                    monthlyPrincipalPayment: data.monthlyPrincipalPayment,
+                    montlyInterestPayment: data.montlyInterestPayment,
+                    startDate: data.startDate,
+                    nextDueDate: data.nextDueDate,
+                    endDate: data.endDate,
+                    status: data.status,
+                    currentBalance: data.currentBalance,
+                    totalInterestPaid: data.totalInterestPaid,
+                    totalPrincipalPaid: data.totalPrincipalPaid,
+                    additionalCharges: data.additionalCharges,
+                    notes: data.notes,
+                    isDeleted: data.isDeleted,
+                    isGoodDebt: data.isGoodDebt,
+                    isCompleted: data.isCompleted,
+                    isExpired: data.isExpired,
+                }));
+            }
         
             // Return the filtered list of debts
-            return result;
+            return mappedData;
         } catch (error) {
             // Log the raw error for debugging purposes
             console.error('Error fetching and refining debts:', error);
