@@ -2,11 +2,11 @@ import { UserModel } from '../../model/user/model/UserModel';
 import IAdminRepository from './interfaces/IAdminRepository';
 import IUserDetails from './interfaces/IUserDetails';
 import { FaqModel } from '../../model/admin/model/FaqModel';
-import { IFaq } from '../../dtos/base/FaqDto';
 import { ISystemMetrics } from './interfaces/ISystemMetrics';
 import osUtils from 'os-utils';
 import checkDiskSpace from 'check-disk-space';
 import IPaginationMeta from '../../dtos/admin/IPaginationMeta';
+import { IFaqDTO } from '../../dtos/base/FaqDto';
 
 class AdminRepository implements IAdminRepository {
     private static _instance: AdminRepository;

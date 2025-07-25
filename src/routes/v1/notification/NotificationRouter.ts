@@ -1,7 +1,4 @@
 import { Router } from 'express';
-import NotificationManagementRepository from '../../../repositories/notifications/NotificaitonRepository';
-import NotificationService from '../../../services/notification/NotificationService';
-import NotificationController from '../../../controller/notification/NotificationController';
 import INotificationController from '../../../controller/notification/interfaces/INotificationController';
 
 const createNotificationRouter = function(notificationController: INotificationController): Router {

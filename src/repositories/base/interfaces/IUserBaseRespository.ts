@@ -1,6 +1,5 @@
-import IFaq from '../../../model/admin/interfaces/IFaq';
 import IAuthUser from './IAuthUser';
-import { IFaqDTO } from 'dtos/base/FaqDto';
+import { IFaqDTO } from '../../../dtos/base/FaqDto';
 
 interface IUserBaseRespository {
     findByPhoneNumber(phoneNumber: string): Promise<IAuthUser | null>;

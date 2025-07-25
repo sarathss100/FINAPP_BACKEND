@@ -4,7 +4,6 @@ import IAdminRepository from '../../repositories/admin/interfaces/IAdminReposito
 import { AppError, ServerError, ValidationError } from '../../error/AppError';
 import { ErrorMessages } from '../../constants/errorMessages';
 import { StatusCodes } from '../../constants/statusCodes';
-import { IFaq } from '../../dtos/base/FaqDto';
 import { IHealthStatus } from './health/interfaces/IHealth';
 import { CompositeHealthCheckService } from './health/composite-health';
 import { ExternalApiHealthCheckService } from './health/api-health';
@@ -13,6 +12,7 @@ import { RedisHealthCheckService } from './health/redis-health';
 import { ServerHealthCheckService } from './health/server-health';
 import { ISystemMetrics } from '../../repositories/admin/interfaces/ISystemMetrics';
 import IPaginationMeta from '../../dtos/admin/IPaginationMeta';
+import { IFaqDTO } from '../../dtos/base/FaqDto';
 
 class AdminService implements IAdminService {
     private _adminRepository: IAdminRepository;

@@ -1,7 +1,7 @@
-import AccountManagementRepository from 'repositories/accounts/AccountsManagementRepository';
-import AccountsService from 'services/accounts/AccountService';
-import AccountsController from 'controller/accounts/AccountsController';
-import IAccountsController from 'controller/accounts/interfaces/IAccountsController';
+import AccountManagementRepository from '../../../repositories/accounts/AccountsManagementRepository';
+import AccountsService from '../../../services/accounts/AccountService';
+import AccountsController from '../../../controller/accounts/AccountsController';
+import IAccountsController from '../../../controller/accounts/interfaces/IAccountsController';
 import createAccountsRouter from './AccountsRouter';
 
 class AccountsContainer {

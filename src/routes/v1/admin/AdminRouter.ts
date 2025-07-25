@@ -1,8 +1,5 @@
-import AdminController from '../../../controller/admin/AdminController';
 import IAdminController from '../../../controller/admin/interfaces/IAdminController';
 import { Router } from 'express';
-import AdminRepository from '../../../repositories/admin/AdminRepository';
-import AdminService from '../../../services/admin/AdminService';
 
 const createAdminRouter = function(adminController: IAdminController): Router {
     const router = Router();

@@ -1,7 +1,7 @@
-import TransactionRepository from 'repositories/transaction/TransactionRepository';
-import TransactionService from 'services/transaction/TransactionService';
-import TransactionController from 'controller/transaction/TransactionController';
-import ITransactionController from 'controller/transaction/interfaces/ITransactionController';
+import TransactionRepository from '../../../repositories/transaction/TransactionRepository';
+import TransactionService from '../../../services/transaction/TransactionService';
+import TransactionController from '../../../controller/transaction/TransactionController';
+import ITransactionController from '../../../controller/transaction/interfaces/ITransactionController';
 import createTransactionRouter from './TransactionRouter';
 
 class TransactionContainer {

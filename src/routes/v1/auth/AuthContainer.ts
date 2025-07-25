@@ -1,8 +1,8 @@
-import AuthService from 'services/auth/AuthService';
-import AuthController from 'controller/auth/AuthController';
-import IAuthController from 'controller/auth/ineterfaces/IAuthController';
-import BcryptHasher from 'utils/auth/hash';
-import AuthRepository from 'repositories/auth/AuthRepository';
+import AuthService from '../../../services/auth/AuthService';
+import AuthController from '../../../controller/auth/AuthController';
+import IAuthController from '../../../controller/auth/ineterfaces/IAuthController';
+import BcryptHasher from '../../../utils/auth/hash';
+import AuthRepository from '../../../repositories/auth/AuthRepository';
 import createAuthRouter from './AuthRouter';
 
 const hasher = new BcryptHasher();

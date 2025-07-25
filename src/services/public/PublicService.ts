@@ -1,9 +1,9 @@
 import IPublicRepository from '../../repositories/public/interfaces/IPublicRepository';
 import IPublicService from './interfaces/IPublicService';
-import { IFaq } from '../../dtos/base/FaqDto';
 import { AppError, ServerError } from '../../error/AppError';
 import { ErrorMessages } from '../../constants/errorMessages';
 import { StatusCodes } from '../../constants/statusCodes';
+import { IFaqDTO } from '../../dtos/base/FaqDto';
 
 class PublicService implements IPublicService {
     public _publicRepository: IPublicRepository;

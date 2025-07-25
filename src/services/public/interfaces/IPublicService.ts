@@ -1,4 +1,4 @@
-import { IFaq } from '../../../dtos/base/FaqDto';
+import { IFaqDTO } from "../../../dtos/base/FaqDto";
 
 interface IPublicService {
     getFaqs(): Promise<IFaqDTO[]>;

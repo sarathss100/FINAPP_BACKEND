@@ -1,7 +1,7 @@
-import DebtManagementRepository from 'repositories/debt/DebtManagementRepository';
-import DebtService from 'services/debt/DebtService';
-import DebtController from 'controller/debt/DebtController';
-import IDebtController from 'controller/debt/interfaces/IDebtController';
+import DebtManagementRepository from '../../../repositories/debt/DebtManagementRepository';
+import DebtService from '../../../services/debt/DebtService';
+import DebtController from '../../../controller/debt/DebtController';
+import IDebtController from '../../../controller/debt/interfaces/IDebtController';
 import createDebtRouter from './debtRouter';
 
 class DebtContainer {

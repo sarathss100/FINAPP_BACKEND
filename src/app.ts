@@ -5,7 +5,7 @@ import loggingMiddleware from './middleware/LoggingMiddleware';
 import router from './routes/routes';
 import cors from 'cors';
 import corsOptions from './utils/middleware/corsOptions';
-// import rateLimiter from './utils/middleware/rateLimiter';
+import rateLimiter from './utils/middleware/rateLimiter';
 import helmet from 'helmet';
 import './cron/scheduler';
 import expireJob from './cron/expireInsurances';
@@ -34,9 +34,9 @@ startNotificationCronJobs();
 startGoalNotificationCronJob();
 setupSocketListeners();
 
-// startTransactionGenerator();
-// startDebtGenerator();
-// startInsuranceGenerator();
+startTransactionGenerator();
+startDebtGenerator();
+startInsuranceGenerator();
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -44,7 +44,7 @@ app.use(cookieParser());
 app.use(loggingMiddleware); 
 app.use(cors(corsOptions));
 app.use(helmet());
-// app.use(rateLimiter);
+app.use(rateLimiter);
 
 const webhookController = new WebhookController();
 app.post(

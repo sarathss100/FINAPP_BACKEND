@@ -1,7 +1,4 @@
 import { Router } from 'express';
-import DebtManagementRepository from '../../../repositories/debt/DebtManagementRepository';
-import DebtService from '../../../services/debt/DebtService';
-import DebtController from '../../../controller/debt/DebtController';
 import IDebtController from '../../../controller/debt/interfaces/IDebtController';
 
 const createDebtRouter = function(debtController: IDebtController): Router {

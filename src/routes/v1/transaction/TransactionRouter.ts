@@ -1,7 +1,4 @@
 import { Router } from 'express';
-import TransactionRepository from '../../../repositories/transaction/TransactionRepository';
-import TransactionService from '../../../services/transaction/TransactionService';
-import TransactionController from '../../../controller/transaction/TransactionController';
 import multer from 'multer';
 import ITransactionController from '../../../controller/transaction/interfaces/ITransactionController';
 

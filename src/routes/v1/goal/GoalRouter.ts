@@ -1,7 +1,4 @@
 import { Router } from 'express';
-import GoalManagementRepository from '../../../repositories/goal/GoalManagementRepository';
-import GoalService from '../../../services/goal/GoalService';
-import GoalController from '../../../controller/goal/GoalController';
 import IGoalController from '../../../controller/goal/interfaces/IGoalController';
 
 const createGoalRouter = function(goalController: IGoalController): Router {

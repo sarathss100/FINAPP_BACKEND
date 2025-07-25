@@ -1,7 +1,7 @@
-import SubscriptionManagementRepository from 'repositories/subscriptions/SubscriptionManagementRepository';
-import SubscriptionService from 'services/subscriptions/SubscriptionService';
-import ISubscriptionController from 'controller/subscriptions/interfaces/ISubscriptionController';
-import SubscriptionController from 'controller/subscriptions/SubscriptionController';
+import SubscriptionManagementRepository from '../../../repositories/subscriptions/SubscriptionManagementRepository';
+import SubscriptionService from '../../../services/subscriptions/SubscriptionService';
+import ISubscriptionController from '../../../controller/subscriptions/interfaces/ISubscriptionController';
+import SubscriptionController from '../../../controller/subscriptions/SubscriptionController';
 import createSubscriptionRouter from './SubscriptionRouter';
 
 class SubscriptionContainer {

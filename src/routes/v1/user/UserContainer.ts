@@ -1,7 +1,7 @@
-import UserRepository from 'repositories/user/UserRepository';
-import UserService from 'services/user/UserService';
-import UserController from 'controller/user/UserController';
-import IUserController from 'controller/user/interfaces/IUserController';
+import UserRepository from '../../../repositories/user/UserRepository';
+import UserService from '../../../services/user/UserService';
+import UserController from '../../../controller/user/UserController';
+import IUserController from '../../../controller/user/interfaces/IUserController';
 import createUserRouter from './UserRouter';
 
 class UserContainer {

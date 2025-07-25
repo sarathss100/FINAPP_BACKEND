@@ -1,7 +1,7 @@
-import InvestmentManagementRepository from 'repositories/investments/InvestmentManagementRepository';
-import InvestmentService from 'services/investments/InvestmentService';
-import InvestmentController from 'controller/investments/InvestmentController';
-import IInvestmentController from 'controller/investments/interfaces/IInvestmentController';
+import InvestmentManagementRepository from '../../../repositories/investments/InvestmentManagementRepository';
+import InvestmentService from '../../../services/investments/InvestmentService';
+import InvestmentController from '../../../controller/investments/InvestmentController';
+import IInvestmentController from '../../../controller/investments/interfaces/IInvestmentController';
 import createInvestmentRouter from './InvestmentRouter';
 
 class InvestmentContainer {

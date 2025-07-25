@@ -1,7 +1,7 @@
-import AdminController from 'controller/admin/AdminController';
-import IAdminController from 'controller/admin/interfaces/IAdminController';
-import AdminRepository from 'repositories/admin/AdminRepository';
-import AdminService from 'services/admin/AdminService';
+import AdminController from '../../../controller/admin/AdminController';
+import IAdminController from '../../../controller/admin/interfaces/IAdminController';
+import AdminRepository from '../../../repositories/admin/AdminRepository';
+import AdminService from '../../../services/admin/AdminService';
 import createAdminRouter from './AdminRouter';
 
 class AdminContainer {

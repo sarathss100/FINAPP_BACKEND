@@ -1,6 +1,6 @@
-import { IFaq } from '../../dtos/base/FaqDto';
 import IPublicRepository from './interfaces/IPublicRepository';
 import { FaqModel } from '../../model/admin/model/FaqModel';
+import { IFaqDTO } from '../../dtos/base/FaqDto';
 
 class PublicRepository implements IPublicRepository {
 

@@ -1,8 +1,8 @@
 import { UserModel } from '../../model/user/model/UserModel';
 import IAuthUser from './interfaces/IAuthUser';
 import IUserBaseRespository from './interfaces/IUserBaseRespository';
-import IFaq from '../../model/admin/interfaces/IFaq';
 import { FaqModel } from '../../model/admin/model/FaqModel';
+import { IFaqDTO } from '../../dtos/base/FaqDto';
 
 class UserBaseRepository implements IUserBaseRespository {
     // Finds a user by their phone number.

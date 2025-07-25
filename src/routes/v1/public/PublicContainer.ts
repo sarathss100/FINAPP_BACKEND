@@ -1,7 +1,7 @@
-import PublicRepository from 'repositories/public/PublicRepository';
-import PublicService from 'services/public/PublicService';
-import IPublicController from 'controller/public/interfaces/IPublicController';
-import PublicController from 'controller/public/publicController';
+import PublicRepository from '../../../repositories/public/PublicRepository';
+import PublicService from '../../../services/public/PublicService';
+import IPublicController from '../../../controller/public/interfaces/IPublicController';
+import PublicController from '../../../controller/public/publicController';
 import createPublicRouter from './PublicRouter';
 
 class PublicContainer {
