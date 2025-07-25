@@ -4,10 +4,9 @@
   "description": "back end",
   "main": "server.ts",
   "scripts": {
-    "start": "ts-node -r tsconfig-paths/register src/server.ts",
     "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/server.ts",
     "build": "tsc -b",
-    "start:node":"node dist/server.js",
+    "start":"node dist/server.js",
     "lint": "eslint . --ext .ts",
     "test": "jest"
   },
