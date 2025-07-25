@@ -59,19 +59,8 @@ class AdminRepository implements IAdminRepository {
         return { ramUsage, diskUsage };
     }
 
-    /**
-    * Adds a new FAQ entry to the database.
-    *
-    * This function inserts a new FAQ item containing a question and answer into the FaqModel.
-    * Returns true if the insertion was successful, false otherwise.
-    *
-    * @param {IFaq} newFaq - The FAQ object to be added. Must contain 'question' and 'answer'.
-    * @returns {Promise<boolean>} A promise that resolves to true if the FAQ was successfully added,
-    *                            or false otherwise.
-    * @throws {Error} If an error occurs during the database insertion, an error is thrown
-    *                 with a descriptive message indicating the failure.
-    */
-    async addFaq(newFaq: IFaq): Promise<boolean> {
+    // Adds a new FAQ entry to the database.
+    async addFaq(newFaq: IFaqDTO): Promise<boolean> {
         try {
             const result = await FaqModel.insertOne({ question: newFaq.question, answer: newFaq.answer });
 
@@ -86,7 +75,7 @@ class AdminRepository implements IAdminRepository {
     }
 
     // Function retrieve all Faq details for admin
-    async getAllFaqsForAdmin(page = 1, limit = 10, search = ''): Promise<{ faqDetails: IFaq[], pagination: IPaginationMeta }> {
+    async getAllFaqsForAdmin(page = 1, limit = 10, search = ''): Promise<{ faqDetails: IFaqDTO[], pagination: IPaginationMeta }> {
         try {
             const query: { isDeleted: boolean, $or?: { [key: string]: { $regex: string, $options: string } }[] } = { isDeleted: false };
 
@@ -114,29 +103,33 @@ class AdminRepository implements IAdminRepository {
                 hasNextPage: page < totalPages,
                 hasPreviousPage: page > 1,
             }
-            
-            return {
-                faqDetails,
-                pagination
+
+            if (faqDetails.length) {
+                const mappedData: IFaqDTO[] = faqDetails.map((data) => ({
+                    _id: data._id?.toString(),
+                    question: data.question,
+                    answer: data.answer,
+                    isDeleted: data.isDeleted,
+                    isPublished: data.isPublished,
+                    createdAt: data.createdAt,
+                    updatedAt: data.updatedAt
+                }));
+
+                return {
+                    faqDetails: mappedData,
+                    pagination
+                }
+            } else {
+               return { faqDetails: [], pagination}; 
             }
+        
         } catch (error) {
             console.error('Error while fetching FAQs:', error);
             throw new Error(`Failed to retrieve FAQs: ${(error as Error).message}`);
         }
     }
 
-    /**
-     * Deletes an FAQ entry by its ID.
-     *
-     * This function searches for an FAQ document in the database using the provided `faqId`
-     * and removes it. It returns true if the deletion was successful, false otherwise.
-     *
-     * @param {string} faqId - The unique identifier of the FAQ to delete.
-     * @returns {Promise<boolean>} A promise that resolves to true if the FAQ was successfully deleted,
-     *                             or false if no matching FAQ was found.
-     * @throws {Error} If an error occurs during the database operation, an error is thrown
-     *                 with a descriptive message indicating the failure.
-     */
+    // Deletes an FAQ entry by its ID.
     async deleteFaq(faqId: string): Promise<boolean> {
         try {
             const result = await FaqModel.findOneAndUpdate({ _id: faqId }, { $set: { isDeleted: true, isPublished: false }});
@@ -151,18 +144,7 @@ class AdminRepository implements IAdminRepository {
         }
     }
 
-    /**
-     * Toggles the 'isPublished' status of an FAQ entry by its ID.
-     *
-     * This function finds an FAQ by ID and flips the value of the 'isPublished' field.
-     * Returns true if the update was successful, false otherwise (e.g., FAQ not found).
-     *
-     * @param {string} faqId - The unique identifier of the FAQ to update.
-     * @returns {Promise<boolean>} A promise that resolves to true if the FAQ was successfully toggled,
-     *                             or false if no matching FAQ was found.
-     * @throws {Error} If an error occurs during the database operation, an error is thrown
-     *                 with a descriptive message indicating the failure.
-     */
+    // Toggles the 'isPublished' status of an FAQ entry by its ID.
     async togglePublish(faqId: string): Promise<boolean> {
         try {
             // Find the FAQ by ID
@@ -188,20 +170,8 @@ class AdminRepository implements IAdminRepository {
         }
     }
 
-    /**
-     * Updates an FAQ entry with the provided data.
-     *
-     * This function finds an FAQ by its ID and updates the specified fields.
-     * It supports partial updates, so only the fields provided in `updatedData` will be modified.
-     *
-     * @param {string} faqId - The unique identifier of the FAQ to update.
-     * @param {Partial<IFaq>} updatedData - An object containing the fields to update (e.g., question, answer, isPublished).
-     * @returns {Promise<boolean>} A promise that resolves to true if the FAQ was successfully updated,
-     *                             or false if no matching FAQ was found.
-     * @throws {Error} If an error occurs during the database operation, an error is thrown
-     *                 with a descriptive message indicating the failure.
-     */
-    async updateFaq(faqId: string, updatedData: Partial<IFaq>): Promise<boolean> {
+    // Updates an FAQ entry with the provided data.
+    async updateFaq(faqId: string, updatedData: Partial<IFaqDTO>): Promise<boolean> {
         try {
             // Update only the provided fields
             const result = await FaqModel.updateOne(
@@ -220,10 +190,23 @@ class AdminRepository implements IAdminRepository {
     }
 
     // Fetches all FAQ entries from the database for admin
-    async getAllFaqs(): Promise<IFaq[] | null> {
+    async getAllFaqs(): Promise<IFaqDTO[] | null> {
         const result = await FaqModel.find();
-        console.log(`Admin Repository:`, result);
-        return result;
+        if (result.length) {
+            const mappedData: IFaqDTO[] = result.map((data) => ({
+                    _id: data._id?.toString(),
+                    question: data.question,
+                    answer: data.answer,
+                    isDeleted: data.isDeleted,
+                    isPublished: data.isPublished,
+                    createdAt: data.createdAt,
+                    updatedAt: data.updatedAt
+            }));
+
+            return mappedData;
+        } else {
+            return null;
+        }
     }
 }
 

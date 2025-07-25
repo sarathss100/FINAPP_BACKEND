@@ -4,16 +4,8 @@ import IUserBaseRespository from './interfaces/IUserBaseRespository';
 import IFaq from '../../model/admin/interfaces/IFaq';
 import { FaqModel } from '../../model/admin/model/FaqModel';
 
-/**
- * Repository class for handling basic user data operations.
- */
 class UserBaseRepository implements IUserBaseRespository {
-    /**
-     * Finds a user by their phone number.
-     *
-     * @param phoneNumber - The phone number to search for.
-     * @returns A promise that resolves to an IAuthUser object if found, or null otherwise.
-     */
+    // Finds a user by their phone number.
     async findByPhoneNumber(phoneNumber: string): Promise<IAuthUser | null> {
         const user = await UserModel.findOne({ phone_number: phoneNumber });
 
@@ -30,13 +22,7 @@ class UserBaseRepository implements IUserBaseRespository {
         };
     }
 
-    /**
-     * Toggles the Two-Factor Authentication (2FA) status for a specific user.
-     *
-     * @param userId - The ID of the user whose 2FA status should be toggled.
-     * @returns A promise that resolves to the updated 2FA status (true or false).
-     * @throws Error if the user is not found or an unexpected error occurs.
-     */
+    // Toggles the Two-Factor Authentication (2FA) status for a specific user.
     async toggleTwoFactorAuthentication(userId: string): Promise<boolean> {
         try {
             // Fetch only the `is2FA` field of the user
@@ -97,21 +83,25 @@ class UserBaseRepository implements IUserBaseRespository {
         }
     }
 
-    /**
-     * Fetches all FAQ entries from the database for administrative purposes.
-     *
-     * @returns A promise that resolves to an array of IFaq objects if found, or null if none exist.
-     * @throws Error if there's a database error during fetching.
-     */
-    async getAllFaqs(): Promise<IFaq[] | null> {
+    // Fetches all FAQ entries from the database for administrative purposes.
+    async getAllFaqs(): Promise<IFaqDTO[] | null> {
         try {
             const result = await FaqModel.find();
 
-            // Log the result for debugging/admin visibility
-            console.log(`Admin Repository - Fetched FAQs:`, result);
-
-            // Return the list of FAQs (could be empty array if none found)
-            return result.length > 0 ? result : null;
+            if (result.length) {
+                const mappedData: IFaqDTO[] = result.map((data) => ({
+                    _id: data._id?.toString(),
+                    question: data.question,
+                    answer: data.answer,
+                    isDeleted: data.isDeleted,
+                    isPublished: data.isPublished,
+                    createdAt: data.createdAt,
+                    updatedAt: data.updatedAt
+                }));
+                return mappedData;
+            } else {
+                return null;
+            }
         } catch (error) {
             console.error(`Error fetching FAQs in Admin Repository:`, error);
             throw new Error(`Failed to fetch FAQs: ${error instanceof Error ? error.message : String(error)}`);

@@ -1,6 +1,3 @@
-/**
- * DTO for Debt entity
- */
 export interface IDebtDTO {
     _id?: string;
     userId?: string; // Required if present

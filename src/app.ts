@@ -34,9 +34,9 @@ startNotificationCronJobs();
 startGoalNotificationCronJob();
 setupSocketListeners();
 
-startTransactionGenerator();
-startDebtGenerator();
-startInsuranceGenerator();
+// startTransactionGenerator();
+// startDebtGenerator();
+// startInsuranceGenerator();
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));

@@ -2,10 +2,6 @@ import { INotificationDTO } from '../../dtos/notification/NotificationDto';
 import INotificatonManagementRepository from './interfaces/INotificaitionRepository'; 
 import { NotificationModel } from '../../model/notification/model/NotificaionModel';
 
-/**
- * Implementation of the notification management repository.
- * This class provides methods to interact with the notification data layer (e.g., database).
- */
 class NotificationManagementRepository implements INotificatonManagementRepository {
     private static _instance: NotificationManagementRepository;
     public constructor() {};
@@ -18,13 +14,7 @@ class NotificationManagementRepository implements INotificatonManagementReposito
         return NotificationManagementRepository._instance;
     }
 
-    /**
-     * Creates a new notification in the data store.
-     * 
-     * @param notificationData - The notification data transfer object containing required fields.
-     * @returns A promise that resolves to the created notification DTO.
-     * @throws Error if the notification creation fails.
-     */
+    // Creates a new notification in the data store.
     async createNotification(notificationData: INotificationDTO): Promise<INotificationDTO> {
         try {
             // Save the notification to the database using the NotificationModel
@@ -51,13 +41,7 @@ class NotificationManagementRepository implements INotificatonManagementReposito
         }
     }
 
-    /**
-     * Retrieves all notifications for a specific user from the data store.
-     * 
-     * @param userId - The ID of the user whose notifications are to be fetched.
-     * @returns A promise that resolves to an array of notification DTOs.
-     * @throws Error if the retrieval process fails.
-     */
+    // Retrieves all notifications for a specific user from the data store.
     async getNotifications(userId: string): Promise<INotificationDTO[]> {
         try {
             // Fetch all notifications associated with the provided user ID
@@ -84,13 +68,7 @@ class NotificationManagementRepository implements INotificatonManagementReposito
         }
     }
 
-    /**
-     * Archives a notification by setting its `archived` flag to true.
-     *
-     * @param notificationId - The ID of the notification to be archived.
-     * @returns A promise that resolves to `true` if the notification was found and updated, otherwise `false`.
-     * @throws Error if an exception occurs during the update process.
-     */
+    // Archives a notification by setting its `archived` flag to true.
     async updateArchieveStatus(notificationId: string): Promise<boolean> {
         try {
             // Find the notification by ID and update its `archived` field to true
@@ -107,13 +85,7 @@ class NotificationManagementRepository implements INotificatonManagementReposito
         }
     }
 
-    /**
-     * Marks a notification as read by setting its `is_read` flag to true.
-     *
-     * @param notificationId - The ID of the notification to be marked as read.
-     * @returns A promise that resolves to `true` if the notification was found and updated, otherwise `false`.
-     * @throws Error if an exception occurs during the update process.
-     */
+    // Marks a notification as read by setting its `is_read` flag to true.
     async updateReadStatus(notificationId: string): Promise<boolean> {
         try {
             // Find the notification by ID and update its `is_read` field to true
@@ -130,18 +102,11 @@ class NotificationManagementRepository implements INotificatonManagementReposito
         }
     }
 
-    /**
-     * Marks all notifications for a specific user as read by setting their `is_read` flag to true.
-     *
-     * @param {string} userId - The ID of the user whose notifications should be marked as read.
-     * @returns {Promise<boolean>} Returns `true` if at least one notification was updated, otherwise `false`.
-     * @throws {Error} If an error occurs during the update process.
-     */
+    // Marks all notifications for a specific user as read by setting their `is_read` flag to true.
     async updateReadStatusAll(userId: string): Promise<boolean> {
         try {
             const user_id = userId.toString();
 
-            console.log(`Request comes here`, user_id);
             // Update all notifications for the given user ID
             const result = await NotificationModel.updateMany(
                 { user_id }, 

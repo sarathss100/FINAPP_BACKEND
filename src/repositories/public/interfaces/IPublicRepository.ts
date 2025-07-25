@@ -1,7 +1,7 @@
 import { IFaq } from '../../../dtos/base/FaqDto';
 
 interface IPublicRepository {
-    getFaqs(): Promise<IFaq[] | null>
+    getFaqs(): Promise<IFaqDTO[] | null>
 }
 
 

@@ -11,19 +11,8 @@ class PublicService implements IPublicService {
         this._publicRepository = publicRepository;
     }
 
-    /**
-     * Fetches all published and non-deleted FAQ entries from the database.
-     * 
-     * This method retrieves FAQ entries by calling the `getFaqs` method of the public repository.
-     * It ensures that only valid FAQ entries are returned. If no FAQs are found or an error occurs,
-     * appropriate exceptions are thrown.
-     * 
-     * @returns A promise that resolves to an array of FAQ entries (`IFaq[]`).
-     * @throws {ServerError} If no FAQs are found or the fetch operation fails.
-     * @throws {AppError} If any application-specific error occurs during the process.
-     * @throws {Error} If an unexpected error occurs.
-     */
-    async getFaqs(): Promise<IFaq[]> {
+    // Fetches all published and non-deleted FAQ entries from the database.
+    async getFaqs(): Promise<IFaqDTO[]> {
         try {
             // Call the public repository method to fetch all published and non-deleted FAQ entries
             const faqDetails = await this._publicRepository.getFaqs();

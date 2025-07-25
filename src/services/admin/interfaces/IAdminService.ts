@@ -7,13 +7,13 @@ import IPaginationMeta from '../../../dtos/admin/IPaginationMeta';
 interface IAdminService {
     getAllUsers(): Promise<IUserDetails[]>;
     toggleUserStatus(_id: string, status: boolean): Promise<boolean>;
-    addFaq(newFaq: IFaq): Promise<boolean>;
-    updateFaq(faqId: string, updatedData: Partial<IFaq>): Promise<boolean>;
-    getAllFaqs(): Promise<IFaq[] | null>;
+    addFaq(newFaq: IFaqDTO): Promise<boolean>;
+    updateFaq(faqId: string, updatedData: Partial<IFaqDTO>): Promise<boolean>;
+    getAllFaqs(): Promise<IFaqDTO[] | null>;
     getNewRegistrationCount(): Promise<number>;
     getHealthStatus(): Promise<IHealthStatus>;
     getSystemMetrics(): Promise<ISystemMetrics>;
-    getAllFaqsForAdmin(page: number, limit: number, search: string): Promise<{ faqDetails: IFaq[], pagination: IPaginationMeta }>;
+    getAllFaqsForAdmin(page: number, limit: number, search: string): Promise<{ faqDetails: IFaqDTO[], pagination: IPaginationMeta }>;
     deleteFaq(faqId: string): Promise<boolean>;
     togglePublish(faqId: string): Promise<boolean>;
 }

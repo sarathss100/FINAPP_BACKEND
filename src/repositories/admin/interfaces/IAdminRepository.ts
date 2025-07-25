@@ -6,13 +6,13 @@ import IPaginationMeta from '../../../dtos/admin/IPaginationMeta';
 interface IAdminRepository {
     findAllUsers(): Promise<IUserDetails[] | null>;
     toggleUserStatus(userId: string, newStatus: boolean): Promise<boolean>;
-    addFaq(newFaq: IFaq): Promise<boolean>;
-    updateFaq(faqId: string, updatedData: Partial<IFaq>): Promise<boolean>;
+    addFaq(newFaq: IFaqDTO): Promise<boolean>;
+    updateFaq(faqId: string, updatedData: Partial<IFaqDTO>): Promise<boolean>;
     deleteFaq(faqId: string): Promise<boolean>;
-    getAllFaqs(): Promise<IFaq[] | null>;
+    getAllFaqs(): Promise<IFaqDTO[] | null>;
     getNewRegistrationCount(): Promise<number>;
     getSystemMetrics(): Promise<ISystemMetrics>;
-    getAllFaqsForAdmin(page: number, limit: number, search: string): Promise<{ faqDetails: IFaq[], pagination: IPaginationMeta }>;
+    getAllFaqsForAdmin(page: number, limit: number, search: string): Promise<{ faqDetails: IFaqDTO[], pagination: IPaginationMeta }>;
     togglePublish(faqId: string): Promise<boolean>;
 }
 

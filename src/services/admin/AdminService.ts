@@ -20,14 +20,7 @@ class AdminService implements IAdminService {
         this._adminRepository = adminRepository;
     }
 
-    /**
-    * Fetches all user details from the database.
-    * 
-    * @returns A promise that resolves to an array of user details (`IUserDetails[]`).
-    * @throws {ServerError} If no users are found in the database.
-    * @throws {AppError} If any application-specific error occurs.
-    * @throws {Error} If an unexpected error occurs.
-    */
+    // Fetches all user details from the database.
     async getAllUsers(): Promise<IUserDetails[]> {
         try {
             // Retrieve all user details from the admin repository
@@ -51,17 +44,7 @@ class AdminService implements IAdminService {
         }
     }
 
-    /**
-     * Toggles the status (block/unblock) of a user for the admin.
-     * 
-     * @param _id - The unique identifier of the user whose status needs to be toggled.
-     * @param status - The new status to be set (`true` for active, `false` for blocked).
-     * @returns A promise that resolves to `true` if the status was successfully toggled.
-     * @throws {ValidationError} If the input is invalid (e.g., missing `_id` or invalid `status` type).
-     * @throws {ServerError} If the status update fails in the repository.
-     * @throws {AppError} If any application-specific error occurs.
-     * @throws {Error} If an unexpected error occurs.
-     */
+    // Toggles the status (block/unblock) of a user for the admin
     async toggleUserStatus(_id: string, status: boolean): Promise<boolean> {
         try {
             // Validate the input parameters to ensure they meet the required criteria
@@ -90,17 +73,8 @@ class AdminService implements IAdminService {
         }
     }
 
-    /**
-     * Adds a new FAQ entry to the list for the admin.
-     * 
-     * @param newFaq - An object containing the `question` and `answer` for the new FAQ entry.
-     * @returns A promise that resolves to `true` if the FAQ was successfully added.
-     * @throws {ValidationError} If the input is invalid (e.g., missing `question` or `answer`).
-     * @throws {ServerError} If the FAQ addition fails in the repository.
-     * @throws {AppError} If any application-specific error occurs.
-     * @throws {Error} If an unexpected error occurs.
-     */
-    async addFaq(newFaq: IFaq): Promise<boolean> {
+    // Adds a new FAQ entry to the list for the admin.
+    async addFaq(newFaq: IFaqDTO): Promise<boolean> {
         try {
             // Validate the input to ensure both `question` and `answer` are provided
             if (!newFaq.question || !newFaq.answer) {
@@ -129,7 +103,7 @@ class AdminService implements IAdminService {
     }
 
     // Fetches all FAQ entries from the database for administrative purposes.
-    async getAllFaqsForAdmin(page: number, limit: number, search: string): Promise<{ faqDetails: IFaq[], pagination: IPaginationMeta }> {
+    async getAllFaqsForAdmin(page: number, limit: number, search: string): Promise<{ faqDetails: IFaqDTO[], pagination: IPaginationMeta }> {
         try {
             const paginatedFaqData = await this._adminRepository.getAllFaqsForAdmin(page, limit, search);
         
@@ -151,15 +125,8 @@ class AdminService implements IAdminService {
         }
     }
 
-    /**
-     * Fetches all FAQ entries from the database for the admin.
-     * 
-     * @returns A promise that resolves to an array of FAQ entries (`IFaq[]`) or `null` if no FAQs exist.
-     * @throws {ServerError} If fetching the FAQs fails in the repository.
-     * @throws {AppError} If any application-specific error occurs.
-     * @throws {Error} If an unexpected error occurs.
-     */
-    async getAllFaqs(): Promise<IFaq[] | null> {
+    // Fetches all FAQ entries from the database for the admin.
+    async getAllFaqs(): Promise<IFaqDTO[] | null> {
         try {
             // Call the repository method to fetch all FAQ entries
             const faqDetails = await this._adminRepository.getAllFaqs();
@@ -187,20 +154,7 @@ class AdminService implements IAdminService {
         }
     }
 
-    /**
-     * Deletes an FAQ entry by its unique identifier.
-     *
-     * This function calls the repository to delete an FAQ from the database using the provided `faqId`.
-     * Returns a boolean indicating whether the deletion was successful.
-     *
-     * @param {string} faqId - The unique identifier of the FAQ to be deleted.
-     * @returns {Promise<boolean>} A promise that resolves to `true` if the FAQ was successfully deleted,
-     *                             or `false` if the deletion failed (e.g., FAQ not found).
-     * 
-     * @throws {ServerError} If an internal server error occurs during the deletion process.
-     * @throws {AppError} If a known application-specific error occurs.
-     * @throws {Error} If an unexpected or unhandled error occurs.
-     */
+    // Deletes an FAQ entry by its unique identifier.
     async deleteFaq(faqId: string): Promise<boolean> {
         try {
             // Call the repository method to delete the FAQ by ID
@@ -224,20 +178,7 @@ class AdminService implements IAdminService {
         }
     }
 
-    /**
-     * Toggles the publish status (e.g., `isPublished`) of an FAQ identified by its ID.
-     *
-     * This function delegates the toggle operation to the repository layer and returns
-     * a boolean indicating whether the update was successful (i.e., if the FAQ exists and was updated).
-     *
-     * @param {string} faqId - The unique identifier of the FAQ whose publish status is to be toggled.
-     * @returns {Promise<boolean>} A promise that resolves to `true` if the FAQ was successfully toggled,
-     *                             or `false` if no matching FAQ was found or the update failed.
-     * 
-     * @throws {ServerError} If an internal server error occurs during the toggle process.
-     * @throws {AppError} If a known application-specific error occurs.
-     * @throws {Error} If an unexpected or unhandled error occurs.
-     */
+    // Toggles the publish status (e.g., `isPublished`) of an FAQ identified by its ID.
     async togglePublish(faqId: string): Promise<boolean> {
         try {
             // Call the repository method to toggle the publish status
@@ -256,22 +197,8 @@ class AdminService implements IAdminService {
         }
     }
 
-    /**
-     * Updates an FAQ entry with the provided partial data.
-     *
-     * This function delegates the update operation to the repository layer and returns
-     * a boolean indicating whether the update was successful (i.e., if the FAQ exists and was modified).
-     *
-     * @param {string} faqId - The unique identifier of the FAQ to update.
-     * @param {Partial<IFaq>} updatedData - An object containing the fields to update.
-     * @returns {Promise<boolean>} A promise that resolves to `true` if the FAQ was successfully updated,
-     *                             or `false` if no matching FAQ was found or the update failed.
-     * 
-     * @throws {ServerError} If an internal server error occurs during the update process.
-     * @throws {AppError} If a known application-specific error occurs.
-     * @throws {Error} If an unexpected or unhandled error occurs.
-     */
-    async updateFaq(faqId: string, updatedData: Partial<IFaq>): Promise<boolean> {
+    // Updates an FAQ entry with the provided partial data.
+    async updateFaq(faqId: string, updatedData: Partial<IFaqDTO>): Promise<boolean> {
         try {
             // Call the repository method to update the FAQ
             const isUpdated = await this._adminRepository.updateFaq(faqId, updatedData);
@@ -289,14 +216,7 @@ class AdminService implements IAdminService {
         }
     }
 
-    /**
-     * Fetches the count of new registrations from the database.
-     * 
-     * @returns A promise that resolves to the count of new registrations (`number`).
-     * @throws {ServerError} If fetching the count fails in the repository.
-     * @throws {AppError} If any application-specific error occurs.
-     * @throws {Error} If an unexpected error occurs.
-     */
+    // Fetches the count of new registrations from the database.
     async getNewRegistrationCount(): Promise<number> {  
         try {
             // Call the repository method to fetch the count of new registrations
@@ -323,11 +243,6 @@ class AdminService implements IAdminService {
     /**
      * Performs a composite health check by evaluating the health of multiple system components
      * such as external APIs, MongoDB, Redis, and the server itself.
-     * 
-     * @returns A promise that resolves to a composite health check result (`IHealthCheck`).
-     * @throws {ServerError} If a repository or infrastructure error occurs during the health check.
-     * @throws {AppError} If an application-specific error occurs.
-     * @throws {Error} If an unexpected error occurs.
      */
     async getHealthStatus(): Promise<IHealthStatus> {  
         try {
@@ -355,11 +270,6 @@ class AdminService implements IAdminService {
     /**
      * Retrieves system metrics by querying the admin repository.
      * This may include various performance or operational metrics from underlying systems.
-     *
-     * @returns A promise that resolves to the system metrics object (`ISystemMetrics`).
-     * @throws {ServerError} If a repository or infrastructure error occurs during the fetch.
-     * @throws {AppError} If an application-specific error is thrown by the repository.
-     * @throws {Error} If an unexpected error occurs.
      */
     async getSystemMetrics(): Promise<ISystemMetrics> {  
         try {

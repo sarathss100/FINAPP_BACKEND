@@ -20,20 +20,7 @@ class TransactionController implements ITransactionController {
     this._transactionService = transactionService;
   }
 
-  /**
-   * Handles creating one or more transactions based on the request body.
-   *
-   * Supports both single transaction and array of transactions.
-   * Validates input using Zod schema before passing to service layer.
-   *
-   * @param {Request} request - Express request object containing cookies and transaction data.
-   * @param {Response} response - Express response object used to send back the API response.
-   * @returns {Promise<void>} - Sends a success or error response.
-   *
-   * @throws {AuthenticationError} If access token is missing or invalid.
-   * @throws {ValidationError} If transaction data fails validation.
-   * @throws {Error} For any internal server errors during processing.
-   */
+  // Handles creating one or more transactions based on the request body.
   async createTransaction(request: Request, response: Response): Promise<void> {
     try {
       const { accessToken } = request.cookies;
@@ -96,16 +83,7 @@ class TransactionController implements ITransactionController {
     }
   }
 
-  /**
-   * Retrieves all transactions associated with the authenticated user.
-   *
-   * @param {Request} request - Express request object containing cookies and authentication data.
-   * @param {Response} response - Express response object used to send back the API response.
-   * @returns {Promise<void>} - Sends a success response with the list of transactions or an error response.
-   *
-   * @throws {AuthenticationError} If access token is missing or invalid.
-   * @throws {Error} For any internal server errors during processing.
-   */
+  // Retrieves all transactions associated with the authenticated user.
   async getUserTransactions(request: Request, response: Response): Promise<void> {
     try {
       const { accessToken } = request.cookies;
@@ -126,16 +104,7 @@ class TransactionController implements ITransactionController {
     }
   }
 
-  /**
-   * Retrieves the total income for the current and previous month for the authenticated user.
-   *
-   * @param {Request} request - Express request object containing cookies and authentication data.
-   * @param {Response} response - Express response object used to send back the API response.
-   * @returns {Promise<void>} - Sends a success response with monthly income totals or an error response.
-   *
-   * @throws {AuthenticationError} If access token is missing or invalid.
-   * @throws {Error} For any internal server errors during processing.
-   */
+  // Retrieves the total income for the current and previous month for the authenticated user.
   async getMonthlyTotalIncome(request: Request, response: Response): Promise<void> {
     try {
       const { accessToken } = request.cookies;
@@ -156,16 +125,7 @@ class TransactionController implements ITransactionController {
     }
   }
 
-  /**
-   * Retrieves the total income for the latest ISO week for the authenticated user.
-   *
-   * @param {Request} request - Express request object containing cookies and authentication data.
-   * @param {Response} response - Express response object used to send back the API response.
-   * @returns {Promise<void>} - Sends a success response with weekly income total or an error response.
-   *
-   * @throws {AuthenticationError} If access token is missing or invalid.
-   * @throws {Error} For any internal server errors during processing.
-   */
+  // Retrieves the total income for the latest ISO week for the authenticated user.
   async getWeeklyTotalIncome(request: Request, response: Response): Promise<void> {
     try {
       const { accessToken } = request.cookies;
@@ -187,16 +147,7 @@ class TransactionController implements ITransactionController {
     }
   }
 
-  /**
-   * Retrieves the total expense for the current month for the authenticated user.
-   *
-   * @param {Request} request - Express request object containing cookies and authentication data.
-   * @param {Response} response - Express response object used to send back the API response.
-   * @returns {Promise<void>} - Sends a success response with monthly expense total or an error response.
-   *
-   * @throws {AuthenticationError} If access token is missing or invalid.
-   * @throws {Error} For any internal server errors during processing.
-   */
+  // Retrieves the total expense for the current month for the authenticated user.
   async getMonthlyTotalExpense(request: Request, response: Response): Promise<void> {
     try {
       const { accessToken } = request.cookies;
@@ -217,16 +168,7 @@ class TransactionController implements ITransactionController {
     }
   }
 
-  /**
-   * Retrieves category-wise expenses for the authenticated user.
-   *
-   * @param {Request} request - Express request object containing cookies and authentication data.
-   * @param {Response} response - Express response object used to send back the API response.
-   * @returns {Promise<void>} - Sends a success response with categorized expenses or an error response.
-   *
-   * @throws {AuthenticationError} If access token is missing or invalid.
-   * @throws {Error} For any internal server errors during processing.
-   */
+  // Retrieves category-wise expenses for the authenticated user.
   async getCategoryWiseExpense(request: Request, response: Response): Promise<void> {
     try {
       const { accessToken } = request.cookies;
@@ -247,16 +189,7 @@ class TransactionController implements ITransactionController {
     }
   }
 
-  /**
-   * Extracts transaction data from an uploaded statement file.
-   *
-   * @param {Request} request - Express request object containing the uploaded file.
-   * @param {Response} response - Express response object used to send back the extracted data.
-   * @returns {Promise<void>} - Sends a success response with extracted data or an error response.
-   *
-   * @throws {ValidationError} If no file was uploaded.
-   * @throws {Error} For any internal server errors during processing.
-   */
+  // Extracts transaction data from an uploaded statement file.
   async extractTransactionData(request: Request, response: Response): Promise<void> {
     try {
       const file = request.file;
@@ -277,21 +210,7 @@ class TransactionController implements ITransactionController {
     }
   }
 
-  /**
-   * Controller to retrieve all INCOME-type transactions for the authenticated user.
-   *
-   * This method:
-   * - Extracts the access token from cookies to authenticate the user.
-   * - Fetches income transactions using the transaction service.
-   * - Sends a structured success response with the retrieved transaction data.
-   *
-   * @param {Request} request - Express request object, expected to contain the access token in cookies.
-   * @param {Response} response - Express response object used to send the result or error.
-   * @returns {Promise<void>} - Sends JSON response with transaction data or error message.
-   *
-   * @throws {AuthenticationError} If the access token is missing or invalid.
-   * @throws {Error} For any internal server errors during the transaction retrieval process.
-   */
+  // Controller to retrieve all INCOME-type transactions for the authenticated user
   async getAllIncomeTransactionsByCategory(request: Request, response: Response): Promise<void> {
     try {
         const { accessToken } = request.cookies;
@@ -310,22 +229,7 @@ class TransactionController implements ITransactionController {
     }
   }
 
-  /**
-   * Controller to retrieve all EXPENSE-type transactions grouped by category for the authenticated user.
-   *
-   * This method:
-   * - Extracts the access token from cookies to authenticate the user.
-   * - Validates that the access token exists and is valid.
-   * - Calls the service layer to fetch expense transactions grouped by category for the current year.
-   * - Sends a structured success response containing the categorized expense data.
-   *
-   * @param {Request} request - Express request object, expected to contain the access token in cookies.
-   * @param {Response} response - Express response object used to send the result or error.
-   * @returns {Promise<void>} - Sends JSON response with categorized expense transaction data or an error message.
-   *
-   * @throws {AuthenticationError} If the access token is missing or invalid.
-   * @throws {Error} For any internal server errors during the transaction retrieval process.
-   */
+  // Controller to retrieve all EXPENSE-type transactions grouped by category for the authenticated user.
   async getAllExpenseTransactionsByCategory(request: Request, response: Response): Promise<void> {
     try {
         const { accessToken } = request.cookies;
@@ -344,22 +248,7 @@ class TransactionController implements ITransactionController {
     }
   }
 
-  /**
-   * Controller to retrieve month-wise income data for the authenticated user.
-   *
-   * This method:
-   * - Extracts the access token from cookies to authenticate the user.
-   * - Fetches aggregated income data grouped by month using the transaction service.
-   * - Returns a structured success response containing chart-ready monthly income data (e.g., { month: "Jan", amount: 5000 }).
-   * - Ensures all 12 months are included, with zero values for months without income.
-   *
-   * @param {Request} request - Express request object, expected to contain the access token in cookies.
-   * @param {Response} response - Express response object used to send the result or error.
-   * @returns {Promise<void>} - Sends JSON response with monthly income data or an error message.
-   *
-   * @throws {AuthenticationError} If the access token is missing or invalid.
-   * @throws {Error} For any internal server errors during the data retrieval process.
-   */
+  // Controller to retrieve month-wise income data for the authenticated user.
   async getMonthlyIncomeForChart(request: Request, response: Response): Promise<void> {
     try {
         const { accessToken } = request.cookies;
@@ -378,22 +267,7 @@ class TransactionController implements ITransactionController {
     }
   }
 
-  /**
-   * Controller to retrieve month-wise income data for the authenticated user.
-   *
-   * This method:
-   * - Extracts the access token from cookies to authenticate the user.
-   * - Fetches aggregated income data grouped by month using the transaction service.
-   * - Returns a structured success response containing chart-ready monthly income data (e.g., { month: "Jan", amount: 5000 }).
-   * - Ensures all 12 months are included, with zero values for months without income.
-   *
-   * @param {Request} request - Express request object, expected to contain the access token in cookies.
-   * @param {Response} response - Express response object used to send the result or error.
-   * @returns {Promise<void>} - Sends JSON response with monthly income data or an error message.
-   *
-   * @throws {AuthenticationError} If the access token is missing or invalid.
-   * @throws {Error} For any internal server errors during the data retrieval process.
-   */
+  // Controller to retrieve month-wise income data for the authenticated user.
   async getMonthlyExpenseForChart(request: Request, response: Response): Promise<void> {
     try {
         const { accessToken } = request.cookies;
@@ -412,22 +286,7 @@ class TransactionController implements ITransactionController {
     }
   }
 
-  /**
-   * Controller to retrieve paginated income transactions for the authenticated user.
-   *
-   * This method:
-   * - Extracts the access token from cookies to authenticate the user.
-   * - Parses pagination (`page`, `limit`) and filter parameters (`timeRange`, `category`, `smartCategory`, `searchText`) from the query string.
-   * - Fetches a paginated list of income transactions using the transaction service.
-   * - Applies optional filters such as time range, category, smart category, and search text.
-   *
-   * @param {Request} request - Express request object containing cookies and query parameters.
-   * @param {Response} response - Express response object used to send the result or error.
-   * @returns {Promise<void>} - Sends JSON response with paginated income transactions or an error message.
-   *
-   * @throws {AuthenticationError} If the access token is missing or invalid.
-   * @throws {Error} For any internal server errors during data retrieval.
-   */
+  // Controller to retrieve paginated income transactions for the authenticated user.
   async getPaginatedIncomeTransactions(request: Request, response: Response): Promise<void> {
     try {
       const { accessToken } = request.cookies;
@@ -458,22 +317,7 @@ class TransactionController implements ITransactionController {
     }
   }
 
-  /**
-   * Controller to retrieve paginated expense transactions for the authenticated user.
-   *
-   * This method:
-   * - Extracts the access token from cookies to authenticate the user.
-   * - Parses pagination (`page`, `limit`) and filter parameters (`timeRange`, `category`, `searchText`) from the query string.
-   * - Fetches a paginated list of expense transactions using the transaction service.
-   * - Applies optional filters such as time range, category, and search text.
-   *
-   * @param {Request} request - Express request object containing cookies and query parameters.
-   * @param {Response} response - Express response object used to send the result or error.
-   * @returns {Promise<void>} - Sends JSON response with paginated expense transactions or an error message.
-   *
-   * @throws {AuthenticationError} If the access token is missing or invalid.
-   * @throws {Error} For any internal server errors during data retrieval.
-   */
+  // Controller to retrieve paginated expense transactions for the authenticated user.
   async getPaginatedExpenseTransactions(request: Request, response: Response): Promise<void> {
     try {
         const { accessToken } = request.cookies;
@@ -504,22 +348,7 @@ class TransactionController implements ITransactionController {
     }
   }
 
-  /**
-  * Controller to retrieve paginated income or expense transactions for the authenticated user.
-  *
-  * This method:
-  * - Extracts the access token from cookies to authenticate the user.
-  * - Parses pagination (`page`, `limit`) and filter parameters (`timeRange`, `category`, `transactionType`, `searchText`) from the query string.
-  * - Fetches a paginated list of transactions using the transaction service.
-  * - Supports filtering by time range, category, transaction type (Income/Expense), and search text.
-  *
-  * @param {Request} request - Express request object containing cookies and query parameters.
-  * @param {Response} response - Express response object used to send the result or error.
-  * @returns {Promise<void>} - Sends JSON response with paginated transactions or an error message.
-  *
-  * @throws {AuthenticationError} If the access token is missing or invalid.
-  * @throws {Error} For any internal server errors during data retrieval.
-  */
+  // Controller to retrieve paginated income or expense transactions for the authenticated user
   async getPaginatedTransactions(request: Request, response: Response): Promise<void> {
     try {
         const { accessToken } = request.cookies;
