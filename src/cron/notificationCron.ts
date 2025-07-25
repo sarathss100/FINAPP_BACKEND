@@ -1,6 +1,6 @@
 import cron from 'node-cron';
-import INotificationService from 'services/notification/interfaces/INotificationService';
-import NotificationService from 'services/notification/NotificationService';
+import INotificationService from '../services/notification/interfaces/INotificationService';
+import NotificationService from '../services/notification/NotificationService';
 
 const notificationService: INotificationService = NotificationService.instance;
 

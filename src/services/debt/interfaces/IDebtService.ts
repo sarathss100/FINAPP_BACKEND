@@ -1,5 +1,5 @@
-import { IDebtDTO } from 'dtos/debt/DebtDto';
-import { ComparisonResult } from 'utils/debt/simulateResult';
+import { IDebtDTO } from '../../../dtos/debt/DebtDto';
+import { ComparisonResult } from '../../../utils/debt/simulateResult';
 
 interface IDebtService {
     createDebt(accessToken: string, debtData: IDebtDTO): Promise<IDebtDTO>;

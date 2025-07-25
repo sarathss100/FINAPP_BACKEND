@@ -1,6 +1,6 @@
 import app from './app';
 import mongooseConnection from './config/database/mongooseConnection';
-import { setupSocketIO } from 'sockets/socket.server';
+import { setupSocketIO } from './sockets/socket.server';
 
 const PORT: number = parseInt(process.env.PORT || '5000', 10);
 

@@ -1,10 +1,10 @@
-import { ServerError } from 'error/AppError';
+import { ServerError } from '../../error/AppError';
 import IMutualFundService from './interfaces/IMutualFundService';
-import IMutualFundRepository from 'repositories/mutualfunds/interfaces/IMutualFundRepository';
-import fetchNavData from 'utils/mutualfunds/navFetcher';
-import { ErrorMessages } from 'constants/errorMessages';
-import MutualFundRepository from 'repositories/mutualfunds/MutualFundRepository';
-import { IMutualFundDTO } from 'dtos/mutualfunds/MutualFundDTO';
+import IMutualFundRepository from '../../repositories/mutualfunds/interfaces/IMutualFundRepository';
+import fetchNavData from '../../utils/mutualfunds/navFetcher';
+import { ErrorMessages } from '../../constants/errorMessages';
+import MutualFundRepository from '../../repositories/mutualfunds/MutualFundRepository';
+import { IMutualFundDTO } from '../../dtos/mutualfunds/MutualFundDTO';
 
 /**
  * Service class for managing accounts, including creating, updating, deleting, and retrieving accounts.

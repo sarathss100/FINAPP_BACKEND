@@ -1,5 +1,5 @@
-import { SignupDto } from 'dtos/auth/SignupDto';
-import IUser from 'model/user/interfaces/IUser';
+import { SignupDto } from '../../../dtos/auth/SignupDto';
+import IUser from '../../../model/user/interfaces/IUser';
 
 interface IUserModel {
     create(data: SignupDto): Promise<IUser>

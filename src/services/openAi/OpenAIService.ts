@@ -1,4 +1,4 @@
-import InvestmentManagementRepository from "repositories/investments/InvestmentManagementRepository";
+import InvestmentManagementRepository from "../../repositories/investments/InvestmentManagementRepository";
 
 const investmentRepo = InvestmentManagementRepository.instance;
 

@@ -1,4 +1,4 @@
-import { IParsedTransaction, ITransactionDTO } from 'dtos/transaction/TransactionDto';
+import { IParsedTransaction, ITransactionDTO } from '../../../dtos/transaction/TransactionDto';
 
 interface ITransactionService {
     createTransaction(accessToken: string, data: ITransactionDTO | ITransactionDTO[]): Promise<ITransactionDTO  | ITransactionDTO[]>;

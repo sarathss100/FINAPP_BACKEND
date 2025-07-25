@@ -1,4 +1,4 @@
-import { IMutualFundDTO } from 'dtos/mutualfunds/MutualFundDTO';
+import { IMutualFundDTO } from '../../../dtos/mutualfunds/MutualFundDTO';
 
 interface IMutualFundRepository {
     syncBulkMutualFund(dataArray: IMutualFundDTO[]): Promise<boolean>;

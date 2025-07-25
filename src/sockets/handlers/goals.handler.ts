@@ -1,4 +1,4 @@
-import GoalService from 'services/goal/GoalService';
+import GoalService from '../../services/goal/GoalService';
 import { Socket, Server } from 'socket.io';
 
 const goalsService = GoalService.instance;

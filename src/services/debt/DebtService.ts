@@ -1,16 +1,16 @@
-import { decodeAndValidateToken } from 'utils/auth/tokenUtils';
-import { AuthenticationError } from 'error/AppError';
-import { ErrorMessages } from 'constants/errorMessages';
-import { StatusCodes } from 'constants/statusCodes';
+import { decodeAndValidateToken } from '../../utils/auth/tokenUtils';
+import { AuthenticationError } from '../../error/AppError';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { StatusCodes } from '../../constants/statusCodes';
 import IDebtService from './interfaces/IDebtService';
-import DebtManagementRepository from 'repositories/debt/DebtManagementRepository';
-import { IDebtDTO } from 'dtos/debt/DebtDto';
-import IDebtRepository from 'repositories/debt/interfaces/IDebtRepository';
-import calculateLoanBreakdown from 'utils/debt/emiCalculator';
-import { calculateLoanClosingMonth, calculateNextDueDate } from 'utils/debt/dueDateCalculator';
-import { categorizeDebt } from 'utils/debt/debtCategorizer';
-import { compareStrategies, ComparisonResult } from 'utils/debt/simulateResult';
-import { eventBus } from 'events/eventBus';
+import DebtManagementRepository from '../../repositories/debt/DebtManagementRepository';
+import { IDebtDTO } from '../../dtos/debt/DebtDto';
+import IDebtRepository from '../../repositories/debt/interfaces/IDebtRepository';
+import calculateLoanBreakdown from '../../utils/debt/emiCalculator';
+import { calculateLoanClosingMonth, calculateNextDueDate } from '../../utils/debt/dueDateCalculator';
+import { categorizeDebt } from '../../utils/debt/debtCategorizer';
+import { compareStrategies, ComparisonResult } from '../../utils/debt/simulateResult';
+import { eventBus } from '../../events/eventBus';
 
 class DebtService implements IDebtService {
     private static _instance: DebtService;

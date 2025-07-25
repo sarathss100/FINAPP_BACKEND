@@ -1,5 +1,5 @@
-import { eventBus } from "events/eventBus";
-import { io } from "sockets/socket.server";
+import { eventBus } from "../../events/eventBus";
+import { io } from "../../sockets/socket.server";
 
 export const setupSocketListeners = function() {
 

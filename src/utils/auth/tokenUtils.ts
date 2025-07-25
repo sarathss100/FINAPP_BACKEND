@@ -1,9 +1,9 @@
-import { ErrorMessages } from 'constants/errorMessages';
-import { StatusCodes } from 'constants/statusCodes';
-import { AuthenticationError, ServerError } from 'error/AppError';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { StatusCodes } from '../../constants/statusCodes';
+import { AuthenticationError, ServerError } from '../../error/AppError';
 import jwt from 'jsonwebtoken';
-import IAuthUser from 'services/auth/interfaces/IAuthUser';
-import ITokenPayload from 'types/auth/ITokenPayload';
+import IAuthUser from '../../services/auth/interfaces/IAuthUser';
+import ITokenPayload from '../../types/auth/ITokenPayload';
 
 // Token secret keys 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;

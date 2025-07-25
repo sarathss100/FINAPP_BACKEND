@@ -1,4 +1,4 @@
-import { IBondDTO } from "dtos/investments/investmentDTO";
+import { IBondDTO } from "../../../dtos/investments/investmentDTO";
 
 
 /**

@@ -1,6 +1,6 @@
-import { StockModel, MutualFundModel, BondModel, BusinessModel, ParkingFundModel, EPFOModel, FixedDepositModel, GoldModel, PropertyModel } from 'model/investments/model/InvestmentModel';
+import { StockModel, MutualFundModel, BondModel, BusinessModel, ParkingFundModel, EPFOModel, FixedDepositModel, GoldModel, PropertyModel } from '../../model/investments/model/InvestmentModel';
 import IInvestmentManagementRepository from './interfaces/IInvestmentManagementRepository';
-import { InvestmentDTO } from 'dtos/investments/investmentDTO';
+import { InvestmentDTO } from '../../dtos/investments/investmentDTO';
 import mongoose from 'mongoose';
 
 const modelMap = {

@@ -1,17 +1,17 @@
-import { IGoalDTO } from 'dtos/goal/GoalDto';
+import { IGoalDTO } from '../../dtos/goal/GoalDto';
 import IGoalService from './interfaces/IGoalService';
-import { decodeAndValidateToken } from 'utils/auth/tokenUtils';
-import IGoalManagementRepository from 'repositories/goal/interfaces/IGoalManagementRepository';
-import { AuthenticationError, NotFoundError } from 'error/AppError';
-import { ErrorMessages } from 'constants/errorMessages';
-import { StatusCodes } from 'constants/statusCodes';
-import formatDuration from 'utils/dateFormatter';
+import { decodeAndValidateToken } from '../../utils/auth/tokenUtils';
+import IGoalManagementRepository from '../../repositories/goal/interfaces/IGoalManagementRepository';
+import { AuthenticationError, NotFoundError } from '../../error/AppError';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { StatusCodes } from '../../constants/statusCodes';
+import formatDuration from '../../utils/dateFormatter';
 import ISmartAnalysisResult from './interfaces/ISmartAnalysisResult';
 import IGoalCategory from './interfaces/IGoalCategory';
-import { createGeminiPrompt, parseGeminiResponse } from 'utils/transaction/analyzeWithGemini';
+import { createGeminiPrompt, parseGeminiResponse } from '../../utils/transaction/analyzeWithGemini';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import GoalManagementRepository from 'repositories/goal/GoalManagementRepository';
-import { eventBus } from 'events/eventBus';
+import GoalManagementRepository from '../../repositories/goal/GoalManagementRepository';
+import { eventBus } from '../../events/eventBus';
 
 class GoalService implements IGoalService {
     private static _instance: GoalService;

@@ -1,6 +1,6 @@
-import ChatModel from "model/chats/model/ChatModel";
+import ChatModel from "../../model/chats/model/ChatModel";
 import IChatRepository from "./interfaces/IChatRepository";
-import { ChatDTO } from "dtos/chats/chatDTO";
+import { ChatDTO } from "../../dtos/chats/chatDTO";
 
 /**
  * @class ChatManagementRepository

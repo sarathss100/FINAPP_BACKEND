@@ -1,13 +1,13 @@
-import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
-import { ErrorMessages } from 'constants/errorMessages';
-import { StatusCodes } from 'constants/statusCodes';
+import { sendErrorResponse, sendSuccessResponse } from '../../utils/responseHandler';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { StatusCodes } from '../../constants/statusCodes';
 import { Request, Response } from 'express';
-import { AppError, AuthenticationError, ServerError, ValidationError } from 'error/AppError';
-import { SuccessMessages } from 'constants/successMessages';
+import { AppError, AuthenticationError, ServerError, ValidationError } from '../../error/AppError';
+import { SuccessMessages } from '../../constants/successMessages'; 
 import IAccountsController from './interfaces/IAccountsController';
-import IAccountsService from 'services/accounts/interfaces/IAccountsService';
-import { IAccountDTO } from 'dtos/accounts/AccountsDTO';
-import accountValidationSchema from 'validation/accounts/account.validation';
+import IAccountsService from '../../services/accounts/interfaces/IAccountsService';
+import { IAccountDTO } from '../../dtos/accounts/AccountsDTO'; 
+import accountValidationSchema from '../../validation/accounts/account.validation';
 
 class AccountsController implements IAccountsController {
     private readonly _accountsService: IAccountsService;

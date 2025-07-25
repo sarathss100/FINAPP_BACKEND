@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { InvestmentDTO } from 'dtos/investments/investmentDTO';
+import { InvestmentDTO } from '../../../dtos/investments/investmentDTO';
 
 /**
  * Updates current price per gram and value for an array of GOLD-type investments.

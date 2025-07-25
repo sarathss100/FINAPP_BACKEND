@@ -1,6 +1,6 @@
-import { IAccountDTO } from 'dtos/accounts/AccountsDTO';
+import { IAccountDTO } from '../../dtos/accounts/AccountsDTO';
 import IAccountsManagementRepository from './interfaces/IAccountsManagementRepository';
-import { AccountModel } from 'model/accounts/model/AccountsModel';
+import { AccountModel } from '../../model/accounts/model/AccountsModel';
 
 class AccountManagementRepository implements IAccountsManagementRepository {
     private static _instance: AccountManagementRepository;

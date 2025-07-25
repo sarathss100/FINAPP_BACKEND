@@ -1,11 +1,11 @@
  import { Request, Response } from 'express';
-import IUserService from 'services/user/interfaces/IUserService';
+import IUserService from '../../services/user/interfaces/IUserService';
 import IUserController from './interfaces/IUserController';
-import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
-import { StatusCodes } from 'constants/statusCodes';
-import { AppError, AuthenticationError, ServerError, ValidationError } from 'error/AppError';
-import { ErrorMessages } from 'constants/errorMessages';
-import { SuccessMessages } from 'constants/successMessages';
+import { sendErrorResponse, sendSuccessResponse } from '../../utils/responseHandler';
+import { StatusCodes } from '../../constants/statusCodes';
+import { AppError, AuthenticationError, ServerError, ValidationError } from '../../error/AppError';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { SuccessMessages } from '../../constants/successMessages';
 import { fileTypeFromBuffer } from 'file-type';
 
 class UserController implements IUserController {

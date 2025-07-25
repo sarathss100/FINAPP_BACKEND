@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
-import { IDebtDTO } from 'dtos/debt/DebtDto';
+import { IDebtDTO } from '../../dtos/debt/DebtDto';
 import IDebtRepository from './interfaces/IDebtRepository';
-import { DebtModel } from 'model/debt/model/DebtModel';
-import { Debt } from 'utils/debt/simulateResult';
-import calculateLoanBreakdown from 'utils/debt/emiCalculator';
+import { DebtModel } from '../../model/debt/model/DebtModel';
+import { Debt } from '../../utils/debt/simulateResult';
+import calculateLoanBreakdown from '../../utils/debt/emiCalculator';
 
 class DebtManagementRepository implements IDebtRepository {
     private static _instance: DebtManagementRepository;

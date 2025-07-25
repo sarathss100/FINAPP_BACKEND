@@ -1,15 +1,15 @@
-import NotificationService from 'services/notification/NotificationService';
+import NotificationService from '../../services/notification/NotificationService';
 import { Server } from 'socket.io';
-import registerAccountsHandlers from 'sockets/handlers/accounts.handler';
-import registerAdminHandlers from 'sockets/handlers/admin.handler';
-import registerChatHandlers from 'sockets/handlers/chat.handler';
-import registerDebtsHandlers from 'sockets/handlers/debts.handler';
-import registerGoalsHandlers from 'sockets/handlers/goals.handler';
-import registerInsurancesHandlers from 'sockets/handlers/insurances.handler';
-import registerInvestmentsHandlers from 'sockets/handlers/investments.handler';
-import registerNotificationHandlers from 'sockets/handlers/notification.handler';
-import registerTransactionsHandlers from 'sockets/handlers/transactions.handler';
-import { authenticate } from 'sockets/middleware/auth.middleware';
+import registerAccountsHandlers from '../../sockets/handlers/accounts.handler';
+import registerAdminHandlers from '../../sockets/handlers/admin.handler';
+import registerChatHandlers from '../../sockets/handlers/chat.handler';
+import registerDebtsHandlers from '../../sockets/handlers/debts.handler';
+import registerGoalsHandlers from '../../sockets/handlers/goals.handler';
+import registerInsurancesHandlers from '../../sockets/handlers/insurances.handler';
+import registerInvestmentsHandlers from '../../sockets/handlers/investments.handler';
+import registerNotificationHandlers from '../../sockets/handlers/notification.handler';
+import registerTransactionsHandlers from '../../sockets/handlers/transactions.handler';
+import { authenticate } from '../../sockets/middleware/auth.middleware';
 
 export function setupNamespaces(io: Server): void {
     // Chat Namespace

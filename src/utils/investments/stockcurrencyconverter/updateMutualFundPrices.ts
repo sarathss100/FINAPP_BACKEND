@@ -1,5 +1,5 @@
-import { InvestmentDTO } from 'dtos/investments/investmentDTO';
-import getMutualFundDetails from 'utils/mutualfunds/getMutualFundDetails';
+import { InvestmentDTO } from '../../../dtos/investments/investmentDTO';
+import getMutualFundDetails from '../../../utils/mutualfunds/getMutualFundDetails';
 
 /**
  * Updates current NAV and value for an array of mutual fund investments.

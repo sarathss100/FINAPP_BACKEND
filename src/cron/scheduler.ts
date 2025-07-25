@@ -1,7 +1,7 @@
 import cron from 'node-cron';
-import logger from 'config/logger/logger';
-import MutualFundService from 'services/mutualfunds/MutualFundService';
-import IMutualFundService from 'services/mutualfunds/interfaces/IMutualFundService';
+import logger from '../config/logger/logger';
+import MutualFundService from '../services/mutualfunds/MutualFundService';
+import IMutualFundService from '../services/mutualfunds/interfaces/IMutualFundService';
 import { checkAndExpireSubscriptions } from './checkSubscriptions';
 
 const mutualFundService: IMutualFundService = MutualFundService.instance;

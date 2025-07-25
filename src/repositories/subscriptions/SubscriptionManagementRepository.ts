@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import ISubscriptionManagemenRepository from './interfaces/ISubscriptionManagemenRepository';
-import { SubscriptionModel } from 'model/subscription/model/SubscriptionModal';
-import { SubscriptionDTO } from 'dtos/subscriptions/subscriptionDTO';
+import { SubscriptionModel } from '../../model/subscription/model/SubscriptionModal';
+import { SubscriptionDTO } from '../../dtos/subscriptions/subscriptionDTO';
 
 class SubscriptionManagementRepository implements ISubscriptionManagemenRepository {
     private static _instance: SubscriptionManagementRepository;

@@ -1,8 +1,8 @@
-import { generateAccessToken } from "utils/auth/tokenUtils";
-import IUserDetails from "repositories/admin/interfaces/IUserDetails";
-import IInsuranceService from "services/insurances/interfaces/IInsuranceService";
-import InsuranceService from "services/insurances/InsuranceService";
-import { InsuranceDTO } from "dtos/insurances/insuranceDTO";
+import { generateAccessToken } from "../../../utils/auth/tokenUtils";
+import IUserDetails from "../../../repositories/admin/interfaces/IUserDetails";
+import IInsuranceService from "../../../services/insurances/interfaces/IInsuranceService";
+import InsuranceService from "../../../services/insurances/InsuranceService";
+import { InsuranceDTO } from "../../../dtos/insurances/insuranceDTO";
 
 const insuranceService: IInsuranceService = InsuranceService.instance;
 

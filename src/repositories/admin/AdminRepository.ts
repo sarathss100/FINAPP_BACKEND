@@ -1,12 +1,12 @@
-import { UserModel } from 'model/user/model/UserModel';
+import { UserModel } from '../../model/user/model/UserModel';
 import IAdminRepository from './interfaces/IAdminRepository';
 import IUserDetails from './interfaces/IUserDetails';
-import { FaqModel } from 'model/admin/model/FaqModel';
-import { IFaq } from 'dtos/base/FaqDto';
+import { FaqModel } from '../../model/admin/model/FaqModel';
+import { IFaq } from '../../dtos/base/FaqDto';
 import { ISystemMetrics } from './interfaces/ISystemMetrics';
 import osUtils from 'os-utils';
 import checkDiskSpace from 'check-disk-space';
-import IPaginationMeta from 'dtos/admin/IPaginationMeta';
+import IPaginationMeta from '../../dtos/admin/IPaginationMeta';
 
 class AdminRepository implements IAdminRepository {
     private static _instance: AdminRepository;

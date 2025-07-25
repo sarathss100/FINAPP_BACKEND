@@ -1,8 +1,8 @@
-import { IFaq } from 'dtos/base/FaqDto';
-import IUserDetails from 'repositories/admin/interfaces/IUserDetails';
+import { IFaq } from '../../../dtos/base/FaqDto';
+import IUserDetails from '../../../repositories/admin/interfaces/IUserDetails';
 import { IHealthStatus } from '../health/interfaces/IHealth';
-import { ISystemMetrics } from 'repositories/admin/interfaces/ISystemMetrics';
-import IPaginationMeta from 'dtos/admin/IPaginationMeta';
+import { ISystemMetrics } from '../../../repositories/admin/interfaces/ISystemMetrics';
+import IPaginationMeta from '../../../dtos/admin/IPaginationMeta';
 
 interface IAdminService {
     getAllUsers(): Promise<IUserDetails[]>;

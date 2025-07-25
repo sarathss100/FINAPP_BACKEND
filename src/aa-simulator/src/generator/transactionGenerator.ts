@@ -1,11 +1,11 @@
-import AdminRepository from "repositories/admin/AdminRepository";
-import IAdminRepository from "repositories/admin/interfaces/IAdminRepository";
-import transactionTemplates from 'aa-simulator/src/data/transaction/transactionTemplates.json';
+import AdminRepository from "../../../repositories/admin/AdminRepository";
+import IAdminRepository from "../../../repositories/admin/interfaces/IAdminRepository";
+import transactionTemplates from '../../../aa-simulator/src/data/transaction/transactionTemplates.json';
 import { TransactionPayload } from "../data/transaction/types";
-import { ITransactionDTO } from "dtos/transaction/TransactionDto";
+import { ITransactionDTO } from "../../../dtos/transaction/TransactionDto";
 import { TransactionGeneratorService } from "../services/transactionService";
-import IAccountsManagementRepository from "repositories/accounts/interfaces/IAccountsManagementRepository";
-import AccountManagementRepository from "repositories/accounts/AccountsManagementRepository";
+import IAccountsManagementRepository from "../../../repositories/accounts/interfaces/IAccountsManagementRepository";
+import AccountManagementRepository from "../../../repositories/accounts/AccountsManagementRepository";
 
 const adminRepository: IAdminRepository = AdminRepository.instance;
 const accountsRepository: IAccountsManagementRepository = AccountManagementRepository.instance;

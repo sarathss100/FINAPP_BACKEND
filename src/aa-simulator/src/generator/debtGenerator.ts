@@ -1,9 +1,9 @@
-import debtTemplates from 'aa-simulator/src/data/debt/debtTemplates.json';
-import { IDebtDTO } from 'dtos/debt/DebtDto';
-import IAccountsManagementRepository from 'repositories/accounts/interfaces/IAccountsManagementRepository';
-import AccountManagementRepository from 'repositories/accounts/AccountsManagementRepository';
-import IAdminRepository from 'repositories/admin/interfaces/IAdminRepository';
-import AdminRepository from 'repositories/admin/AdminRepository';
+import debtTemplates from '../../../aa-simulator/src/data/debt/debtTemplates.json';
+import { IDebtDTO } from '../../../dtos/debt/DebtDto';
+import IAccountsManagementRepository from '../../../repositories/accounts/interfaces/IAccountsManagementRepository';
+import AccountManagementRepository from '../../../repositories/accounts/AccountsManagementRepository';
+import IAdminRepository from '../../../repositories/admin/interfaces/IAdminRepository';
+import AdminRepository from '../../../repositories/admin/AdminRepository';
 import { DebtGeneratorService } from '../services/debtService';
 
 const adminRepository: IAdminRepository = AdminRepository.instance;

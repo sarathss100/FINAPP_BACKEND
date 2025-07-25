@@ -1,4 +1,4 @@
-import { InvestmentDTO } from 'dtos/investments/investmentDTO';
+import { InvestmentDTO } from '../../../dtos/investments/investmentDTO';
 import IStock from './IStock';
 
 interface IInvestmentService {

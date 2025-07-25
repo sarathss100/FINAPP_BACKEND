@@ -1,12 +1,12 @@
-import { SignupDto } from 'dtos/auth/SignupDto';
-import { UserModel } from 'model/user/model/UserModel';
+import { SignupDto } from '../../dtos/auth/SignupDto';
+import { UserModel } from '../../model/user/model/UserModel';
 import IAuthUser from '../base/interfaces/IAuthUser';
-import { ResetPasswordDto } from 'dtos/auth/ResetPasswordDto';
-import UserBaseRespository from 'repositories/base/UserBaseRespository';
+import { ResetPasswordDto } from '../../dtos/auth/ResetPasswordDto';
+import UserBaseRespository from '../../repositories/base/UserBaseRespository';
 import IAuthRepository from './interfaces/IAuthRepository';
-import { ServerError } from 'error/AppError';
-import { ErrorMessages } from 'constants/errorMessages';
-import IUser from 'dtos/base/UserDto';
+import { ServerError } from '../../error/AppError';
+import { ErrorMessages } from '../../constants/errorMessages';
+import IUser from '../../dtos/base/UserDto';
 
 class AuthRepository extends UserBaseRespository implements IAuthRepository {
     // Create a new user

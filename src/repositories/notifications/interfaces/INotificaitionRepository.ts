@@ -1,4 +1,4 @@
-import { INotificationDTO } from 'dtos/notification/NotificationDto';
+import { INotificationDTO } from '../../../dtos/notification/NotificationDto';
 
 interface INotificatonManagementRepository {
     createNotification(notificationData: INotificationDTO): Promise<INotificationDTO>;

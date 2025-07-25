@@ -1,7 +1,7 @@
-import insuranceTemplates from 'aa-simulator/src/data/insurance/insuranceTemplates.json';
-import IAdminRepository from 'repositories/admin/interfaces/IAdminRepository';
-import AdminRepository from 'repositories/admin/AdminRepository';
-import { InsuranceDTO } from 'dtos/insurances/insuranceDTO';
+import insuranceTemplates from '../../../aa-simulator/src/data/insurance/insuranceTemplates.json';
+import IAdminRepository from '../../../repositories/admin/interfaces/IAdminRepository';
+import AdminRepository from '../../../repositories/admin/AdminRepository';
+import { InsuranceDTO } from '../../../dtos/insurances/insuranceDTO';
 import { InsuranceGeneratorService } from '../services/insuranceService';
 
 const adminRepository: IAdminRepository = AdminRepository.instance;

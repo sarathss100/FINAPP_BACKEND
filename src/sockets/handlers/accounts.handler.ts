@@ -1,4 +1,4 @@
-import AccountsService from 'services/accounts/AccountService';
+import AccountsService from '../../services/accounts/AccountService';
 import { Socket, Server } from 'socket.io';
 
 const accountsService = AccountsService.instance;

@@ -1,7 +1,7 @@
-import { IFaq } from 'dtos/base/FaqDto';
+import { IFaq } from '../../../dtos/base/FaqDto';
 import IUserDetails from './IUserDetails';
 import { ISystemMetrics } from './ISystemMetrics';
-import IPaginationMeta from 'dtos/admin/IPaginationMeta';
+import IPaginationMeta from '../../../dtos/admin/IPaginationMeta';
 
 interface IAdminRepository {
     findAllUsers(): Promise<IUserDetails[] | null>;

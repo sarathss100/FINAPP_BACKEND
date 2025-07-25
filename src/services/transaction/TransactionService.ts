@@ -1,18 +1,18 @@
-import ITransactionRepository from 'repositories/transaction/interfaces/ITransactionRepository';
+import ITransactionRepository from '../../repositories/transaction/interfaces/ITransactionRepository';
 import ITransactionService from './interfaces/ITransaction';
-import { IParsedTransaction, ITransactionDTO } from 'dtos/transaction/TransactionDto';
-import { decodeAndValidateToken } from 'utils/auth/tokenUtils';
-import { AuthenticationError } from 'error/AppError';
-import { ErrorMessages } from 'constants/errorMessages';
-import { StatusCodes } from 'constants/statusCodes';
+import { IParsedTransaction, ITransactionDTO } from '../../dtos/transaction/TransactionDto';
+import { decodeAndValidateToken } from '../../utils/auth/tokenUtils';
+import { AuthenticationError } from '../../error/AppError';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { StatusCodes } from '../../constants/statusCodes';
 import * as Papa from 'papaparse';
 import * as XLSX from 'xlsx';
-import { extractTransactionTable } from 'utils/transaction/extractTransactionTable';
-import { normalizeTransactionObject } from 'utils/transaction/normalizeTransaction';
+import { extractTransactionTable } from '../../utils/transaction/extractTransactionTable';
+import { normalizeTransactionObject } from '../../utils/transaction/normalizeTransaction';
 import crypto from 'crypto';
-import { classifyTransaction } from 'utils/transaction/classifyTransaction';
-import TransactionRepository from 'repositories/transaction/TransactionRepository';
-import { eventBus } from 'events/eventBus';
+import { classifyTransaction } from '../../utils/transaction/classifyTransaction';
+import TransactionRepository from '../../repositories/transaction/TransactionRepository';
+import { eventBus } from '../../events/eventBus';
 
 class TransactionService implements ITransactionService {
     private static _instance: TransactionService;

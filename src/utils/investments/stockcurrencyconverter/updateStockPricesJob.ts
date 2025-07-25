@@ -1,7 +1,7 @@
 // src/utils/updateStockPrices.ts
 
 import axios from 'axios';
-import { InvestmentDTO } from 'dtos/investments/investmentDTO';
+import { InvestmentDTO } from '../../../dtos/investments/investmentDTO';
 import { detectCurrencyFromExchange } from './regionRegex';
 import { getExchangeRate } from './currencyConverter';
 

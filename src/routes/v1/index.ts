@@ -14,9 +14,9 @@ import chatRoutes from './chats/ChatRouter';
 import notificationRoutes from './notification/NotificationRouter';
 import subscriptionRoutes from './subscription/SubscriptionRouter';
 
-import { authorizeRoles } from 'middleware/authMiddleware'; 
-import { UserRole } from 'types/auth/roles';
-import { requireSubscription } from 'middleware/requireSubscription';
+import { authorizeRoles } from '../../middleware/authMiddleware'; 
+import { UserRole } from '../../types/auth/roles';
+import { requireSubscription } from '../../middleware/requireSubscription';
 const apiV1Router = Router();
 
 // Public routes

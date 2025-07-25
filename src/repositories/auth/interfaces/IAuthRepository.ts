@@ -1,7 +1,7 @@
-import { SignupDto } from 'dtos/auth/SignupDto';
+import { SignupDto } from '../../../dtos/auth/SignupDto';
 import IAuthUser from '../../base/interfaces/IAuthUser';
-import { ResetPasswordDto } from 'dtos/auth/ResetPasswordDto';
-import IUser from 'dtos/base/UserDto';
+import { ResetPasswordDto } from '../../../dtos/auth/ResetPasswordDto';
+import IUser from '../../../dtos/base/UserDto';
 
 interface IAuthRepository {
     createUser(data: SignupDto): Promise<IAuthUser>;

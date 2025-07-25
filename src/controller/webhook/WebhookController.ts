@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
-import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
-import { StatusCodes } from 'constants/statusCodes';
-import { ErrorMessages } from 'constants/errorMessages';
-import { SuccessMessages } from 'constants/successMessages';
+import { sendErrorResponse, sendSuccessResponse } from '../../utils/responseHandler';
+import { StatusCodes } from '../../constants/statusCodes';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { SuccessMessages } from '../../constants/successMessages';
 import Stripe from 'stripe';
-import UserBaseRepository from 'repositories/base/UserBaseRespository';
-import IUserBaseRespository from 'repositories/base/interfaces/IUserBaseRespository';
-import ISubscriptionManagemenRepository from 'repositories/subscriptions/interfaces/ISubscriptionManagemenRepository';
-import SubscriptionManagementRepository from 'repositories/subscriptions/SubscriptionManagementRepository';
+import UserBaseRepository from '../../repositories/base/UserBaseRespository';
+import IUserBaseRespository from '../../repositories/base/interfaces/IUserBaseRespository';
+import ISubscriptionManagemenRepository from '../../repositories/subscriptions/interfaces/ISubscriptionManagemenRepository';
+import SubscriptionManagementRepository from '../../repositories/subscriptions/SubscriptionManagementRepository';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-06-30.basil' });
 const userBaseRepository: IUserBaseRespository = new UserBaseRepository();

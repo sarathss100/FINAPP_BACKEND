@@ -1,19 +1,14 @@
-import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
-import { ErrorMessages } from 'constants/errorMessages';
-import { StatusCodes } from 'constants/statusCodes';
+import { sendErrorResponse, sendSuccessResponse } from '../../utils/responseHandler';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { StatusCodes } from '../../constants/statusCodes';
 import { Request, Response } from 'express';
-import { AppError, ValidationError } from 'error/AppError';
-import { SuccessMessages } from 'constants/successMessages';
-import IInvestmentService from 'services/investments/interfaces/IInvestmentService';
+import { AppError, ValidationError } from '../../error/AppError';
+import { SuccessMessages } from '../../constants/successMessages';
+import IInvestmentService from '../../services/investments/interfaces/IInvestmentService';
 import IInvestmentController from './interfaces/IInvestmentController';
 import { ZodError } from 'zod';
-import { InvestmentDTOSchema } from 'validation/investments/investment.validation';
+import { InvestmentDTOSchema } from '../../validation/investments/investment.validation';
 
-/**
- * @class InvestmentController
- * @description Controller class responsible for handling investment-related HTTP requests.
- * Acts as an intermediary between the Express routes and the service layer.
- */
 class InvestmentController implements IInvestmentController {
     private readonly _investmentService: IInvestmentService;
 

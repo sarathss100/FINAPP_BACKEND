@@ -1,4 +1,4 @@
-import InsuranceService from 'services/insurances/InsuranceService';
+import InsuranceService from '../../services/insurances/InsuranceService';
 import { Socket, Server } from 'socket.io';
 
 const insuranceService = InsuranceService.instance;

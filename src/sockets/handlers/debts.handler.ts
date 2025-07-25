@@ -1,4 +1,4 @@
-import DebtService from 'services/debt/DebtService';
+import DebtService from '../../services/debt/DebtService';
 import { Socket, Server } from 'socket.io';
 
 const debtsService = DebtService.instance;

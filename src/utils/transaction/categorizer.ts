@@ -1,4 +1,4 @@
-import { SMART_CATEGORIES } from 'model/transaction/interfaces/ITransaction';
+import { SMART_CATEGORIES } from '../../model/transaction/interfaces/ITransaction';
 export type TransactionSmartCategory = typeof SMART_CATEGORIES[number];
 
 export const SMART_CATEGORY_REGEX_MAP: Record<TransactionSmartCategory, RegExp[]> = {

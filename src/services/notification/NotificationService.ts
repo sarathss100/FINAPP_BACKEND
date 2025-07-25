@@ -1,17 +1,17 @@
-import { decodeAndValidateToken } from 'utils/auth/tokenUtils'; 
-import { AuthenticationError } from 'error/AppError'; 
-import { ErrorMessages } from 'constants/errorMessages'; 
-import { StatusCodes } from 'constants/statusCodes'; 
+import { decodeAndValidateToken } from '../../utils/auth/tokenUtils'; 
+import { AuthenticationError } from '../../error/AppError'; 
+import { ErrorMessages } from '../../constants/errorMessages'; 
+import { StatusCodes } from '../../constants/statusCodes'; 
 import INotificationService from './interfaces/INotificationService';
-import INotificatonManagementRepository from 'repositories/notifications/interfaces/INotificaitionRepository'; 
-import { INotificationDTO } from 'dtos/notification/NotificationDto'; 
-import NotificationManagementRepository from 'repositories/notifications/NotificaitonRepository'; 
-import DebtService from 'services/debt/DebtService';
-import GoalService from 'services/goal/GoalService';
-import { NOTIFICATION_TYPES } from 'model/notification/interfaces/INotificaiton';
-import InsuranceService from 'services/insurances/InsuranceService';
-import { io } from 'sockets/socket.server';
-import { eventBus } from 'events/eventBus';
+import INotificatonManagementRepository from '../../repositories/notifications/interfaces/INotificaitionRepository'; 
+import { INotificationDTO } from '../../dtos/notification/NotificationDto'; 
+import NotificationManagementRepository from '../../repositories/notifications/NotificaitonRepository'; 
+import DebtService from '../../services/debt/DebtService';
+import GoalService from '../../services/goal/GoalService';
+import { NOTIFICATION_TYPES } from '../../model/notification/interfaces/INotificaiton';
+import InsuranceService from '../../services/insurances/InsuranceService';
+import { io } from '../../sockets/socket.server';
+import { eventBus } from '../../events/eventBus';
 
 class NotificationService implements INotificationService {
     // Singleton instance of the service

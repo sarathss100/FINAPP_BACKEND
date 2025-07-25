@@ -1,5 +1,5 @@
-import { IDebtDTO } from 'dtos/debt/DebtDto';
-import { Debt } from 'utils/debt/simulateResult';
+import { IDebtDTO } from '../../../dtos/debt/DebtDto';
+import { Debt } from '../../../utils/debt/simulateResult';
 
 interface IDebtRepository {
     createDebt(debtData: IDebtDTO, userId: string): Promise<IDebtDTO>;

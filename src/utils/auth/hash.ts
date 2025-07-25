@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import IHasher from 'types/utils/IHasher';
+import IHasher from '../../types/utils/IHasher';
 
 /**
  * BcryptHasher is an implementation of the IHasher interface.

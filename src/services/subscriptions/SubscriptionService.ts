@@ -1,11 +1,11 @@
-import { decodeAndValidateToken } from 'utils/auth/tokenUtils';
-import { AuthenticationError } from 'error/AppError';
-import { ErrorMessages } from 'constants/errorMessages';
-import { StatusCodes } from 'constants/statusCodes';
+import { decodeAndValidateToken } from '../../utils/auth/tokenUtils';
+import { AuthenticationError } from '../../error/AppError';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { StatusCodes } from '../../constants/statusCodes';
 import IInsuranceService from './interfaces/ISubscriptionService';
-import ISubscriptionManagemenRepository from 'repositories/subscriptions/interfaces/ISubscriptionManagemenRepository';
-import SubscriptionManagementRepository from 'repositories/subscriptions/SubscriptionManagementRepository';
-import { initiatePaymentDTO } from 'dtos/subscriptions/subscriptionDTO';
+import ISubscriptionManagemenRepository from '../../repositories/subscriptions/interfaces/ISubscriptionManagemenRepository';
+import SubscriptionManagementRepository from '../../repositories/subscriptions/SubscriptionManagementRepository';
+import { initiatePaymentDTO } from '../../dtos/subscriptions/subscriptionDTO';
 import Stripe from 'stripe';
 
 // Initialize Stripe

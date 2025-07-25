@@ -1,5 +1,5 @@
-import MutualFundService from 'services/mutualfunds/MutualFundService';
-import { IMutualFundDTO } from 'dtos/mutualfunds/MutualFundDTO';
+import MutualFundService from '../../services/mutualfunds/MutualFundService';
+import { IMutualFundDTO } from '../../dtos/mutualfunds/MutualFundDTO';
 
 const mutualFundService = MutualFundService.instance;
 

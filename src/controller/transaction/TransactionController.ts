@@ -1,26 +1,21 @@
-import ITransactionService from 'services/transaction/interfaces/ITransaction';
+import ITransactionService from '../../services/transaction/interfaces/ITransaction';
 import ITransactionController from './interfaces/ITransactionController';
 import { Request, Response } from 'express';
 import {
   AppError,
   AuthenticationError,
   ValidationError
-} from 'error/AppError';
-import { ErrorMessages } from 'constants/errorMessages';
-import { StatusCodes } from 'constants/statusCodes';
-import { ITransactionDTO } from 'dtos/transaction/TransactionDto';
-import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
-import { SuccessMessages } from 'constants/successMessages';
-import transactionDTOSchema from 'validation/transaction/transaction.validation';
+} from '../../error/AppError';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { StatusCodes } from '../../constants/statusCodes';
+import { ITransactionDTO } from '../../dtos/transaction/TransactionDto';
+import { sendErrorResponse, sendSuccessResponse } from '../../utils/responseHandler';
+import { SuccessMessages } from '../../constants/successMessages';
+import transactionDTOSchema from '../../validation/transaction/transaction.validation';
 
 class TransactionController implements ITransactionController {
   private readonly _transactionService: ITransactionService;
 
-  /**
-   * Initializes a new instance of the `TransactionController` class.
-   *
-   * @param {ITransactionService} transactionService - The service implementation used to process transaction logic.
-   */
   constructor(transactionService: ITransactionService) {
     this._transactionService = transactionService;
   }

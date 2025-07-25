@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import IInsuranceManagementRepository from './interfaces/IInsuranceManagementRepository';
-import { InsuranceDTO } from 'dtos/insurances/insuranceDTO';
-import { InsuranceModel } from 'model/insurances/model/InsuranceModel';
+import { InsuranceDTO } from '../../dtos/insurances/insuranceDTO';
+import { InsuranceModel } from '../../model/insurances/model/InsuranceModel';
 
 class InsuranceManagementRepository implements IInsuranceManagementRepository {
     private static _instance: InsuranceManagementRepository;

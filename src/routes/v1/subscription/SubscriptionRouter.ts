@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import SubscriptionManagementRepository from 'repositories/subscriptions/SubscriptionManagementRepository';
-import SubscriptionService from 'services/subscriptions/SubscriptionService';
-import ISubscriptionController from 'controller/subscriptions/interfaces/ISubscriptionController';
-import SubscriptionController from 'controller/subscriptions/SubscriptionController';
+import SubscriptionManagementRepository from '../../../repositories/subscriptions/SubscriptionManagementRepository';
+import SubscriptionService from '../../../services/subscriptions/SubscriptionService';
+import ISubscriptionController from '../../../controller/subscriptions/interfaces/ISubscriptionController';
+import SubscriptionController from '../../../controller/subscriptions/SubscriptionController';
 
 const router = Router();
 const subscriptionRepository = new SubscriptionManagementRepository();

@@ -1,8 +1,8 @@
-import { UserModel } from 'model/user/model/UserModel';
+import { UserModel } from '../../model/user/model/UserModel';
 import IAuthUser from './interfaces/IAuthUser';
 import IUserBaseRespository from './interfaces/IUserBaseRespository';
-import IFaq from 'model/admin/interfaces/IFaq';
-import { FaqModel } from 'model/admin/model/FaqModel';
+import IFaq from '../../model/admin/interfaces/IFaq';
+import { FaqModel } from '../../model/admin/model/FaqModel';
 
 /**
  * Repository class for handling basic user data operations.

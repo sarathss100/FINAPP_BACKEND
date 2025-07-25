@@ -1,7 +1,7 @@
-import IUserBaseRespository from 'repositories/base/interfaces/IUserBaseRespository';
-import UserBaseRepository from 'repositories/base/UserBaseRespository';
-import ISubscriptionManagemenRepository from 'repositories/subscriptions/interfaces/ISubscriptionManagemenRepository';
-import SubscriptionManagementRepository from 'repositories/subscriptions/SubscriptionManagementRepository';
+import IUserBaseRespository from '../repositories/base/interfaces/IUserBaseRespository';
+import UserBaseRepository from '../repositories/base/UserBaseRespository';
+import ISubscriptionManagemenRepository from '../repositories/subscriptions/interfaces/ISubscriptionManagemenRepository';
+import SubscriptionManagementRepository from '../repositories/subscriptions/SubscriptionManagementRepository';
 
 const userBaseRepository: IUserBaseRespository = new UserBaseRepository();
 const subscriptionRepository: ISubscriptionManagemenRepository = new SubscriptionManagementRepository(); 

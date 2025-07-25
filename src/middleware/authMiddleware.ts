@@ -1,12 +1,12 @@
 import { Response, NextFunction } from 'express';
-import { UserRole } from 'types/auth/roles';
-import { sendErrorResponse } from 'utils/responseHandler';
-import { StatusCodes } from 'constants/statusCodes';
-import { generateAccessToken, verifyAccessToken } from 'utils/auth/tokenUtils';
+import { UserRole } from '../types/auth/roles';
+import { sendErrorResponse } from '../utils/responseHandler';
+import { StatusCodes } from '../constants/statusCodes';
+import { generateAccessToken, verifyAccessToken } from '../utils/auth/tokenUtils';
 import IAuthenticationRequest from './interfaces/IAuthenticationRequest';
-import { ErrorMessages } from 'constants/errorMessages';
-import RedisService from 'services/redis/RedisService';
-import ITokenPayload from 'types/auth/ITokenPayload';
+import { ErrorMessages } from '../constants/errorMessages';
+import RedisService from '../services/redis/RedisService';
+import ITokenPayload from '../types/auth/ITokenPayload';
 
 // Middleware to verify JWT and check roles
 export const authorizeRoles = function (...allowedRoles: UserRole[]) {

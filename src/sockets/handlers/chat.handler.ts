@@ -1,8 +1,8 @@
 import { Socket, Server } from "socket.io";
-import ChatService from "services/chats/ChatService";
-import IChatService from "services/chats/interfaces/IChatService";
+import ChatService from "../../services/chats/ChatService";
+import IChatService from "../../services/chats/interfaces/IChatService";
 // import getBotResponse from "services/openAi/OpenAIService";
-import { notifyAdminOfUserConnection } from "sockets/utils/socketRoomUtils";
+import { notifyAdminOfUserConnection } from "../../sockets/utils/socketRoomUtils";
 
 interface ChatMessagePayload {
   id: string;

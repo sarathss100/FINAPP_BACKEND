@@ -1,8 +1,8 @@
 import { Socket } from 'socket.io';
 import { decodeAndValidateToken } from '../../utils/auth/tokenUtils';
 import { AuthenticationError } from '../../error/AppError';
-import { StatusCodes } from 'constants/statusCodes';
-import { ErrorMessages } from 'constants/errorMessages';
+import { StatusCodes } from '../../constants/statusCodes';
+import { ErrorMessages } from '../../constants/errorMessages';
 
 export const authenticate = (socket: Socket, next: (err?: Error) => void): void => {
     const accessToken = socket.handshake.auth?.accessToken || socket.handshake.query?.accessToken;

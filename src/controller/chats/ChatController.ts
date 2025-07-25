@@ -1,12 +1,12 @@
-import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
-import { ErrorMessages } from 'constants/errorMessages';
-import { StatusCodes } from 'constants/statusCodes';
+import { sendErrorResponse, sendSuccessResponse } from '../../utils/responseHandler';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { StatusCodes } from '../../constants/statusCodes';
 import { Request, Response } from 'express';
-import { AppError } from 'error/AppError';
-import { SuccessMessages } from 'constants/successMessages';
+import { AppError } from '../../error/AppError';
+import { SuccessMessages } from '../../constants/successMessages';
 import { ZodError } from 'zod';
 import IChatController from './interfaces/IChatController';
-import IChatService from 'services/chats/interfaces/IChatService';
+import IChatService from '../../services/chats/interfaces/IChatService';
 // import { chatDTOSchema } from 'validation/chats/chat.validation';
 
 class ChatController implements IChatController {

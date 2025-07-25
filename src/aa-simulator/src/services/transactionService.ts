@@ -1,8 +1,8 @@
-import { generateAccessToken } from "utils/auth/tokenUtils";
-import TransactionService from "services/transaction/TransactionService";
-import ITransactionService from "services/transaction/interfaces/ITransaction";
-import { ITransactionDTO } from "dtos/transaction/TransactionDto";
-import IUserDetails from "repositories/admin/interfaces/IUserDetails";
+import { generateAccessToken } from "../../../utils/auth/tokenUtils";
+import TransactionService from "../../../services/transaction/TransactionService";
+import ITransactionService from "../../../services/transaction/interfaces/ITransaction";
+import { ITransactionDTO } from "../../../dtos/transaction/TransactionDto";
+import IUserDetails from "../../../repositories/admin/interfaces/IUserDetails";
 
 const transactionService: ITransactionService = TransactionService.instance;
 

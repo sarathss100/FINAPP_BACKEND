@@ -1,4 +1,4 @@
-import RedisService from 'services/redis/RedisService';
+import RedisService from '../../../services/redis/RedisService';
 import { IHealthCheck, IHealthStatus } from './interfaces/IHealth';
 
 const client = RedisService.getClient();

@@ -1,22 +1,22 @@
 import IInvestmentService from './interfaces/IInvestmentService';
-import InvestmentManagementRepository from 'repositories/investments/InvestmentManagementRepository';
+import InvestmentManagementRepository from '../../repositories/investments/InvestmentManagementRepository';
 import axios from 'axios';
 import IStock from './interfaces/IStock';
-import { InvestmentDTO } from 'dtos/investments/investmentDTO';
-import { decodeAndValidateToken } from 'utils/auth/tokenUtils';
-import { AuthenticationError } from 'error/AppError';
-import { ErrorMessages } from 'constants/errorMessages';
-import { StatusCodes } from 'constants/statusCodes';
-import { detectCurrencyFromExchange } from 'utils/investments/stockcurrencyconverter/regionRegex';
-import { getExchangeRate } from 'utils/investments/stockcurrencyconverter/currencyConverter';
-import getMutualFundDetails from 'utils/mutualfunds/getMutualFundDetails';
-import calculateBondProfitOrLoss from 'utils/investments/stockcurrencyconverter/calculateBondProfitOrLoss';
-import { updateStockPrices } from 'utils/investments/stockcurrencyconverter/updateStockPricesJob';
-import { updateMutualFundPrices } from 'utils/investments/stockcurrencyconverter/updateMutualFundPrices';
-import { updateGoldPrices } from 'utils/investments/stockcurrencyconverter/updateGoldPrices';
-import { updateBondPrices } from 'utils/investments/stockcurrencyconverter/updateBondPrices';
-import IInvestmentManagementRepository from 'repositories/investments/interfaces/IInvestmentManagementRepository';
-import { eventBus } from 'events/eventBus';
+import { InvestmentDTO } from '../../dtos/investments/investmentDTO';
+import { decodeAndValidateToken } from '../../utils/auth/tokenUtils';
+import { AuthenticationError } from '../../error/AppError';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { StatusCodes } from '../../constants/statusCodes';
+import { detectCurrencyFromExchange } from '../../utils/investments/stockcurrencyconverter/regionRegex';
+import { getExchangeRate } from '../../utils/investments/stockcurrencyconverter/currencyConverter';
+import getMutualFundDetails from '../../utils/mutualfunds/getMutualFundDetails';
+import calculateBondProfitOrLoss from '../../utils/investments/stockcurrencyconverter/calculateBondProfitOrLoss';
+import { updateStockPrices } from '../../utils/investments/stockcurrencyconverter/updateStockPricesJob';
+import { updateMutualFundPrices } from '../../utils/investments/stockcurrencyconverter/updateMutualFundPrices';
+import { updateGoldPrices } from '../../utils/investments/stockcurrencyconverter/updateGoldPrices';
+import { updateBondPrices } from '../../utils/investments/stockcurrencyconverter/updateBondPrices';
+import IInvestmentManagementRepository from '../../repositories/investments/interfaces/IInvestmentManagementRepository';
+import { eventBus } from '../../events/eventBus';
 
 
 class InvestmentService implements IInvestmentService {

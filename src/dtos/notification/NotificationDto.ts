@@ -1,4 +1,4 @@
-import { NotificationType } from "model/notification/interfaces/INotificaiton";
+import { NotificationType } from "../../model/notification/interfaces/INotificaiton";
 
 /**
  * DTO for Notification entity

@@ -1,12 +1,12 @@
-import { decodeAndValidateToken } from 'utils/auth/tokenUtils';
-import { AuthenticationError } from 'error/AppError';
-import { ErrorMessages } from 'constants/errorMessages';
-import { StatusCodes } from 'constants/statusCodes';
-import { IAccountDTO } from 'dtos/accounts/AccountsDTO';
+import { decodeAndValidateToken } from '../../utils/auth/tokenUtils';
+import { AuthenticationError } from '../../error/AppError';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { StatusCodes } from '../../constants/statusCodes';
+import { IAccountDTO } from '../../dtos/accounts/AccountsDTO';
 import IAccountsService from './interfaces/IAccountsService';
-import IAccountsManagementRepository from 'repositories/accounts/interfaces/IAccountsManagementRepository';
-import AccountManagementRepository from 'repositories/accounts/AccountsManagementRepository';
-import { eventBus } from 'events/eventBus';
+import IAccountsManagementRepository from '../../repositories/accounts/interfaces/IAccountsManagementRepository';
+import AccountManagementRepository from '../../repositories/accounts/AccountsManagementRepository';
+import { eventBus } from '../../events/eventBus';
 
 class AccountsService implements IAccountsService {
     private static _instance: AccountsService;

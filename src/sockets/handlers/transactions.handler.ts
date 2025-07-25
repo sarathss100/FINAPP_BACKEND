@@ -1,4 +1,4 @@
-import TransactionService from 'services/transaction/TransactionService';
+import TransactionService from '../../services/transaction/TransactionService';
 import { Socket, Server } from 'socket.io';
 
 const transactionService = TransactionService.instance;

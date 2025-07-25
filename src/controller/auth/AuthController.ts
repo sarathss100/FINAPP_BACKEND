@@ -1,12 +1,11 @@
 import { Request, Response } from 'express';
 import IAuthController from './ineterfaces/IAuthController';
-import IAuthService from 'services/auth/interfaces/IAuthService';
-import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
-import { StatusCodes } from 'constants/statusCodes';
-import { SuccessMessages } from 'constants/successMessages';
-import { ErrorMessages } from 'constants/errorMessages';
-import { AuthenticationError, ServerError } from 'error/AppError';
-import { AppError } from 'error/AppError';
+import IAuthService from '../../services/auth/interfaces/IAuthService';
+import { sendErrorResponse, sendSuccessResponse } from '../../utils/responseHandler';
+import { StatusCodes } from '../../constants/statusCodes';
+import { SuccessMessages } from '../../constants/successMessages';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { AuthenticationError, ServerError, AppError } from '../../error/AppError';
 
 class AuthController implements IAuthController {
     private readonly _authService: IAuthService;

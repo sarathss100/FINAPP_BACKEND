@@ -3,10 +3,10 @@
 // import { ErrorMessages } from 'constants/errorMessages';
 // import { StatusCodes } from 'constants/statusCodes';
 import IChatService from './interfaces/IChatService';
-import IChatRepository from 'repositories/chats/interfaces/IChatRepository';
-import ChatManagementRepository from 'repositories/chats/ChatManagementRepository';
-import getBotResponse from 'services/openAi/OpenAIService';
-import { ChatDTO } from 'dtos/chats/chatDTO';
+import IChatRepository from '../../repositories/chats/interfaces/IChatRepository';
+import ChatManagementRepository from '../../repositories/chats/ChatManagementRepository';
+import getBotResponse from '../../services/openAi/OpenAIService';
+import { ChatDTO } from '../../dtos/chats/chatDTO';
 
 // import ChatbotProvider from 'services/openAi/interfaces/ChatbotProvider';
 // import OpenAIService from 'services/openAi/OpenAIService';

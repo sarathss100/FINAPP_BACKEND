@@ -1,4 +1,4 @@
-import IFaq from 'model/admin/interfaces/IFaq';
+import IFaq from '../../../model/admin/interfaces/IFaq';
 import IAuthUser from './IAuthUser';
 
 interface IUserBaseRespository {

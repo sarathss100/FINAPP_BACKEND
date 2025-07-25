@@ -1,10 +1,10 @@
-import IProfile from 'services/user/interfaces/IProfile';
+import IProfile from '../../services/user/interfaces/IProfile';
 import IUserRepository from './interfaces/IUserRepository';
-import UserBaseRespository from 'repositories/base/UserBaseRespository';
-import { UserModel } from 'model/user/model/UserModel';
-import { NotFoundError } from 'error/AppError';
+import UserBaseRespository from '../../repositories/base/UserBaseRespository';
+import { UserModel } from '../../model/user/model/UserModel';
+import { NotFoundError } from '../../error/AppError';
 import { Error } from 'mongoose';
-import { ErrorMessages } from 'constants/errorMessages';
+import { ErrorMessages } from '../../constants/errorMessages';
 
 class UserRepository extends UserBaseRespository implements IUserRepository {
     // Find a user's profile information by their unique user ID.

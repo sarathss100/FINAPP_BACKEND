@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-escape */
 import { v2 as cloudinaryV2 } from 'cloudinary';
-import { ErrorMessages } from 'constants/errorMessages';
-import { ServerError } from 'error/AppError';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { ServerError } from '../../error/AppError';
 import { Stream as stream } from 'stream';
 
 cloudinaryV2.config({

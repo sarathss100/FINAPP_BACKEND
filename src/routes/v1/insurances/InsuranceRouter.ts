@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import InsuranceManagementRepository from 'repositories/insurances/InsuranceManagementRepository';
-import IInsuranceController from 'controller/insurances/interfaces/IInsuranceController';
-import InsuranceService from 'services/insurances/InsuranceService';
-import InsuranceController from 'controller/insurances/InsuranceController';
+import InsuranceManagementRepository from '../../../repositories/insurances/InsuranceManagementRepository';
+import IInsuranceController from '../../../controller/insurances/interfaces/IInsuranceController';
+import InsuranceService from '../../../services/insurances/InsuranceService';
+import InsuranceController from '../../../controller/insurances/InsuranceController';
 
 const router = Router();
 const insuranceRepository = new InsuranceManagementRepository();

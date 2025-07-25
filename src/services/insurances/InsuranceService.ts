@@ -1,12 +1,12 @@
-import { decodeAndValidateToken } from 'utils/auth/tokenUtils';
-import { AuthenticationError } from 'error/AppError';
-import { ErrorMessages } from 'constants/errorMessages';
-import { StatusCodes } from 'constants/statusCodes';
+import { decodeAndValidateToken } from '../../utils/auth/tokenUtils';
+import { AuthenticationError } from '../../error/AppError';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { StatusCodes } from '../../constants/statusCodes';
 import IInsuranceService from './interfaces/IInsuranceService';
-import InsuranceManagementRepository from 'repositories/insurances/InsuranceManagementRepository';
-import { InsuranceDTO } from 'dtos/insurances/insuranceDTO';
-import IInsuranceManagementRepository from 'repositories/insurances/interfaces/IInsuranceManagementRepository';
-import { eventBus } from 'events/eventBus';
+import InsuranceManagementRepository from '../../repositories/insurances/InsuranceManagementRepository';
+import { InsuranceDTO } from '../../dtos/insurances/insuranceDTO';
+import IInsuranceManagementRepository from '../../repositories/insurances/interfaces/IInsuranceManagementRepository';
+import { eventBus } from '../../events/eventBus';
 
 class InsuranceService implements IInsuranceService {
     private static _instance: InsuranceService;

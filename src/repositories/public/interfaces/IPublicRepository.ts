@@ -1,4 +1,4 @@
-import { IFaq } from 'dtos/base/FaqDto';
+import { IFaq } from '../../../dtos/base/FaqDto';
 
 interface IPublicRepository {
     getFaqs(): Promise<IFaq[] | null>

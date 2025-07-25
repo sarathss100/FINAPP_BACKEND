@@ -1,11 +1,11 @@
 // middleware/requireSubscription.ts
-import { ErrorMessages } from "constants/errorMessages";
-import { StatusCodes } from "constants/statusCodes";
+import { ErrorMessages } from "../constants/errorMessages";
+import { StatusCodes } from "../constants/statusCodes";
 import { Request, Response, NextFunction, response } from "express";
-import IUserRepository from "repositories/user/interfaces/IUserRepository";
-import UserRepository from "repositories/user/UserRepository";
-import { verifyAccessToken } from "utils/auth/tokenUtils";
-import { sendErrorResponse } from "utils/responseHandler";
+import IUserRepository from "../repositories/user/interfaces/IUserRepository";
+import UserRepository from "../repositories/user/UserRepository";
+import { verifyAccessToken } from "../utils/auth/tokenUtils";
+import { sendErrorResponse } from "../utils/responseHandler";
 
 const userRepository: IUserRepository = new UserRepository();
 

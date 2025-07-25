@@ -1,5 +1,5 @@
 import { Socket, Server } from 'socket.io';
-import INotificationService from 'services/notification/interfaces/INotificationService';
+import INotificationService from '../../services/notification/interfaces/INotificationService';
 
 const registerNotificationHandlers = function(io: Server, socket: Socket, notificationService: INotificationService): void {
     const accessToken = socket.data.accessToken;

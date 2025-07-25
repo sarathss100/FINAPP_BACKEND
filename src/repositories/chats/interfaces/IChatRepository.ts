@@ -1,4 +1,4 @@
-import { ChatDTO } from "dtos/chats/chatDTO";
+import { ChatDTO } from "../../../dtos/chats/chatDTO";
 
 interface IChatRepository {
     createChat(userId: string, role: 'user' | 'admin', message: string): Promise<void>;

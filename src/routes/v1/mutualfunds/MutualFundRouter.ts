@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import MutualFundRepository from 'repositories/mutualfunds/MutualFundRepository';
-import MutualFundController from 'controller/mutualfunds/MutualFundController';
-import MutualFundService from 'services/mutualfunds/MutualFundService';
-import IMutualFundController from 'controller/mutualfunds/interfaces/IMutualFundController';
+import MutualFundRepository from '../../../repositories/mutualfunds/MutualFundRepository';
+import MutualFundController from '../../../controller/mutualfunds/MutualFundController';
+import MutualFundService from '../../../services/mutualfunds/MutualFundService';
+import IMutualFundController from '../../../controller/mutualfunds/interfaces/IMutualFundController';
 
 const router = Router();
 const mutualFundRepository = new MutualFundRepository();

@@ -1,4 +1,4 @@
-import { IGoalDTO } from 'dtos/goal/GoalDto';
+import { IGoalDTO } from '../../../dtos/goal/GoalDto';
 
 interface IGoalManagementRepository {
     createGoal(goalData: IGoalDTO): Promise<IGoalDTO>;

@@ -1,15 +1,12 @@
 import { Request, Response } from 'express';
-import { AppError, ServerError, ValidationError } from 'error/AppError';
-import { ErrorMessages } from 'constants/errorMessages';
-import { StatusCodes } from 'constants/statusCodes';
-import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
-import { SuccessMessages } from 'constants/successMessages';
+import { AppError, ServerError, ValidationError } from '../../error/AppError';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { StatusCodes } from '../../constants/statusCodes';
+import { sendErrorResponse, sendSuccessResponse } from '../../utils/responseHandler';
+import { SuccessMessages } from '../../constants/successMessages';
 import IMutualFundController from './interfaces/IMutualFundController';
-import IMutualFundService from 'services/mutualfunds/interfaces/IMutualFundService';
+import IMutualFundService from '../../services/mutualfunds/interfaces/IMutualFundService';
 
-/**
- * Controller class responsible for handling Mutual Fund-related HTTP requests.
- */
 class MutualFundController implements IMutualFundController {
     private readonly _mutualFundService: IMutualFundService;
 

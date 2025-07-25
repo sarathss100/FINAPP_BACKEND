@@ -1,7 +1,7 @@
 import { CronJob } from 'cron';
 import moment from 'moment';
-import DebtService from 'services/debt/DebtService';
-import IDebtService from 'services/debt/interfaces/IDebtService';
+import DebtService from '../services/debt/DebtService';
+import IDebtService from '../services/debt/interfaces/IDebtService';
 
 const debtService: IDebtService = DebtService.instance;
 

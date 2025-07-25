@@ -1,4 +1,4 @@
-import { ITransactionDTO } from 'dtos/transaction/TransactionDto';
+import { ITransactionDTO } from '../../../dtos/transaction/TransactionDto';
 
 interface ITransactionRepository {
     createTransaction(data: ITransactionDTO): Promise<ITransactionDTO>;

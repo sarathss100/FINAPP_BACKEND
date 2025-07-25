@@ -1,6 +1,6 @@
-import { ITransactionDTO } from 'dtos/transaction/TransactionDto';
+import { ITransactionDTO } from '../../dtos/transaction/TransactionDto';
 import ITransactionRepository from './interfaces/ITransactionRepository';
-import { TransactionModel } from 'model/transaction/model/TransactionModel';
+import { TransactionModel } from '../../model/transaction/model/TransactionModel';
 
 class TransactionRepository implements ITransactionRepository {
     private static _instance: TransactionRepository;

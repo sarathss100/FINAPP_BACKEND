@@ -1,5 +1,5 @@
-import ChatService from "services/chats/ChatService";
-import IChatService from "services/chats/interfaces/IChatService";
+import ChatService from "../../services/chats/ChatService";
+import IChatService from "../../services/chats/interfaces/IChatService";
 import { Socket, Server } from "socket.io";
 
 const chatService: IChatService = ChatService.instance;

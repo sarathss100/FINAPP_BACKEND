@@ -1,11 +1,11 @@
-import IPublicService from 'services/public/interfaces/IPublicService';
+import IPublicService from '../../services/public/interfaces/IPublicService';
 import IPublicController from './interfaces/IPublicController';
-import { StatusCodes } from 'constants/statusCodes';
-import { SuccessMessages } from 'constants/successMessages';
-import { ErrorMessages } from 'constants/errorMessages';
-import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
+import { StatusCodes } from '../../constants/statusCodes';
+import { SuccessMessages } from '../../constants/successMessages';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { sendErrorResponse, sendSuccessResponse } from '../../utils/responseHandler';
 import { Request, Response } from 'express';
-import { AppError } from 'error/AppError';
+import { AppError } from '../../error/AppError';
 
 class PublicController implements IPublicController {
     public readonly _publicService: IPublicService;

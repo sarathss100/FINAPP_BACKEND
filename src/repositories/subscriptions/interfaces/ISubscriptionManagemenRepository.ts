@@ -1,4 +1,4 @@
-import { SubscriptionDTO } from 'dtos/subscriptions/subscriptionDTO';
+import { SubscriptionDTO } from '../../../dtos/subscriptions/subscriptionDTO';
 
 interface ISubscriptionManagemenRepository {
     createSubscription(subscriptionData: SubscriptionDTO): Promise<void>;

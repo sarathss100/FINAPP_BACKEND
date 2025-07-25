@@ -1,6 +1,6 @@
-import { IMutualFundDTO } from 'dtos/mutualfunds/MutualFundDTO';
+import { IMutualFundDTO } from '../../dtos/mutualfunds/MutualFundDTO';
 import IMutualFundRepository from './interfaces/IMutualFundRepository';
-import { MutualFundModel } from 'model/mutualfunds/model/MutualFundModel';
+import { MutualFundModel } from '../../model/mutualfunds/model/MutualFundModel';
 
 class MutualFundRepository implements IMutualFundRepository {
     private static _instance: MutualFundRepository;

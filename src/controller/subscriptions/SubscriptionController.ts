@@ -1,13 +1,13 @@
-import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
-import { ErrorMessages } from 'constants/errorMessages';
-import { StatusCodes } from 'constants/statusCodes';
+import { sendErrorResponse, sendSuccessResponse } from '../../utils/responseHandler';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { StatusCodes } from '../../constants/statusCodes';
 import { Request, Response } from 'express';
-import { AppError } from 'error/AppError';
-import { SuccessMessages } from 'constants/successMessages';
+import { AppError } from '../../error/AppError';
+import { SuccessMessages } from '../../constants/successMessages';
 import { ZodError } from 'zod';
 import ISubscriptionController from './interfaces/ISubscriptionController';
-import ISubscriptionService from 'services/subscriptions/interfaces/ISubscriptionService';
-import { initiatePaymentDTOSchema } from 'validation/subscription/subscription.validation';
+import ISubscriptionService from '../../services/subscriptions/interfaces/ISubscriptionService';
+import { initiatePaymentDTOSchema } from '../../validation/subscription/subscription.validation';
 
 class SubscriptionController implements ISubscriptionController {
     private readonly _subscriptionService: ISubscriptionService;

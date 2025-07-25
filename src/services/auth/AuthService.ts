@@ -1,20 +1,20 @@
-import { SignupDto } from 'dtos/auth/SignupDto';
+import { SignupDto } from '../../dtos/auth/SignupDto';
 import IAuthService from './interfaces/IAuthService';
-import IAuthRepository from 'repositories/auth/interfaces/IAuthRepository';
-import IHasher from 'types/utils/IHasher';
-import { generateAccessToken, generateRefreshToken, verifyAccessToken } from 'utils/auth/tokenUtils';
-import RedisService from 'services/redis/RedisService';
+import IAuthRepository from '../../repositories/auth/interfaces/IAuthRepository';
+import IHasher from '../../types/utils/IHasher';
+import { generateAccessToken, generateRefreshToken, verifyAccessToken } from '../../utils/auth/tokenUtils';
+import RedisService from '../../services/redis/RedisService';
 import IAuthServiceUser from './interfaces/IAuthUser';
-import { SigninDto } from 'dtos/auth/SigninDto';
-import ITokenPayload from 'types/auth/ITokenPayload';
-import { ResetPasswordDto } from 'dtos/auth/ResetPasswordDto';
-import { AppError, AuthenticationError, ForbiddenError, ServerError, ValidationError } from 'error/AppError';
-import { ErrorMessages } from 'constants/errorMessages';
-import { StatusCodes } from 'constants/statusCodes';
-import { SignupSchema } from 'validation/auth/signup.validation';
-import { ResetPasswordSchema } from 'validation/auth/resetPassword.validation';
-import { SigninSchema } from 'validation/auth/signin.validation';
-import IUser from 'dtos/base/UserDto';
+import { SigninDto } from '../../dtos/auth/SigninDto';
+import ITokenPayload from '../../types/auth/ITokenPayload';
+import { ResetPasswordDto } from '../../dtos/auth/ResetPasswordDto';
+import { AppError, AuthenticationError, ForbiddenError, ServerError, ValidationError } from '../../error/AppError';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { StatusCodes } from '../../constants/statusCodes';
+import { SignupSchema } from '../../validation/auth/signup.validation';
+import { ResetPasswordSchema } from '../../validation/auth/resetPassword.validation';
+import { SigninSchema } from '../../validation/auth/signin.validation';
+import IUser from '../../dtos/base/UserDto';
 
 class AuthService implements IAuthService {
     private _authRepository: IAuthRepository;

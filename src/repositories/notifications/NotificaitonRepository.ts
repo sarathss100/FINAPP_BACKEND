@@ -1,6 +1,6 @@
-import { INotificationDTO } from 'dtos/notification/NotificationDto';
+import { INotificationDTO } from '../../dtos/notification/NotificationDto';
 import INotificatonManagementRepository from './interfaces/INotificaitionRepository'; 
-import { NotificationModel } from 'model/notification/model/NotificaionModel';
+import { NotificationModel } from '../../model/notification/model/NotificaionModel';
 
 /**
  * Implementation of the notification management repository.

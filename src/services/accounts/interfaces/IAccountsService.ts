@@ -1,4 +1,4 @@
-import { IAccountDTO } from 'dtos/accounts/AccountsDTO';
+import { IAccountDTO } from '../../../dtos/accounts/AccountsDTO';
 
 interface IAccountsService {
     addAccount(accessToken: string, accountData: IAccountDTO): Promise<IAccountDTO>;

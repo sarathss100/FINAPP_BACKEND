@@ -1,4 +1,4 @@
-import InvestmentService from 'services/investments/InvestmentService';
+import InvestmentService from '../../services/investments/InvestmentService';
 import { Socket, Server } from 'socket.io';
 
 const investmentService = InvestmentService.instance;

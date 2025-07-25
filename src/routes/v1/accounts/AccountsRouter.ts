@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import AccountManagementRepository from 'repositories/accounts/AccountsManagementRepository';
-import AccountsService from 'services/accounts/AccountService';
-import AccountsController from 'controller/accounts/AccountsController';
-import IAccountsController from 'controller/accounts/interfaces/IAccountsController';
+import AccountManagementRepository from '../../../repositories/accounts/AccountsManagementRepository';
+import AccountsService from '../../../services/accounts/AccountService';
+import AccountsController from '../../../controller/accounts/AccountsController';
+import IAccountsController from '../../../controller/accounts/interfaces/IAccountsController';
 
 const router = Router();
 const accountsRepository = new AccountManagementRepository();

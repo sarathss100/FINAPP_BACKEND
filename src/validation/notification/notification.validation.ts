@@ -1,4 +1,4 @@
-import { NOTIFICATION_TYPES } from 'model/notification/interfaces/INotificaiton';
+import { NOTIFICATION_TYPES } from '../../model/notification/interfaces/INotificaiton';
 import { z } from 'zod';
 
 // Create a Zod enum schema from the array

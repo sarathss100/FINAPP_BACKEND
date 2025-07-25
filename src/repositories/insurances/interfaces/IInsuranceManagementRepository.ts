@@ -1,4 +1,4 @@
-import { InsuranceDTO } from 'dtos/insurances/insuranceDTO';
+import { InsuranceDTO } from '../../../dtos/insurances/insuranceDTO';
 
 interface IInsuranceManagementRepository {
     createInsurance(insuranceData: InsuranceDTO, userId: string): Promise<InsuranceDTO>;

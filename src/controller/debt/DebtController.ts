@@ -1,19 +1,14 @@
-import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
-import { ErrorMessages } from 'constants/errorMessages';
-import { StatusCodes } from 'constants/statusCodes';
+import { sendErrorResponse, sendSuccessResponse } from '../../utils/responseHandler';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { StatusCodes } from '../../constants/statusCodes';
 import { Request, Response } from 'express';
-import { AppError, ServerError } from 'error/AppError';
-import { SuccessMessages } from 'constants/successMessages';
+import { AppError, ServerError } from '../../error/AppError';
+import { SuccessMessages } from '../../constants/successMessages';
 import { ZodError } from 'zod';
 import IDebtController from './interfaces/IDebtController';
-import IDebtService from 'services/debt/interfaces/IDebtService';
-import debtDTOSchema from 'validation/debt/debt.validation';
+import IDebtService from '../../services/debt/interfaces/IDebtService';
+import debtDTOSchema from '../../validation/debt/debt.validation';
 
-/**
- * @class DebtController
- * @description Controller class responsible for handling debt-related HTTP requests.
- * Acts as an intermediary between the Express routes and the service layer.
- */
 class DebtController implements IDebtController {
     private readonly _debtService: IDebtService;
 

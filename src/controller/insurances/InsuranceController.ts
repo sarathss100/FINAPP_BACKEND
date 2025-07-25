@@ -1,19 +1,14 @@
-import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler';
-import { ErrorMessages } from 'constants/errorMessages';
-import { StatusCodes } from 'constants/statusCodes';
+import { sendErrorResponse, sendSuccessResponse } from '../../utils/responseHandler';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { StatusCodes } from '../../constants/statusCodes';
 import { Request, Response } from 'express';
-import { AppError } from 'error/AppError';
-import { SuccessMessages } from 'constants/successMessages';
+import { AppError } from '../../error/AppError';
+import { SuccessMessages } from '../../constants/successMessages';
 import { ZodError } from 'zod';
 import IInsuranceController from './interfaces/IInsuranceController';
-import IInsuranceService from 'services/insurances/interfaces/IInsuranceService';
-import { insuranceDTOSchema } from 'validation/insurances/insurance.validation';
+import IInsuranceService from '../../services/insurances/interfaces/IInsuranceService';
+import { insuranceDTOSchema } from '../../validation/insurances/insurance.validation';
 
-/**
- * @class InsuranceController
- * @description Controller class responsible for handling insurance-related HTTP requests.
- * Acts as an intermediary between the Express routes and the service layer.
- */
 class InsuranceController implements IInsuranceController {
     private readonly _insuranceService: IInsuranceService;
 

@@ -1,27 +1,27 @@
-import './config/envConfig/envConfig'; // Load dotenv globally
+import './config/envConfig/envConfig'; 
 import express, { Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 import loggingMiddleware from './middleware/LoggingMiddleware';
 import router from './routes/routes';
 import cors from 'cors';
-import corsOptions from 'utils/middleware/corsOptions';
-// import rateLimiter from 'utils/middleware/rateLimiter';
+import corsOptions from './utils/middleware/corsOptions';
+// import rateLimiter from './utils/middleware/rateLimiter';
 import helmet from 'helmet';
 import './cron/scheduler';
 import expireJob from './cron/expireInsurances';
 import markExpiryDebts from './cron/DebtMonthlyExpiry';
 import markDebtCompleted from './cron/markEndedDebtsAsCompleted.ts';
-import updateStockPrice from 'cron/updateStockPrices';
-import updateMutualFundPrice from 'cron/updateMutualFundPrices';
-import updateBondPricesCron from 'cron/updateBondPrices';
-import { startNotificationCronJobs } from 'cron/notificationCron';
-import { startGoalNotificationCronJob } from 'cron/notificationCron';
-import { setupSocketListeners } from 'sockets/listeners';
-import WebhookController from 'controller/webhook/WebhookController';
+import updateStockPrice from './cron/updateStockPrices';
+import updateMutualFundPrice from './cron/updateMutualFundPrices';
+import updateBondPricesCron from './cron/updateBondPrices';
+import { startNotificationCronJobs } from './cron/notificationCron';
+import { startGoalNotificationCronJob } from './cron/notificationCron';
+import { setupSocketListeners } from './sockets/listeners';
+import WebhookController from './controller/webhook/WebhookController';
 
-import { startTransactionGenerator } from 'aa-simulator/src/cron/startTransactionGenerator';
-import  { startDebtGenerator } from 'aa-simulator/src/cron/startDebtGenerator';
-import { startInsuranceGenerator } from 'aa-simulator/src/cron/startInsuranceGenerator';
+import { startTransactionGenerator } from './aa-simulator/src/cron/startTransactionGenerator';
+import  { startDebtGenerator } from './aa-simulator/src/cron/startDebtGenerator';
+import { startInsuranceGenerator } from './aa-simulator/src/cron/startInsuranceGenerator';
 
 const app = express();
 expireJob.start();

@@ -1,12 +1,12 @@
-import IUserRepository from 'repositories/user/interfaces/IUserRepository';
+import IUserRepository from '../../repositories/user/interfaces/IUserRepository';
 import IUserService from './interfaces/IUserService';
 import IProfile from './interfaces/IProfile';
-import { decodeAndValidateToken } from 'utils/auth/tokenUtils';
-import { AuthenticationError, ServerError, ValidationError } from 'error/AppError';
-import { ErrorMessages } from 'constants/errorMessages';
-import { StatusCodes } from 'constants/statusCodes';
-import uploadToCloudinary, { deleteImage } from 'services/cloudinary/cloudinaryService';
-import generateUniqueId from 'utils/user/generateUniqueId';
+import { decodeAndValidateToken } from '../../utils/auth/tokenUtils';
+import { AuthenticationError, ServerError, ValidationError } from '../../error/AppError';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { StatusCodes } from '../../constants/statusCodes';
+import uploadToCloudinary, { deleteImage } from '../../services/cloudinary/cloudinaryService';
+import generateUniqueId from '../../utils/user/generateUniqueId';
 
 class UserService implements IUserService {
     private _userRepository: IUserRepository;

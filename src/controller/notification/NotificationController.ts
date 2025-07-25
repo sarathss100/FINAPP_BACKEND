@@ -1,18 +1,13 @@
-import { sendErrorResponse, sendSuccessResponse } from 'utils/responseHandler'; 
-import { ErrorMessages } from 'constants/errorMessages'; 
-import { StatusCodes } from 'constants/statusCodes'; 
+import { sendErrorResponse, sendSuccessResponse } from '../../utils/responseHandler'; 
+import { ErrorMessages } from '../../constants/errorMessages'; 
+import { StatusCodes } from '../../constants/statusCodes'; 
 import { Request, Response } from 'express'; 
-import { AppError, AuthenticationError, ValidationError } from 'error/AppError'; 
-import { SuccessMessages } from 'constants/successMessages'; 
+import { AppError, AuthenticationError, ValidationError } from '../../error/AppError'; 
+import { SuccessMessages } from '../../constants/successMessages'; 
 import INotificationController from './interfaces/INotificationController';
-import INotificationService from 'services/notification/interfaces/INotificationService';
-import notificationDTOSchema from 'validation/notification/notification.validation';
+import INotificationService from '../../services/notification/interfaces/INotificationService';
+import notificationDTOSchema from '../../validation/notification/notification.validation';
 
-/**
- * Controller class responsible for handling incoming HTTP requests related to notifications.
- * This class acts as an intermediary between the routes and the service layer,
- * ensuring proper validation, error handling, and response formatting.
- */
 class NotificationController implements INotificationController {
     private readonly _notificationService: INotificationService;
 

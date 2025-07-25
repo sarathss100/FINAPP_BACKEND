@@ -1,8 +1,8 @@
-import { generateAccessToken } from "utils/auth/tokenUtils";
-import IUserDetails from "repositories/admin/interfaces/IUserDetails";
-import { IDebtDTO } from "dtos/debt/DebtDto";
-import IDebtService from "services/debt/interfaces/IDebtService";
-import DebtService from "services/debt/DebtService";
+import { generateAccessToken } from "../../../utils/auth/tokenUtils";
+import IUserDetails from "../../../repositories/admin/interfaces/IUserDetails";
+import { IDebtDTO } from "../../../dtos/debt/DebtDto";
+import IDebtService from "../../../services/debt/interfaces/IDebtService";
+import DebtService from "../../../services/debt/DebtService";
 
 const debtService: IDebtService = DebtService.instance;
 
