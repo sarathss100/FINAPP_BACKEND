@@ -7,5 +7,3 @@ private_key.pem
 public_key.pem
 system.log
 analysis.sh
-Dockerfile.prod
-docker-compose.yml
