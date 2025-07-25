@@ -15,4 +15,4 @@ COPY . .
 EXPOSE 5000 
 
 # Start development server with hot reload 
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "start"  ]
