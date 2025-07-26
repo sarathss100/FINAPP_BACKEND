@@ -16,7 +16,7 @@ export const startTransactionGenerator = function() {
     setTimeout(generateSingleTransaction, 2000);
 
     // Schedule cron job for every 10 minutes: */10 * * * * 
-    cron.schedule('*/10 * * * *', async () => {
+    cron.schedule('*0 */4 * * *', async () => {
         console.log(`\nCron Job Triggered - ${new Date().toLocaleString()}`);
         await generateSingleTransaction();
     });

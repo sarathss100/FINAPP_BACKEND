@@ -16,7 +16,7 @@ export const startDebtGenerator = function() {
     setTimeout(generateSingleDebt, 2000);
 
     // Schedule cron job for every 10 minutes: */10 * * * * 
-    cron.schedule('*/10 * * * *', async () => {
+    cron.schedule('*0 10 * * 1', async () => {
         console.log(`\nCron Job Triggered - ${new Date().toLocaleString()}`);
         await generateSingleDebt();
     });
