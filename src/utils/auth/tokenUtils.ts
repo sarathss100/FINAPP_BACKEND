@@ -22,7 +22,7 @@ export const generateAccessToken = function (user: IAuthUser): string {
     return jwt.sign(
         { userId: user.userId, phoneNumber: user.phoneNumber, role: user.role },
         ACCESS_TOKEN_SECRET,
-        { expiresIn: '15m' }
+        { expiresIn: '40m' }
     )
 };
 
