@@ -52,16 +52,21 @@ class AuthController implements IAuthController {
     async verifyToken(request: Request, response: Response): Promise<void> {
         try {
             // Extract the cookie from the request headers
-            const authHeader: string | undefined = request.headers.cookie;
+            const accessToken = 
+                request.body.token ||
+                request.headers.authorization?.split(' ')[1] ||
+                request.cookies?.accessToken;
+
+            // const authHeader: string | undefined = request.headers.cookie;
 
             // Check if the cookie exists
-            if (!authHeader) {
-                throw new AuthenticationError(ErrorMessages.AUTH_COOKIE_MISSING, StatusCodes.UNAUTHORIZED);
-            }
+            // if (!authHeader) {
+            //     throw new AuthenticationError(ErrorMessages.AUTH_COOKIE_MISSING, StatusCodes.UNAUTHORIZED);
+            // }
   
-            // Parse the cookie to extract 
-            const parsedAuthHeader = JSON.parse(authHeader!);
-            const { accessToken } = parsedAuthHeader;
+            // // Parse the cookie to extract 
+            // const parsedAuthHeader = JSON.parse(authHeader!);
+            // const { accessToken } = parsedAuthHeader;
         
             if (!accessToken) {
                 throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
