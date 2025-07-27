@@ -18,27 +18,26 @@ class AuthController implements IAuthController {
         try {
             const signupData = request.body;
             
-            // Call the signup method from AuthService
             const result = await this._authService.signup(signupData);
 
-            // Extract the accessToken from the result
             const { accessToken, userId, role } = result;
 
-            // Set the accessToken as an HTTP-only cookie
             response.cookie('accessToken', accessToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production' ? true : false,
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                domain: process.env.NODE_ENV === 'production' ? 'finapp.my' : undefined,
+                path: '/'
             });
 
-            // Set the user ID, role and LoggedIn state as an HTTP-only cookie
             response.cookie('userMetaData', JSON.stringify({ userId, role, isLoggedIn: true }), {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production' ? true : false,
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                domain: process.env.NODE_ENV === 'production' ? 'finapp.my' : undefined,
+                path: '/'
             });
 
-            // Send a success response
             sendSuccessResponse(response, StatusCodes.CREATED, SuccessMessages.SIGNUP_SUCCESS, { userId, role });
         } catch (error) {
             if (error instanceof AppError) {
@@ -51,22 +50,14 @@ class AuthController implements IAuthController {
 
     async verifyToken(request: Request, response: Response): Promise<void> {
         try {
-            // Extract the cookie from the request headers
-            const accessToken = 
-                request.body.token ||
-                request.headers.authorization?.split(' ')[1] ||
-                request.cookies?.accessToken;
+            const authHeader: string | undefined = request.headers.cookie;
 
-            // const authHeader: string | undefined = request.headers.cookie;
-
-            // Check if the cookie exists
-            // if (!authHeader) {
-            //     throw new AuthenticationError(ErrorMessages.AUTH_COOKIE_MISSING, StatusCodes.UNAUTHORIZED);
-            // }
+            if (!authHeader) {
+                throw new AuthenticationError(ErrorMessages.AUTH_COOKIE_MISSING, StatusCodes.UNAUTHORIZED);
+            }
   
-            // // Parse the cookie to extract 
-            // const parsedAuthHeader = JSON.parse(authHeader!);
-            // const { accessToken } = parsedAuthHeader;
+            const parsedAuthHeader = JSON.parse(authHeader!);
+            const { accessToken } = parsedAuthHeader;
         
             if (!accessToken) {
                 throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
@@ -93,27 +84,26 @@ class AuthController implements IAuthController {
         try {
             const signinData = request.body;
             
-            // Call the signup method from AuthService
             const result = await this._authService.signin(signinData);
 
-            // Extract the accessToken from the result
             const { accessToken, userId, role, is2FA } = result;
 
-            // Set the accessToken as an HTTP-only cookie
             response.cookie('accessToken', accessToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production' ? true : false,
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                domain: process.env.NODE_ENV === 'production' ? 'finapp.my' : undefined,
+                path: '/'
             });
 
-            // Cookie for user metadata 
             response.cookie('userMetaData', JSON.stringify({ userId, role, isLoggedIn: true }), {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production' ? true : false,
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                domain: process.env.NODE_ENV === 'production' ? 'finapp.my' : undefined,
+                path: '/'
             });
 
-            // Send a success response
             sendSuccessResponse(response, StatusCodes.CREATED, SuccessMessages.SIGNIN_SUCCESS, { userId, role, is2FA });
         } catch (error) {
             if (error instanceof AppError) {
@@ -132,7 +122,6 @@ class AuthController implements IAuthController {
                 throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
             }
 
-            // Call the signout method from AuthService
             const signoutStatus = await this._authService.signout(accessToken);
             if (!signoutStatus) {
                 throw new ServerError(ErrorMessages.SIGNOUT_ERROR, StatusCodes.INTERNAL_SERVER_ERROR);
@@ -142,12 +131,16 @@ class AuthController implements IAuthController {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production'? true : false,
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                domain: process.env.NODE_ENV === 'production' ? 'finapp.my' : undefined,
+                path: '/'
             });
 
             response.clearCookie('userMetaData', {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production'? true : false,
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                domain: process.env.NODE_ENV === 'production' ? 'finapp.my' : undefined,
+                path: '/'
             });
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.SIGNOUT_SUCCESS);
@@ -168,7 +161,6 @@ class AuthController implements IAuthController {
                 throw new AuthenticationError(ErrorMessages.PHONE_NUMBER_MISSING, StatusCodes.BAD_REQUEST);
             }
 
-            // Call the verifyPhoneNumber method from AuthService
             const isVerifiedPhoneNumber = await this._authService.verifyPhoneNumber(phoneNumber);
             if (!isVerifiedPhoneNumber) throw new AuthenticationError(ErrorMessages.USER_NOT_FOUND, StatusCodes.BAD_REQUEST);
             
@@ -186,7 +178,6 @@ class AuthController implements IAuthController {
         try {
             const data = request.body;
 
-            // Call the verifyPhoneNumber method from AuthService
             const isPasswordResetted = await this._authService.resetPassword(data);
             if (!isPasswordResetted) throw new ServerError(ErrorMessages.PASSWORD_RESET_FAILED, StatusCodes.BAD_REQUEST);
 
