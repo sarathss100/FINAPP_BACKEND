@@ -26,7 +26,7 @@ class AuthController implements IAuthController {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production' ? true : false,
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-                domain: process.env.NODE_ENV === 'production' ? 'finapp.my' : undefined,
+                domain: process.env.NODE_ENV === 'production' ? '.finapp.my' : undefined,
                 path: '/'
             });
 
@@ -34,7 +34,7 @@ class AuthController implements IAuthController {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production' ? true : false,
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-                domain: process.env.NODE_ENV === 'production' ? 'finapp.my' : undefined,
+                domain: process.env.NODE_ENV === 'production' ? '.finapp.my' : undefined,
                 path: '/'
             });
 
@@ -92,7 +92,7 @@ class AuthController implements IAuthController {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production' ? true : false,
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-                domain: process.env.NODE_ENV === 'production' ? 'finapp.my' : undefined,
+                domain: process.env.NODE_ENV === 'production' ? '.finapp.my' : undefined,
                 path: '/'
             });
 
@@ -100,7 +100,7 @@ class AuthController implements IAuthController {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production' ? true : false,
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-                domain: process.env.NODE_ENV === 'production' ? 'finapp.my' : undefined,
+                domain: process.env.NODE_ENV === 'production' ? '.finapp.my' : undefined,
                 path: '/'
             });
 
@@ -131,7 +131,7 @@ class AuthController implements IAuthController {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production'? true : false,
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-                domain: process.env.NODE_ENV === 'production' ? 'finapp.my' : undefined,
+                domain: process.env.NODE_ENV === 'production' ? '.finapp.my' : undefined,
                 path: '/'
             });
 
@@ -139,7 +139,7 @@ class AuthController implements IAuthController {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production'? true : false,
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-                domain: process.env.NODE_ENV === 'production' ? 'finapp.my' : undefined,
+                domain: process.env.NODE_ENV === 'production' ? '.finapp.my' : undefined,
                 path: '/'
             });
 
