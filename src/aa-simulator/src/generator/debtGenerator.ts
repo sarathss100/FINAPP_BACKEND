@@ -61,6 +61,7 @@ export class DebtGenerator {
         try {
             // Pick random user
             const randomUser = await this.getRandomUser();
+            
             // Pick random account
             const randomAccount = await this.getRandomAccount(randomUser.userId);
 

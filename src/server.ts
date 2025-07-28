@@ -12,16 +12,13 @@ const PORT: number = parseInt(process.env.PORT || '5000', 10);
             console.log(`Server Successfully start on PORT ${PORT}`)
         });
 
-        // Initialize Socket.IO
         setupSocketIO(server);
 
-        // Handle server errors
         server.on('error', (error) => {
             console.error(`Server failed to start on PORT ${PORT}:`, error.message);
             process.exit(1);
         });
 
-        // shutdown
         process.on('SIGINT', async () => {
             console.log(`Shutting down the application....`);
             await mongooseConnection.disconnect();

@@ -1,7 +1,7 @@
 import { Document, Types } from 'mongoose';
 
-export interface IAccount extends Document {
-    // Common Fields
+export default interface IAccountDocument extends Document {
+    _id: string | Types.ObjectId;
     user_id?: Types.ObjectId;
     account_name: string;
     currency: 'INR';
@@ -34,4 +34,5 @@ export interface IAccount extends Document {
 
     // Liquid Cash Account Fields
     location?: 'Home' | 'Safe' | 'Wallet' | 'Office';
+    __v?: number
 }

@@ -1,9 +1,12 @@
-import { IAccountDTO } from '../../dtos/accounts/AccountsDTO';
 import IAccountsManagementRepository from './interfaces/IAccountsManagementRepository';
 import { AccountModel } from '../../model/accounts/model/AccountsModel';
+import IAccountDocument from '../../model/accounts/interfaces/IAccounts';
+import BaseRepository from '../base_repo/BaseRepository';
+import IBaseRepository from '../base_repo/interface/IBaseRepository';
 
 class AccountManagementRepository implements IAccountsManagementRepository {
     private static _instance: AccountManagementRepository;
+    private baseRepo: IBaseRepository<IAccountDocument> = new BaseRepository<IAccountDocument>(AccountModel);
 
     public constructor() {};
 
@@ -14,85 +17,34 @@ class AccountManagementRepository implements IAccountsManagementRepository {
         return AccountManagementRepository._instance;
     }
 
-    // Creates a new financial account in the database and returns the created account in `AccountDTO` format.
-    async addAccount(accountData: IAccountDTO): Promise<IAccountDTO> {
+    async addAccount(accountData: Partial<IAccountDocument>): Promise<IAccountDocument> {
         try {
             // Check if an account with the same name and number already exists for this user
-            const existingAccount = await AccountModel.findOne({
+            const existingAccount = await this.baseRepo.findOne({
+                user_id: accountData.user_id,
                 account_name: accountData.account_name,
                 account_number: accountData.account_number,
-                user_id: accountData.user_id
             });
     
             if (existingAccount) {
-                // Return the existing account instead of throwing error
-                return {
-                    _id: existingAccount._id?.toString(),
-                    user_id: existingAccount.user_id?.toString(),
-                    account_name: existingAccount.account_name,
-                    currency: existingAccount.currency,
-                    description: existingAccount.description,
-                    is_active: existingAccount.is_active,
-                    created_by: existingAccount.created_by.toString(),
-                    last_updated_by: existingAccount.last_updated_by?.toString(),
-                    account_type: existingAccount.account_type,
-                    current_balance: existingAccount.current_balance,
-                    institution: existingAccount.institution,
-                    account_number: existingAccount.account_number,
-                    account_subtype: existingAccount.account_subtype,
-                    loan_type: existingAccount.loan_type,
-                    interest_rate: existingAccount.interest_rate,
-                    monthly_payment: existingAccount.monthly_payment,
-                    due_date: existingAccount.due_date,
-                    term_months: existingAccount.term_months,
-                    investment_platform: existingAccount.investment_platform,
-                    portfolio_value: existingAccount.portfolio_value,
-                    location: existingAccount.location
-                };
+                return existingAccount;
             }
     
             // No duplicate found, proceed to create a new account
-            const result = await AccountModel.create(accountData);
+            const result = await this.baseRepo.create(accountData);
     
-            // Return the newly created account
-            const addedAccount: IAccountDTO = {
-                _id: result._id?.toString(),
-                user_id: result.user_id?.toString(),
-                account_name: result.account_name,
-                currency: result.currency,
-                description: result.description,
-                is_active: result.is_active,
-                created_by: result.created_by.toString(),
-                last_updated_by: result.last_updated_by?.toString(),
-                account_type: result.account_type,
-                current_balance: result.current_balance,
-                institution: result.institution,
-                account_number: result.account_number,
-                account_subtype: result.account_subtype,
-                loan_type: result.loan_type,
-                interest_rate: result.interest_rate,
-                monthly_payment: result.monthly_payment,
-                due_date: result.due_date,
-                term_months: result.term_months,
-                investment_platform: result.investment_platform,
-                portfolio_value: result.portfolio_value,
-                location: result.location
-            };
-    
-            return addedAccount;
+            return result;
         } catch (error) {
             throw new Error((error as Error).message);
         }
     }
 
-    // Updates an existing account in the database and returns the updated account in IAccountDTO format.
-    async updateAccount(accountId: string, accountData: Partial<IAccountDTO>): Promise<IAccountDTO> {
+    async updateAccount(accountId: string, accountData: Partial<IAccountDocument>): Promise<IAccountDocument> {
         try {
             // Perform the update operation
-            const result = await AccountModel.findOneAndUpdate(
+            const result = await this.baseRepo.updateOne(
                 { _id: accountId }, 
                 { ...accountData }, 
-                { new: true }   
             );
 
             // Handle case where no account is found
@@ -100,123 +52,44 @@ class AccountManagementRepository implements IAccountsManagementRepository {
                 throw new Error('Account not found');
             }
 
-            // Map the updated result to IAccountDTO format
-            const updatedAccount: IAccountDTO = {
-                _id: result._id?.toString(),
-                user_id: result?.user_id?.toString(),
-                account_name: result.account_name,
-                currency: result.currency,
-                description: result.description,
-                is_active: result.is_active,
-                created_by: result.created_by.toString(),
-                last_updated_by: result.last_updated_by?.toString(),
-                account_type: result.account_type,
-                current_balance: result.current_balance,
-                institution: result.institution,
-                account_number: result.account_number,
-                account_subtype: result.account_subtype,
-                loan_type: result.loan_type,
-                interest_rate: result.interest_rate,
-                monthly_payment: result.monthly_payment,
-                due_date: result.due_date,
-                term_months: result.term_months,
-                investment_platform: result.investment_platform,
-                portfolio_value: result.portfolio_value,
-                location: result.location
-            }
-
-            return updatedAccount;
+            return result;
         } catch (error) {
             console.error('Error updating Account:', error);
             throw new Error((error as Error).message);
         }
     }
 
-    // Removes an existing account from the database.
-    async removeAccount(accountId: string): Promise<IAccountDTO> {
+    async removeAccount(accountId: string): Promise<IAccountDocument> {
         try {
             // Perform the deletion operation
-            const result = await AccountModel.findOneAndDelete({ _id: accountId }, { new: true });
+            const result = await this.baseRepo.deleteOne({ _id: accountId });
 
             // Handle case where no account is found
             if (!result) {
                 throw new Error('Account not found');
             }
 
-            // Map the removed result to IAccountDTO format
-            const removedAccount: IAccountDTO = {
-                _id: result._id?.toString(),
-                user_id: result?.user_id?.toString(),
-                account_name: result.account_name,
-                currency: result.currency,
-                description: result.description,
-                is_active: result.is_active,
-                created_by: result.created_by.toString(),
-                last_updated_by: result.last_updated_by?.toString(),
-                account_type: result.account_type,
-                current_balance: result.current_balance,
-                institution: result.institution,
-                account_number: result.account_number,
-                account_subtype: result.account_subtype,
-                loan_type: result.loan_type,
-                interest_rate: result.interest_rate,
-                monthly_payment: result.monthly_payment,
-                due_date: result.due_date,
-                term_months: result.term_months,
-                investment_platform: result.investment_platform,
-                portfolio_value: result.portfolio_value,
-                location: result.location
-            }
-
-            return removedAccount;
+            return result;
         } catch (error) {
             console.error('Error updating Account:', error);
             throw new Error((error as Error).message);
         }
     }
 
-    // Retrieves all accounts associated with a specific user from the database.
-    async getUserAccounts(userId: string): Promise<IAccountDTO[]> {
+    async getUserAccounts(userId: string): Promise<IAccountDocument[]> {
         try {
             // Query the database to retrieve all accounts associated with the given `userId`.
-            const result = await AccountModel.find<IAccountDTO>({ user_id: userId });
+            const results = await this.baseRepo.find({ user_id: userId });
 
             // it means no accounts were found for the given user, and an error is thrown.
-            if (!result || result.length === 0) {
+            if (!results || results.length === 0) {
                 throw new Error('No accounts found for the specified user');
             }
 
-            const mappedAccounts: IAccountDTO[] = result.map((data) => ({
-                _id: data._id?.toString(),
-                user_id: data.user_id?.toString(),
-                account_name: data.account_name,
-                currency: data.currency,
-                description: data.description,
-                is_active: data.is_active,
-                created_by: data.created_by?.toString(),
-                last_updated_by: data.last_updated_by?.toString(),
-                account_type: data.account_type,
-                current_balance: data.current_balance,
-                institution: data.institution,
-                account_number: data.account_number,
-                account_subtype: data.account_subtype,
-                loan_type: data.loan_type,
-                interest_rate: data.interest_rate,
-                monthly_payment: data.monthly_payment,
-                due_date: data.due_date,
-                term_months: data.term_months,
-                investment_platform: data.investment_platform,
-                portfolio_value: data.portfolio_value,
-                location: data.location
-            }));
-
-            // Return the retrieved accounts as an array of `IAccountDTO` objects.
-            return mappedAccounts;
+            return results;
         } catch (error) {
-            // Log the error for debugging purposes.
             console.error('Error retrieving account details:', error);
 
-            // Re-throw the error with a more descriptive message, ensuring the caller is informed of the issue.
             throw new Error((error as Error).message);
         }
     }

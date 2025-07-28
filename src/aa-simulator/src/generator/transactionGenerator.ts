@@ -62,7 +62,7 @@ export class TransactionGenerator {
             // Build transaction payload
             const transactionData: ITransactionDTO = {
                 user_id: randomUser.userId,
-                account_id: randomAccount._id,
+                account_id: randomAccount._id.toString(),
                 transaction_type: template.transaction_type as "EXPENSE" | "INCOME",
                 type: template.type as TransactionPayload['type'],
                 category: template.category as TransactionPayload['category'],

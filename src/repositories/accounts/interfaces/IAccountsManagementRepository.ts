@@ -1,10 +1,8 @@
-import { IAccountDTO } from '../../../dtos/accounts/AccountsDTO';
+import IAccountDocument from '../../../model/accounts/interfaces/IAccounts';
 
-interface IAccountsManagementRepository {
-    addAccount(accountsData: IAccountDTO): Promise<IAccountDTO>;
-    updateAccount(accountId: string, accountData: Partial<IAccountDTO>): Promise<IAccountDTO>;
-    removeAccount(accountId: string): Promise<IAccountDTO>;
-    getUserAccounts(userId: string): Promise<IAccountDTO[]>;
+export default interface IAccountsManagementRepository {
+    addAccount(accountsData: Partial<IAccountDocument>): Promise<IAccountDocument>;
+    updateAccount(accountId: string, accountData: Partial<IAccountDocument>): Promise<IAccountDocument>;
+    removeAccount(accountId: string): Promise<IAccountDocument>;
+    getUserAccounts(userId: string): Promise<IAccountDocument[]>;
 }
-
-export default IAccountsManagementRepository;

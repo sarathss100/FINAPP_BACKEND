@@ -1,4 +1,3 @@
-// middleware/requireSubscription.ts
 import { ErrorMessages } from "../constants/errorMessages";
 import { StatusCodes } from "../constants/statusCodes";
 import { Request, Response, NextFunction, response } from "express";

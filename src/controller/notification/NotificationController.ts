@@ -11,22 +11,10 @@ import notificationDTOSchema from '../../validation/notification/notification.va
 class NotificationController implements INotificationController {
     private readonly _notificationService: INotificationService;
 
-    /**
-     * Initializes a new instance of the NotificationController.
-     *
-     * @param notificaitonService - Service instance to handle business logic.
-     */
     constructor(notificaitonService: INotificationService) {
         this._notificationService = notificaitonService;
     }
 
-    /**
-     * Handles the creation of a new notification via an HTTP POST request.
-     * Validates the access token and request body before delegating to the service layer.
-     *
-     * @param request - Express request object containing cookies and notification data.
-     * @param response - Express response object used to send back the result.
-     */
     async createNotification(request: Request, response: Response): Promise<void> {
         try {
             // Extract the access token from cookies
@@ -77,13 +65,6 @@ class NotificationController implements INotificationController {
         }
     }
 
-    /**
-     * Handles the creation of a new notification via an HTTP POST request.
-     * Validates the access token and request body before delegating to the service layer.
-     *
-     * @param request - Express request object containing cookies and notification data.
-     * @param response - Express response object used to send back the result.
-     */
     async getNotifications(request: Request, response: Response): Promise<void> {
         try {
             // Extract the access token from cookies
@@ -115,13 +96,6 @@ class NotificationController implements INotificationController {
         }
     }
 
-    /**
-     * Handles the request to archive a specific notification.
-     * Extracts the notification ID from the request and delegates the operation to the service layer.
-     *
-     * @param request - Express request object containing route parameters (notification ID).
-     * @param response - Express response object used to send back the result.
-     */
     async updateArchieveStatus(request: Request, response: Response): Promise<void> {
         try {
             // Extract the access token from cookies
@@ -151,13 +125,6 @@ class NotificationController implements INotificationController {
         }
     }
 
-    /**
-     * Handles the request to mark a specific notification as read.
-     * Extracts the notification ID from the request and delegates the operation to the service layer.
-     *
-     * @param request - Express request object containing route parameters (notification ID).
-     * @param response - Express response object used to send back the result.
-     */
     async updateReadStatus(request: Request, response: Response): Promise<void> {
         try {
             // Extract the access token from cookies
@@ -187,14 +154,6 @@ class NotificationController implements INotificationController {
         }
     }
 
-    /**
-     * Handles the request to mark all notifications as read for the authenticated user.
-     * Extracts the access token from cookies to identify the user,
-     * and delegates the operation to the service layer.
-     *
-     * @param request - Express request object containing cookies (access token).
-     * @param response - Express response object used to send back the result.
-     */
     async updateReadStatusAll(request: Request, response: Response): Promise<void> {
         try {
             console.log(`Request comes here`);

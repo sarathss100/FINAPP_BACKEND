@@ -12,24 +12,10 @@ import { insuranceDTOSchema } from '../../validation/insurances/insurance.valida
 class InsuranceController implements IInsuranceController {
     private readonly _insuranceService: IInsuranceService;
 
-    /**
-     * @constructor
-     * @param {IInsuranceService} insuranceService - The service implementation to handle business logic.
-     */
     constructor(insuranceService: IInsuranceService) {
         this._insuranceService = insuranceService;
     }
 
-    /**
-     * @method createInsurance
-     * @description Handles incoming requests to create a new insurance record.
-     * Extracts the access token from cookies, validates the request body using Zod schema,
-     * and delegates creation logic to the service layer.
-     *
-     * @param {Request} request - Express request object containing cookies and body data.
-     * @param {Response} response - Express response object used to send the HTTP response.
-     * @returns {Promise<void>}
-     */
     async createInsurance(request: Request, response: Response): Promise<void> {
         try {
             const { accessToken } = request.cookies;
@@ -60,16 +46,6 @@ class InsuranceController implements IInsuranceController {
         }
     }
 
-    /**
-     * @method removeInsurance
-     * @description Handles incoming requests to delete an insurance record by its ID.
-     * Extracts the insurance ID from request parameters, delegates deletion logic to the service layer,
-     * and sends an appropriate HTTP response based on the result.
-     *
-     * @param {Request} request - Express request object containing URL parameters and cookies.
-     * @param {Response} response - Express response object used to send the HTTP response.
-     * @returns {Promise<void>}
-     */
     async removeInsurance(request: Request, response: Response): Promise<void> {
         try {
             const { id } = request.params;
@@ -92,16 +68,6 @@ class InsuranceController implements IInsuranceController {
         }
     }
 
-    /**
-     * @method removeInsurance
-     * @description Handles incoming requests to delete an insurance record by its ID.
-     * Extracts the insurance ID from request parameters, delegates deletion logic to the service layer,
-     * and sends an appropriate HTTP response based on the result.
-     *
-     * @param {Request} request - Express request object containing URL parameters and cookies.
-     * @param {Response} response - Express response object used to send the HTTP response.
-     * @returns {Promise<void>}
-     */
     async getUserInsuranceCoverageTotal(request: Request, response: Response): Promise<void> {
         try {
             const { accessToken } = request.cookies;
@@ -120,16 +86,6 @@ class InsuranceController implements IInsuranceController {
         }
     }
 
-    /**
-     * @method getUserTotalPremiumAmount
-     * @description Handles incoming requests to retrieve the total premium amount from active insurance policies for the authenticated user.
-     * Extracts the access token from cookies, delegates the calculation logic to the service layer,
-     * and sends back the result in the HTTP response.
-     *
-     * @param {Request} request - Express request object containing cookies and authentication data.
-     * @param {Response} response - Express response object used to send the HTTP response.
-     * @returns {Promise<void>}
-     */
     async getUserTotalPremiumAmount(request: Request, response: Response): Promise<void> {
         try {
             const { accessToken } = request.cookies;
@@ -148,16 +104,6 @@ class InsuranceController implements IInsuranceController {
         }
     }
 
-    /**
-     * @method getAllInsurances
-     * @description Handles incoming requests to retrieve all insurance records for the authenticated user.
-     * Extracts the access token from cookies, delegates the data fetching logic to the service layer,
-     * and sends back the list of insurances in the HTTP response.
-     *
-     * @param {Request} request - Express request object containing cookies and authentication data.
-     * @param {Response} response - Express response object used to send the HTTP response.
-     * @returns {Promise<void>}
-     */
     async getAllInsurances(request: Request, response: Response): Promise<void> {
         try {
             const { accessToken } = request.cookies;
@@ -176,17 +122,6 @@ class InsuranceController implements IInsuranceController {
         }
     }
 
-    /**
-     * @method getClosestNextPaymentDate
-     * @description Handles incoming requests to retrieve the closest upcoming next payment date
-     * among all insurance records for the authenticated user.
-     * Extracts the access token from cookies, delegates the logic to the service layer,
-     * and sends back the result in the HTTP response.
-     *
-     * @param {Request} request - Express request object containing cookies and authentication data.
-     * @param {Response} response - Express response object used to send the HTTP response.
-     * @returns {Promise<void>}
-     */
     async getClosestNextPaymentDate(request: Request, response: Response): Promise<void> {
         try {
             const { accessToken } = request.cookies;
@@ -205,16 +140,6 @@ class InsuranceController implements IInsuranceController {
         }
     }
 
-    /**
-     * @method markPaymentAsPaid
-     * @description Handles incoming requests to update the payment status of an insurance policy to "paid".
-     * Extracts the insurance ID from request parameters, delegates the update logic to the service layer,
-     * and sends back a success response upon completion.
-     *
-     * @param {Request} request - Express request object containing route parameters and data.
-     * @param {Response} response - Express response object used to send the HTTP response.
-     * @returns {Promise<void>}
-     */
     async markPaymentAsPaid(request: Request, response: Response): Promise<void> {
         try {
             const { id } = request.params;

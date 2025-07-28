@@ -16,7 +16,7 @@ type LocationType = 'Home' | 'Safe' | 'Wallet' | 'Office';
 export interface IAccountDTO {
     _id?: string;
     user_id?: string;
-    account_name: string;
+    account_name?: string;
     currency?: Currency;
     description?: string;
     is_active?: boolean;

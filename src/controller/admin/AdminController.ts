@@ -135,16 +135,7 @@ class AdminController implements IAdminController {
         }
     }
 
-    /**
-     * Controller to handle FAQ deletion via HTTP DELETE request.
-     *
-     * Extracts the FAQ ID from the request parameters, calls the service to delete the FAQ,
-     * and sends an appropriate success or error response.
-     *
-     * @param {Request} request - Express Request object containing the FAQ ID in `params.id`.
-     * @param {Response} response - Express Response object to send the response.
-     * @returns {Promise<void>} Sends response via Express; does not return a value.
-     */
+    // Controller to handle FAQ deletion via HTTP DELETE request.
     async deleteFaq(request: Request, response: Response): Promise<void> {
         try {
             const faqId: string = request.params.id;
@@ -162,16 +153,7 @@ class AdminController implements IAdminController {
         }
     }
 
-    /**
-     * Controller to handle toggling the publish status of an FAQ via an HTTP PATCH request.
-     *
-     * Extracts the FAQ ID from the request parameters, calls the service to toggle the
-     * 'isPublished' status of the FAQ, and sends an appropriate success or error response.
-     *
-     * @param {Request} request - Express Request object containing the FAQ ID in `params.id`.
-     * @param {Response} response - Express Response object to send the response.
-     * @returns {Promise<void>} Sends response via Express; does not return a value.
-     */
+    // Controller to handle toggling the publish status of an FAQ via an HTTP PATCH request.
     async togglePublish(request: Request, response: Response): Promise<void> {
         try {
             const faqId: string = request.params.id;
@@ -189,17 +171,7 @@ class AdminController implements IAdminController {
         }
     }
 
-    /**
-     * Controller to handle updating an FAQ entry via an HTTP PATCH request.
-     *
-     * Extracts the FAQ ID from the request parameters and the update data from the request body.
-     * Validates the input using the FAQ schema, calls the service to update the FAQ,
-     * and sends an appropriate success or error response.
-     *
-     * @param {Request} request - Express Request object containing the FAQ ID in `params.id` and update data in `body`.
-     * @param {Response} response - Express Response object to send the response.
-     * @returns {Promise<void>} Sends response via Express; does not return a value.
-     */
+    // Controller to handle updating an FAQ entry via an HTTP PATCH request.
     async updateFaq(request: Request, response: Response): Promise<void> {
         try {
             
