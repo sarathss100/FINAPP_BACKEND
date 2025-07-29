@@ -1,5 +1,5 @@
 import mongoose, { Model } from 'mongoose';
 import FaqSchema from '../schema/faqModel';
-import IFaq from '../interfaces/IFaq';
+import IFaqDocument from '../interfaces/IFaq';
 
-export const FaqModel: Model<IFaq> = mongoose.model<IFaq>('Faq', FaqSchema);
+export const FaqModel: Model<IFaqDocument> = mongoose.model<IFaqDocument>('Faq', FaqSchema);

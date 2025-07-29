@@ -1,12 +1,13 @@
 import IUserRepository from '../../repositories/user/interfaces/IUserRepository';
 import IUserService from './interfaces/IUserService';
-import IProfile from './interfaces/IProfile';
-import { decodeAndValidateToken } from '../../utils/auth/tokenUtils';
-import { AuthenticationError, ServerError, ValidationError } from '../../error/AppError';
+import { ServerError } from '../../error/AppError';
 import { ErrorMessages } from '../../constants/errorMessages';
 import { StatusCodes } from '../../constants/statusCodes';
 import uploadToCloudinary, { deleteImage } from '../../services/cloudinary/cloudinaryService';
 import generateUniqueId from '../../utils/user/generateUniqueId';
+import { extractUserIdFromToken, wrapServiceError } from '../../utils/serviceUtils';
+import UserMapper from '../../mappers/user/UserMapper';
+import IProfileDTO from '../../dtos/user/IProfileDTO';
 
 class UserService implements IUserService {
     private _userRepository: IUserRepository;
@@ -14,30 +15,30 @@ class UserService implements IUserService {
         this._userRepository = userRepository;
     }
 
-    async getUserProfileDetails(accessToken: string): Promise<IProfile> {
+    async getUserProfileDetails(accessToken: string): Promise<IProfileDTO> {
         try {
-            // Decode and Validate the token
-            const userId = decodeAndValidateToken(accessToken);
+            const userId = extractUserIdFromToken(accessToken);
 
-            const profileDetails = await this._userRepository.findByUserId(userId);
-            if (!profileDetails) throw new AuthenticationError(ErrorMessages.FETCH_USER_PROFILE_FAILED, StatusCodes.BAD_REQUEST);
+            const userDetails = await this._userRepository.getUserDetails(userId);
 
-            return profileDetails;
+            const resultDTO = UserMapper.toIProfileDTO(userDetails);
+
+            return resultDTO;
         } catch (error) {
-            throw new Error((error as Error).message);
+            console.error('Error while getting user profile details: ', error);
+            throw wrapServiceError(error);
         }
     }
 
     async updateUserProfilePicture(file: Express.Multer.File, accessToken: string): Promise<string> {
         try {
-            // Decode and validate the token
-            const userId = decodeAndValidateToken(accessToken);
+            const userId = extractUserIdFromToken(accessToken);
 
-            if (!file || !file.buffer) throw new ValidationError(ErrorMessages.USER_PROFILE_PICTURE_MISSING_ERROR, StatusCodes.BAD_REQUEST);
+            const userDetails = await this._userRepository.getUserDetails(userId);
 
-            // Get Current Cloudinary UserId 
-            const imageData = await this._userRepository.getUserProfileImageData(userId);
-            const currentCloudinaryUrl = imageData?.imageUrl;
+            const resultDTO = UserMapper.toIProfilePictureDTO(userDetails);
+
+            const currentCloudinaryUrl = resultDTO?.imageUrl;
 
             if (currentCloudinaryUrl) {
                 // Delete the current profile picture 
@@ -55,32 +56,37 @@ class UserService implements IUserService {
 
             if (!isProfilePictureUpdated) throw new ServerError(ErrorMessages.FAILED_TO_UPLOAD_PROFILE_PICTURE, StatusCodes.INTERNAL_SERVER_ERROR);
 
-            // Return proxy URL instead of direct Cloudinary URL 
             const proxyUrl = `${process.env.BASE_URL}/api/user/images/${imageId}`;
+
+            // Return proxy URL instead of direct Cloudinary URL 
             return proxyUrl;
         } catch (error) {
-            throw new Error((error as Error).message);
+            console.error('Error while updating profile picture: ', error);
+            throw wrapServiceError(error);
         }
     }
 
     async getUserProfilePictureUrl(accessToken: string): Promise<string> {
         try {
-            // Decode and validate the token
-            const userId = decodeAndValidateToken(accessToken);
+            const userId = extractUserIdFromToken(accessToken);
 
             // Extract the profile picture url from the database
-            const imageData = await this._userRepository.getUserProfileImageData(userId);
+            const userDetails = await this._userRepository.getUserDetails(userId);
 
-            if (!imageData) {
+            const resultDTO = UserMapper.toIProfilePictureDTO(userDetails);
+
+            if (!resultDTO.imageUrl) {
                 // Return proxy URL for default image 
                 return `${process.env.BASE_URL}/api/user/images/default`;
             }
 
-            // Return proxy URL
-            const proxyUrl = `${process.env.BASE_URL}/api/v1/user/images/${imageData.imageId}`;
+            const proxyUrl = `${process.env.BASE_URL}/api/v1/user/images/${resultDTO.imageId}`;
+
+            // Return proxy URL instead of direct Cloudinary URL
             return proxyUrl;
         } catch (error) {
-            throw new Error((error as Error).message);
+            console.error('Error while getting profile picture url: ', error);
+            throw wrapServiceError(error);
         }
     }
 
@@ -110,37 +116,39 @@ class UserService implements IUserService {
             }
 
             const arrayBuffer = await response.arrayBuffer();
+
             return Buffer.from(arrayBuffer);
         } catch (error) {
-            throw new Error((error as Error).message);
+            console.error('Error while getting image for proxy: ', error);
+            throw wrapServiceError(error);
         }
     }
 
     async toggleTwoFactorAuthentication(accessToken: string): Promise<boolean> {
         try {
-            // Decode and validate the token
-            const userId = decodeAndValidateToken(accessToken);
+            const userId = extractUserIdFromToken(accessToken);
 
             // Toggle User Two Factor Authentcation (2FA) status for a user in the repository layer.
             const isToggled = await this._userRepository.toggleTwoFactorAuthentication(userId);
 
-            return isToggled; // Return the Success status
+            return isToggled;
         } catch (error) {
-            throw new Error((error as Error).message);
+            console.error('Error while toggle two factor authentication: ', error);
+            throw wrapServiceError(error);
         }
     }
 
     async deleteUserAccount(accessToken: string): Promise<boolean> {
         try {
-            // Decode and validate the token
-            const userId = decodeAndValidateToken(accessToken);
+            const userId = extractUserIdFromToken(accessToken);
 
             // Delete User Account for a user in the repository layer.
             const isDeleted = await this._userRepository.deleteUserAccount(userId);
 
-            return isDeleted; // Return the Success status
+            return isDeleted;
         } catch (error) {
-            throw new Error((error as Error).message);
+            console.error('Error while deleting account: ', error);
+            throw wrapServiceError(error);
         }
     }
 }

@@ -1,9 +1,9 @@
+import jwt from 'jsonwebtoken';
 import { ErrorMessages } from '../../constants/errorMessages';
 import { StatusCodes } from '../../constants/statusCodes';
 import { AuthenticationError, ServerError } from '../../error/AppError';
-import jwt from 'jsonwebtoken';
-import IAuthUser from '../../services/auth/interfaces/IAuthUser';
-import ITokenPayload from '../../types/auth/ITokenPayload';
+import IAuthUserDTO from '../../dtos/auth/IAuthUserDTO';
+import ITokenPayloadDTO from '../../dtos/auth/ITokenPayloadDTO';
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const REFERSH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
@@ -12,7 +12,7 @@ if (!ACCESS_TOKEN_SECRET || !REFERSH_TOKEN_SECRET) {
     throw new Error(`Missing required environment variables: ACCESS_TOKEN_SECRET or REFRESH_TOKEN_SECRET`);
 }
 
-export const generateAccessToken = function (user: IAuthUser): string {
+export const generateAccessToken = function (user: IAuthUserDTO): string {
     return jwt.sign(
         { userId: user.userId, phoneNumber: user.phoneNumber, role: user.role },
         ACCESS_TOKEN_SECRET,
@@ -20,7 +20,7 @@ export const generateAccessToken = function (user: IAuthUser): string {
     )
 };
 
-export const generateRefreshToken = function (user: IAuthUser): string {
+export const generateRefreshToken = function (user: IAuthUserDTO): string {
     return jwt.sign(
         { userId: user.userId, phoneNumber: user.phoneNumber, role: user.role },
         REFERSH_TOKEN_SECRET,
@@ -28,9 +28,9 @@ export const generateRefreshToken = function (user: IAuthUser): string {
     )
 };
 
-export const verifyAccessToken = function (token: string): ITokenPayload {
+export const verifyAccessToken = function (token: string): ITokenPayloadDTO {
     try {
-        const res = jwt.verify(token, ACCESS_TOKEN_SECRET) as ITokenPayload;
+        const res = jwt.verify(token, ACCESS_TOKEN_SECRET) as ITokenPayloadDTO;
         return res;
     } catch (error) {
         if (error instanceof jwt.TokenExpiredError) {
@@ -43,11 +43,11 @@ export const verifyAccessToken = function (token: string): ITokenPayload {
     }
 };
 
-export const verifyRefreshToken = function (token: string): ITokenPayload {
+export const verifyRefreshToken = function (token: string): ITokenPayloadDTO {
     try {
         const decoded = jwt.verify(token, REFERSH_TOKEN_SECRET);
      
-        return decoded as ITokenPayload;
+        return decoded as ITokenPayloadDTO;
     } catch (error) {
         if (error instanceof jwt.TokenExpiredError) {
             throw new Error(`Access token has expired`);

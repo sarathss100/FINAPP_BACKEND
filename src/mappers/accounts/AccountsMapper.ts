@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { IAccountDTO } from '../../dtos/accounts/AccountsDTO'; 
+import { IAccountDTO } from '../../dtos/accounts/IAccountsDTO'; 
 import IAccountDocument from '../../model/accounts/interfaces/IAccounts';
 
 export default class AccountMapper {

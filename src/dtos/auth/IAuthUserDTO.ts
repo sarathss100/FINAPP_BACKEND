@@ -1,4 +1,4 @@
-interface IAuthUser {
+export default interface IAuthUserDTO {
     userId: string;
     phoneNumber: string;
     status: boolean;
@@ -6,5 +6,3 @@ interface IAuthUser {
     is2FA: boolean;
     hashedPassword?: string;
 }
-
-export default IAuthUser;

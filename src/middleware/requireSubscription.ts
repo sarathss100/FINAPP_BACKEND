@@ -41,7 +41,7 @@ export const requireSubscription = async (
     return;
   }
 
-  const user = await userRepository.findByUserId(userId);
+  const user = await userRepository.getUserDetails(userId);
   if (!user || !user.subscription_status) {
     res.status(403).json({ success: false, message: 'Premium subscription required' });
     return;

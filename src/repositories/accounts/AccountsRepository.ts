@@ -1,20 +1,20 @@
-import IAccountsManagementRepository from './interfaces/IAccountsManagementRepository';
 import { AccountModel } from '../../model/accounts/model/AccountsModel';
 import IAccountDocument from '../../model/accounts/interfaces/IAccounts';
 import BaseRepository from '../base_repo/BaseRepository';
 import IBaseRepository from '../base_repo/interface/IBaseRepository';
+import IAccountsRepository from './interfaces/IAccountsRepository';
 
-class AccountManagementRepository implements IAccountsManagementRepository {
-    private static _instance: AccountManagementRepository;
+export default class AccountsRepository implements IAccountsRepository {
+    private static _instance: AccountsRepository;
     private baseRepo: IBaseRepository<IAccountDocument> = new BaseRepository<IAccountDocument>(AccountModel);
 
     public constructor() {};
 
-    public static get instance(): AccountManagementRepository {
-        if (!AccountManagementRepository._instance) {
-            AccountManagementRepository._instance = new AccountManagementRepository();
+    public static get instance(): AccountsRepository {
+        if (!AccountsRepository._instance) {
+            AccountsRepository._instance = new AccountsRepository();
         }
-        return AccountManagementRepository._instance;
+        return AccountsRepository._instance;
     }
 
     async addAccount(accountData: Partial<IAccountDocument>): Promise<IAccountDocument> {
@@ -54,7 +54,6 @@ class AccountManagementRepository implements IAccountsManagementRepository {
 
             return result;
         } catch (error) {
-            console.error('Error updating Account:', error);
             throw new Error((error as Error).message);
         }
     }
@@ -71,7 +70,6 @@ class AccountManagementRepository implements IAccountsManagementRepository {
 
             return result;
         } catch (error) {
-            console.error('Error updating Account:', error);
             throw new Error((error as Error).message);
         }
     }
@@ -88,11 +86,7 @@ class AccountManagementRepository implements IAccountsManagementRepository {
 
             return results;
         } catch (error) {
-            console.error('Error retrieving account details:', error);
-
             throw new Error((error as Error).message);
         }
     }
 }
-
-export default AccountManagementRepository;

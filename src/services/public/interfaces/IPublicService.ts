@@ -1,7 +1,7 @@
-import { IFaqDTO } from "../../../dtos/base/FaqDto";
+import { IFaqDTO } from "../../../dtos/base/IFaqDTO";
 
-interface IPublicService {
+
+export default interface IPublicService {
     getFaqs(): Promise<IFaqDTO[]>;
 }
 
-export default IPublicService;

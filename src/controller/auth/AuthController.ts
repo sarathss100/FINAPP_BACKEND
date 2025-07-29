@@ -1,13 +1,14 @@
 import { Request, Response } from 'express';
 import IAuthController from './ineterfaces/IAuthController';
 import IAuthService from '../../services/auth/interfaces/IAuthService';
-import { sendErrorResponse, sendSuccessResponse } from '../../utils/responseHandler';
+import { sendSuccessResponse } from '../../utils/responseHandler';
 import { StatusCodes } from '../../constants/statusCodes';
 import { SuccessMessages } from '../../constants/successMessages';
 import { ErrorMessages } from '../../constants/errorMessages';
-import { AuthenticationError, ServerError, AppError } from '../../error/AppError';
+import { AuthenticationError, ServerError } from '../../error/AppError';
+import { handleControllerError } from '../../utils/controllerUtils';
 
-class AuthController implements IAuthController {
+export default class AuthController implements IAuthController {
     private readonly _authService: IAuthService;
 
     constructor(authService: IAuthService) {
@@ -40,11 +41,7 @@ class AuthController implements IAuthController {
 
             sendSuccessResponse(response, StatusCodes.CREATED, SuccessMessages.SIGNUP_SUCCESS, { userId, role });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -72,11 +69,7 @@ class AuthController implements IAuthController {
             
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.TOKEN_VERIFIED, { valid: true, status: verificationStatus.status, subscription_status: userDetails.subscription_status });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -106,11 +99,7 @@ class AuthController implements IAuthController {
 
             sendSuccessResponse(response, StatusCodes.CREATED, SuccessMessages.SIGNIN_SUCCESS, { userId, role, is2FA });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -145,18 +134,13 @@ class AuthController implements IAuthController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.SIGNOUT_SUCCESS);
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
     async verifyPhoneNumber(request: Request, response: Response): Promise<void> {
         try {
             const { phoneNumber } = request.body;
-
             if (!phoneNumber) {
                 throw new AuthenticationError(ErrorMessages.PHONE_NUMBER_MISSING, StatusCodes.BAD_REQUEST);
             }
@@ -166,11 +150,7 @@ class AuthController implements IAuthController {
             
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.PHONE_NUMBER_VERIFIED);
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -183,13 +163,8 @@ class AuthController implements IAuthController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.PASSWORD_RESET_SUCCESS);
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 }
-
-export default AuthController;
+ 

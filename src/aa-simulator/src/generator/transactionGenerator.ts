@@ -4,8 +4,8 @@ import transactionTemplates from '../../../aa-simulator/src/data/transaction/tra
 import { TransactionPayload } from "../data/transaction/types";
 import { ITransactionDTO } from "../../../dtos/transaction/TransactionDto";
 import { TransactionGeneratorService } from "../services/transactionService";
-import IAccountsManagementRepository from "../../../repositories/accounts/interfaces/IAccountsManagementRepository";
-import AccountManagementRepository from "../../../repositories/accounts/AccountsManagementRepository";
+import IAccountsManagementRepository from "../../../repositories/accounts/interfaces/IAccountsRepository";
+import AccountManagementRepository from "../../../repositories/accounts/AccountsRepository";
 
 const adminRepository: IAdminRepository = AdminRepository.instance;
 const accountsRepository: IAccountsManagementRepository = AccountManagementRepository.instance;

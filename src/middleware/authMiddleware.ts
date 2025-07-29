@@ -6,7 +6,7 @@ import { generateAccessToken, verifyAccessToken } from '../utils/auth/tokenUtils
 import IAuthenticationRequest from './interfaces/IAuthenticationRequest';
 import { ErrorMessages } from '../constants/errorMessages';
 import RedisService from '../services/redis/RedisService';
-import ITokenPayload from '../types/auth/ITokenPayload';
+import ITokenPayload from '../dtos/auth/ITokenPayloadDTO';
 
 // Middleware to verify JWT and check roles
 export const authorizeRoles = function (...allowedRoles: UserRole[]) {

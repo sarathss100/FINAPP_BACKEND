@@ -1,12 +1,9 @@
-import IProfile from '../../../services/user/interfaces/IProfile';
+import IUserDocument from "../../../model/user/interfaces/IUser";
 
-interface IUserRepository {
-    findByUserId(userId: string): Promise<IProfile | null>;
-    updateUserProfileImageData(userId: string, imageUrl: string, imageId: string): Promise<boolean>;
-    getUserProfileImageData(userId: string): Promise<{ imageUrl: string;  imageId: string} | null>;
+export default interface IUserRepository {
+    getUserDetails(userId: string): Promise<IUserDocument>;
     toggleTwoFactorAuthentication(userId: string): Promise<boolean>;
+    getImageUrlById(imageId: string): Promise<string>;
+    updateUserProfileImageData(userId: string, imageUrl: string, imageId: string): Promise<boolean>;
     deleteUserAccount(userId: string): Promise<boolean>;
-    getImageUrlById(imageId: string): Promise<string | null>;
 }
-
-export default IUserRepository;

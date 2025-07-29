@@ -6,11 +6,11 @@ import { ServerError, ValidationError } from '../../error/AppError';
 import { SuccessMessages } from '../../constants/successMessages'; 
 import IAccountsController from './interfaces/IAccountsController';
 import IAccountsService from '../../services/accounts/interfaces/IAccountsService';
-import { IAccountDTO } from '../../dtos/accounts/AccountsDTO'; 
+import { IAccountDTO } from '../../dtos/accounts/IAccountsDTO'; 
 import accountValidationSchema from '../../validation/accounts/account.validation';
 import { getAccessTokenOrThrow, handleControllerError } from '../../utils/controllerUtils';
 
-class AccountsController implements IAccountsController {
+export default class AccountsController implements IAccountsController {
     private readonly _accountsService: IAccountsService;
 
     constructor(accountsService: IAccountsService) {
@@ -179,5 +179,3 @@ class AccountsController implements IAccountsController {
         }
     }
 }
-
-export default AccountsController;

@@ -1,22 +1,22 @@
-import { IAccountDTO } from '../../dtos/accounts/AccountsDTO';
+import { IAccountDTO } from '../../dtos/accounts/IAccountsDTO';
 import IAccountsService from './interfaces/IAccountsService';
-import IAccountsManagementRepository from '../../repositories/accounts/interfaces/IAccountsManagementRepository';
-import AccountManagementRepository from '../../repositories/accounts/AccountsManagementRepository';
 import { eventBus } from '../../events/eventBus';
 import AccountMapper from '../../mappers/accounts/AccountsMapper';
 import { extractUserIdFromToken, wrapServiceError } from '../../utils/serviceUtils';
+import IAccountsRepository from '../../repositories/accounts/interfaces/IAccountsRepository';
+import AccountsRepository from '../../repositories/accounts/AccountsRepository';
 
-class AccountsService implements IAccountsService {
+export default class AccountsService implements IAccountsService {
     private static _instance: AccountsService;
-    private _accountRepository: IAccountsManagementRepository;
+    private _accountRepository: IAccountsRepository;
 
-    constructor(accountRepository: IAccountsManagementRepository) {
+    constructor(accountRepository: IAccountsRepository) {
         this._accountRepository = accountRepository;
     }
 
     public static get instance(): AccountsService {
         if (!AccountsService._instance) {
-            const repo = AccountManagementRepository.instance;
+            const repo = AccountsRepository.instance;
             AccountsService._instance = new AccountsService(repo);
         }
         return AccountsService._instance;
@@ -201,5 +201,3 @@ class AccountsService implements IAccountsService {
         }
     }
 }
-
-export default AccountsService;
