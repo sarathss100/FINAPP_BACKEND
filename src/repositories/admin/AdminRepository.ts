@@ -48,7 +48,7 @@ export default class AdminRepository implements IAdminRepository {
         try {
             const count = await UserModel.countDocuments({ createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000 * 7) } });
 
-            return count;
+            return count
         } catch (error) {
             throw new Error(`Failed to get new registration count: ${(error as Error).message} `);
         }

@@ -2,10 +2,10 @@ import { IHealthStatus } from '../health/interfaces/IHealth';
 import IPaginationMeta from '../../../dtos/admin/IPaginationMetaDTO';
 import { IFaqDTO } from '../../../dtos/base/IFaqDTO';
 import ISystemMetricsDTO from '../../../dtos/admin/ISystemMetricsDTO';
-import IUserDTO from '../../../dtos/base/IUserDTO';
+import IAdminUserDTO from '../../../dtos/admin/IAdminUserDTO';
 
 export default interface IAdminService {
-    getAllUsers(): Promise<IUserDTO[]>;
+    getAllUsers(): Promise<IAdminUserDTO[]>;
     toggleUserStatus(_id: string, status: boolean): Promise<boolean>;
     getSystemMetrics(): Promise<ISystemMetricsDTO>;
     addFaq(newFaq: IFaqDTO): Promise<boolean>;

@@ -12,10 +12,10 @@ import { ServerHealthCheckService } from './health/server-health';
 import IPaginationMeta from '../../dtos/admin/IPaginationMetaDTO';
 import { IFaqDTO } from '../../dtos/base/IFaqDTO';
 import ISystemMetricsDTO from '../../dtos/admin/ISystemMetricsDTO';
-import IUserDTO from '../../dtos/base/IUserDTO';
 import UserMapper from '../../mappers/user/UserMapper';
 import { wrapServiceError } from '../../utils/serviceUtils';
 import FaqMapper from '../../mappers/faqs/FaqMapper';
+import IAdminUserDTO from '../../dtos/admin/IAdminUserDTO';
 
 export default class AdminService implements IAdminService {
     private _adminRepository: IAdminRepository;
@@ -23,12 +23,12 @@ export default class AdminService implements IAdminService {
         this._adminRepository = adminRepository;
     }
 
-    async getAllUsers(): Promise<IUserDTO[]> {
+    async getAllUsers(): Promise<IAdminUserDTO[]> {
         try {
             // Retrieve all user details from the admin repository
             const userDetails = await this._adminRepository.findAllUsers();
 
-            const resultDTO = UserMapper.toDTOs(userDetails);
+            const resultDTO = UserMapper.toAdminUserDTOs(userDetails);
 
             if (!resultDTO || resultDTO.length === 0) {
                 throw new ServerError(ErrorMessages.NO_USERS_FOUND, StatusCodes.BAD_REQUEST);
@@ -67,7 +67,7 @@ export default class AdminService implements IAdminService {
             const count = await this._adminRepository.getNewRegistrationCount();
 
             if (typeof count !== 'number' || count < 1) {
-                throw new ServerError(ErrorMessages.FAILED_TO_FETCH_REGISTRATION_COUNT, StatusCodes.INTERNAL_SERVER_ERROR);
+                return 0;
             }
 
             return count;

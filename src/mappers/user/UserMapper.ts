@@ -4,6 +4,7 @@ import IUserDocument from '../../model/user/interfaces/IUser';
 import IAuthUserDTO from '../../dtos/auth/IAuthUserDTO';
 import IProfileDTO from '../../dtos/user/IProfileDTO';
 import IProfilePictureDTO from '../../dtos/user/IProfilePictureDTO';
+import IAdminUserDTO from '../../dtos/admin/IAdminUserDTO';
 
 export default class UserMapper {
   // Maps IUserDocument (Mongo model) to IUserDTO
@@ -23,6 +24,21 @@ export default class UserMapper {
       subscription_status: data.subscription_status ? true : false,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
+    };
+
+    return dto;
+  }
+
+  // Maps IUserDocument (Mongo model) to IAdminUserDTO
+  static toIAdminUserDTO(data: IUserDocument): IAdminUserDTO {
+    const dto: IAdminUserDTO = {
+      userId: data._id.toString(),
+      firstName: data.first_name,
+      lastName: data.last_name,
+      phoneNumber: data.phone_number,
+      role: data.role,
+      status: data.status,
+      twoFactorEnabled: data.is2FA,
     };
 
     return dto;
@@ -70,6 +86,11 @@ export default class UserMapper {
   // Maps an array of IUserDocument to an array of IUserDTO
   static toDTOs(users: IUserDocument[]): IUserDTO[] {
     return users.map((user) => this.toIUserDTO(user));
+  }
+
+  // Maps an array of IUserDocument to an array of IAdminUserDTO
+  static toAdminUserDTOs(users: IUserDocument[]): IAdminUserDTO[] {
+    return users.map((user) => this.toIAdminUserDTO(user));
   }
 
   // Maps IUserDTO to Partial<IUserDocument> (for create/update)
