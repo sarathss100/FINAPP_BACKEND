@@ -12,7 +12,7 @@ export const PREDEFINED_GOAL_CATEGORIES = [
 // Infer the type of valid goal categories
 export type GoalCategory = typeof PREDEFINED_GOAL_CATEGORIES[number] | string;
 
-interface IGoal extends Document {
+export default interface IGoalDocument extends Document {
     user_id: Types.ObjectId;
     tenant_id?: Types.ObjectId; 
     goal_name: string; 
@@ -47,5 +47,3 @@ interface IGoal extends Document {
     createdAt?: Date; 
     updatedAt?: Date; 
 }
-
-export default IGoal;

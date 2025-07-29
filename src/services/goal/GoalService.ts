@@ -1,4 +1,4 @@
-import { IGoalDTO } from '../../dtos/goal/GoalDto';
+import { IGoalDTO } from '../../dtos/goal/GoalDTO';
 import IGoalService from './interfaces/IGoalService';
 import { decodeAndValidateToken } from '../../utils/auth/tokenUtils';
 import IGoalManagementRepository from '../../repositories/goal/interfaces/IGoalManagementRepository';

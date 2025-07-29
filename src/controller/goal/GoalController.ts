@@ -7,7 +7,7 @@ import { Request, Response } from 'express';
 import { AppError, AuthenticationError, ServerError, ValidationError } from '../../error/AppError';
 import { SuccessMessages } from '../../constants/successMessages';
 import goalDTOSchema from '../../validation/goal/goal.validation';
-import { IGoalDTO } from '../../dtos/goal/GoalDto';
+import { IGoalDTO } from '../../dtos/goal/GoalDTO';
 
 class GoalController implements IGoalController {
     private readonly _goalService: IGoalService;
