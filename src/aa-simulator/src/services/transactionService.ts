@@ -2,13 +2,13 @@ import { generateAccessToken } from "../../../utils/auth/tokenUtils";
 import TransactionService from "../../../services/transaction/TransactionService";
 import ITransactionService from "../../../services/transaction/interfaces/ITransaction";
 import { ITransactionDTO } from "../../../dtos/transaction/TransactionDto";
-import IUserDetails from "../../../repositories/admin/interfaces/IUserDetails";
+import IAuthUserDTO from "../../../dtos/auth/IAuthUserDTO";
 
 const transactionService: ITransactionService = TransactionService.instance;
 
 export class TransactionGeneratorService {
 
-    static async submitTransaction(transactionData: ITransactionDTO, user: IUserDetails) {
+    static async submitTransaction(transactionData: ITransactionDTO, user: IAuthUserDTO) {
 
         try {
             const refinedUserData = {

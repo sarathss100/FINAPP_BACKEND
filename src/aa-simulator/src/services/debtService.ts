@@ -1,13 +1,13 @@
 import { generateAccessToken } from "../../../utils/auth/tokenUtils";
-import IUserDetails from "../../../repositories/admin/interfaces/IUserDetails";
 import { IDebtDTO } from "../../../dtos/debt/DebtDto";
 import IDebtService from "../../../services/debt/interfaces/IDebtService";
 import DebtService from "../../../services/debt/DebtService";
+import IAuthUserDTO from "../../../dtos/auth/IAuthUserDTO";
 
 const debtService: IDebtService = DebtService.instance;
 
 export class DebtGeneratorService {
-    static async submitDebt(debtData: IDebtDTO, user: IUserDetails) {
+    static async submitDebt(debtData: IDebtDTO, user: IAuthUserDTO) {
 
         try {
             const refinedUserData = {
