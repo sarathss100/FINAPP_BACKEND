@@ -1,5 +1,5 @@
 import debtTemplates from '../../../aa-simulator/src/data/debt/debtTemplates.json';
-import { IDebtDTO } from '../../../dtos/debt/DebtDto';
+import IDebtDTO from '../../../dtos/debt/DebtDTO';
 import IAccountsManagementRepository from '../../../repositories/accounts/interfaces/IAccountsRepository';
 import AccountManagementRepository from '../../../repositories/accounts/AccountsRepository';
 import IAdminRepository from '../../../repositories/admin/interfaces/IAdminRepository';

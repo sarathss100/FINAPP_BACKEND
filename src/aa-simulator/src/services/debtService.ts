@@ -1,5 +1,5 @@
 import { generateAccessToken } from "../../../utils/auth/tokenUtils";
-import { IDebtDTO } from "../../../dtos/debt/DebtDto";
+import IDebtDTO from "../../../dtos/debt/DebtDTO";
 import IDebtService from "../../../services/debt/interfaces/IDebtService";
 import DebtService from "../../../services/debt/DebtService";
 import IAuthUserDTO from "../../../dtos/auth/IAuthUserDTO";

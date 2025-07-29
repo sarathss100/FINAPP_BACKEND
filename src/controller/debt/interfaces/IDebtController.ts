@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-interface IDebtController {
+export default interface IDebtController {
     createDebt(request: Request, response: Response): Promise<void>;
     getTotalDebt(request: Request, response: Response): Promise<void>;
     getTotalOutstandingDebt(request: Request, response: Response): Promise<void>;
@@ -12,5 +12,3 @@ interface IDebtController {
     deleteDebt(request: Request, response: Response): Promise<void>;
     markAsPaid(request: Request, response: Response): Promise<void>;
 }
-
-export default IDebtController;

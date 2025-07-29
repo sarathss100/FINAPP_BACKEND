@@ -1,15 +1,15 @@
-import { sendErrorResponse, sendSuccessResponse } from '../../utils/responseHandler';
+import { sendSuccessResponse } from '../../utils/responseHandler';
 import { ErrorMessages } from '../../constants/errorMessages';
 import { StatusCodes } from '../../constants/statusCodes';
 import { Request, Response } from 'express';
 import { AppError, ServerError } from '../../error/AppError';
 import { SuccessMessages } from '../../constants/successMessages';
-import { ZodError } from 'zod';
 import IDebtController from './interfaces/IDebtController';
 import IDebtService from '../../services/debt/interfaces/IDebtService';
 import debtDTOSchema from '../../validation/debt/debt.validation';
+import { handleControllerError } from '../../utils/controllerUtils';
 
-class DebtController implements IDebtController {
+export default class DebtController implements IDebtController {
     private readonly _debtService: IDebtService;
 
     constructor(debtService: IDebtService) {
@@ -26,21 +26,7 @@ class DebtController implements IDebtController {
 
             sendSuccessResponse(response, StatusCodes.CREATED, SuccessMessages.DEBT_CREATED_SUCCESSFULLY, { debt });
         } catch (error) {
-            if (error instanceof ZodError) {
-                console.log(error.errors);
-
-                const errorMessages = error.errors.map(err => {
-                    const path = err.path.join('.');
-                    return `${path}: ${err.message}`;
-                }).join(', ');
-
-                sendErrorResponse(response, StatusCodes.BAD_REQUEST, `Validation failed: ${errorMessages}`);
-            } else if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                console.error('Unexpected error:', error);
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -52,21 +38,7 @@ class DebtController implements IDebtController {
         
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { totalDebt });
         } catch (error) {
-            if (error instanceof ZodError) {
-                console.log(error.errors);
-
-                const errorMessages = error.errors.map(err => {
-                    const path = err.path.join('.');
-                    return `${path}: ${err.message}`;
-                }).join(', ');
-            
-                sendErrorResponse(response, StatusCodes.BAD_REQUEST, `Validation failed: ${errorMessages}`);
-            } else if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                console.error('Unexpected error:', error);
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -78,21 +50,7 @@ class DebtController implements IDebtController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { totalOutstandingDebt });
         } catch (error) {
-            if (error instanceof ZodError) {
-                console.log(error.errors);
-
-                const errorMessages = error.errors.map(err => {
-                    const path = err.path.join('.');
-                    return `${path}: ${err.message}`;
-                }).join(', ');
-
-                sendErrorResponse(response, StatusCodes.BAD_REQUEST, `Validation failed: ${errorMessages}`);
-            } else if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                console.error('Unexpected error:', error);
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -104,21 +62,7 @@ class DebtController implements IDebtController {
         
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { totalMonthlyPayment });
         } catch (error) {
-            if (error instanceof ZodError) {
-                console.log(error.errors);
-
-                const errorMessages = error.errors.map(err => {
-                    const path = err.path.join('.');
-                    return `${path}: ${err.message}`;
-                }).join(', ');
-            
-                sendErrorResponse(response, StatusCodes.BAD_REQUEST, `Validation failed: ${errorMessages}`);
-            } else if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                console.error('Unexpected error:', error);
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -130,21 +74,7 @@ class DebtController implements IDebtController {
         
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { maxTenure });
         } catch (error) {
-            if (error instanceof ZodError) {
-                console.log(error.errors);
-
-                const errorMessages = error.errors.map(err => {
-                    const path = err.path.join('.');
-                    return `${path}: ${err.message}`;
-                }).join(', ');
-            
-                sendErrorResponse(response, StatusCodes.BAD_REQUEST, `Validation failed: ${errorMessages}`);
-            } else if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                console.error('Unexpected error:', error);
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -161,21 +91,7 @@ class DebtController implements IDebtController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { debtDetails });
         } catch (error) {
-            if (error instanceof ZodError) {
-                console.log(error.errors);
-
-                const errorMessages = error.errors.map(err => {
-                    const path = err.path.join('.');
-                    return `${path}: ${err.message}`;
-                }).join(', ');
-
-                sendErrorResponse(response, StatusCodes.BAD_REQUEST, `Validation failed: ${errorMessages}`);
-            } else if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                console.error('Unexpected error:', error);
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -194,21 +110,7 @@ class DebtController implements IDebtController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { repaymentComparisonResult });
         } catch (error) {
-            if (error instanceof ZodError) {
-                console.log(error.errors);
-
-                const errorMessages = error.errors.map(err => {
-                    const path = err.path.join('.');
-                    return `${path}: ${err.message}`;
-                }).join(', ');
-            
-                sendErrorResponse(response, StatusCodes.BAD_REQUEST, `Validation failed: ${errorMessages}`);
-            } else if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                console.error('Unexpected error:', error);
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -220,21 +122,7 @@ class DebtController implements IDebtController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { debtDetails });
         } catch (error) {
-            if (error instanceof ZodError) {
-                console.log(error.errors);
-
-                const errorMessages = error.errors.map(err => {
-                    const path = err.path.join('.');
-                    return `${path}: ${err.message}`;
-                }).join(', ');
-            
-                sendErrorResponse(response, StatusCodes.BAD_REQUEST, `Validation failed: ${errorMessages}`);
-            } else if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                console.error('Unexpected error:', error);
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -250,21 +138,7 @@ class DebtController implements IDebtController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.REMOVED_DEBT, { isDeleted });
         } catch (error) {
-            if (error instanceof ZodError) {
-                console.log(error.errors);
-
-                const errorMessages = error.errors.map(err => {
-                    const path = err.path.join('.');
-                    return `${path}: ${err.message}`;
-                }).join(', ');
-
-                sendErrorResponse(response, StatusCodes.BAD_REQUEST, `Validation failed: ${errorMessages}`);
-            } else if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                console.error('Unexpected error:', error);
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -280,23 +154,7 @@ class DebtController implements IDebtController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.UPDATED_SUCCESSFULLY, { isUpdated });
         } catch (error) {
-            if (error instanceof ZodError) {
-                console.log(error.errors);
-
-                const errorMessages = error.errors.map(err => {
-                    const path = err.path.join('.');
-                    return `${path}: ${err.message}`;
-                }).join(', ');
-            
-                sendErrorResponse(response, StatusCodes.BAD_REQUEST, `Validation failed: ${errorMessages}`);
-            } else if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                console.error('Unexpected error:', error);
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 }
-
-export default DebtController;
