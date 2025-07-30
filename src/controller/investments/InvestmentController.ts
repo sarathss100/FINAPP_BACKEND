@@ -12,23 +12,10 @@ import { InvestmentDTOSchema } from '../../validation/investments/investment.val
 class InvestmentController implements IInvestmentController {
     private readonly _investmentService: IInvestmentService;
 
-    /**
-     * @constructor
-     * @param {IInvestmentService} investmentService - The service implementation to handle business logic.
-     */
     constructor(investmentService: IInvestmentService) {
         this._investmentService = investmentService;
     }
 
-    /**
-     * @method searchStocks
-     * @description Handles incoming requests to search for stocks based on a keyword using an external API.
-     * Validates the presence of the query parameter before delegating to the service.
-     *
-     * @param {Request} request - Express request object containing the query parameter.
-     * @param {Response} response - Express response object used to send the HTTP response.
-     * @returns {Promise<void>}
-     */
     async searchStocks(request: Request, response: Response): Promise<void> {
         try {
             const { keyword } = request.query;
@@ -49,16 +36,6 @@ class InvestmentController implements IInvestmentController {
         }
     }
 
-    /**
-     * @method createInvestment
-     * @description Handles incoming requests to create a new investment.
-     * Extracts the access token from cookies and validates the request body using Zod schema.
-     * Delegates creation logic to the service layer.
-     *
-     * @param {Request} request - Express request object containing cookies and body data.
-     * @param {Response} response - Express response object used to send the HTTP response.
-     * @returns {Promise<void>}
-     */
     async createInvestment(request: Request, response: Response): Promise<void> {
         try {
             const { accessToken } = request.cookies;
@@ -109,15 +86,6 @@ class InvestmentController implements IInvestmentController {
         }
     }
 
-    /**
-     * @method totalInvestedAmount
-     * @description Handles incoming requests to fetch the total initial investment amount for the authenticated user.
-     * Extracts the access token from cookies, authenticates the user, and delegates the calculation to the service layer.
-     *
-     * @param {Request} request - Express request object containing cookies and body data.
-     * @param {Response} response - Express response object used to send the HTTP response.
-     * @returns {Promise<void>}
-     */
     async totalInvestedAmount(request: Request, response: Response): Promise<void> {
         try {
             const { accessToken } = request.cookies;
@@ -136,15 +104,6 @@ class InvestmentController implements IInvestmentController {
         }
     }
 
-    /**
-     * @method currentTotalValue
-     * @description Handles incoming requests to fetch the current total value of all investments for the authenticated user.
-     * Extracts the access token from cookies, authenticates the user, and delegates the calculation to the service layer.
-     *
-     * @param {Request} request - Express request object containing cookies and body data.
-     * @param {Response} response - Express response object used to send the HTTP response.
-     * @returns {Promise<void>}
-     */
     async currentTotalValue(request: Request, response: Response): Promise<void> {
         try {
             const { accessToken } = request.cookies;
@@ -163,17 +122,6 @@ class InvestmentController implements IInvestmentController {
         }
     }
 
-    /**
-     * @method getTotalReturns
-     * @description Handles incoming requests to fetch the total returns (profit or loss)
-     * from all investments for the authenticated user.
-     * Extracts the access token from cookies, authenticates the user, and delegates
-     * the calculation to the service layer.
-     *
-     * @param {Request} request - Express request object containing cookies and body data.
-     * @param {Response} response - Express response object used to send the HTTP response.
-     * @returns {Promise<void>}
-     */
     async getTotalReturns(request: Request, response: Response): Promise<void> {
         try {
             const { accessToken } = request.cookies;
@@ -192,16 +140,6 @@ class InvestmentController implements IInvestmentController {
         }
     }
 
-    /**
-     * @method getCategorizedInvestments
-     * @description Handles incoming requests to fetch and return all investments for the authenticated user,
-     * grouped by investment type (e.g., STOCK, MUTUAL_FUND).
-     * Extracts the access token from cookies, authenticates the user, and delegates the data fetching to the service layer.
-     *
-     * @param {Request} request - Express request object containing cookies and body data.
-     * @param {Response} response - Express response object used to send the HTTP response.
-     * @returns {Promise<void>}
-     */
     async getCategorizedInvestments(request: Request, response: Response): Promise<void> {
         try {
             const { accessToken } = request.cookies;
@@ -220,16 +158,6 @@ class InvestmentController implements IInvestmentController {
         }
     }
 
-    /**
-     * @method removeInvestment
-     * @description Handles incoming requests to delete an investment of a specific type and ID.
-     * Extracts the investment type and ID from request parameters and delegates the deletion logic to the service layer.
-     * Sends a success response if the deletion is successful, or an error response if something goes wrong.
-     *
-     * @param {Request} request - Express request object containing the investment type and ID in params.
-     * @param {Response} response - Express response object used to send the HTTP response.
-     * @returns {Promise<void>}
-     */
     async removeInvestment(request: Request, response: Response): Promise<void> {
         try {
             const { investmentType, investmentId } = request.params;

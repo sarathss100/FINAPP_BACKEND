@@ -1,10 +1,7 @@
-import { ChatDTO } from "../../../dtos/chats/chatDTO";
+import IChatDTO from "../../../dtos/chats/chatDTO";
 
-interface IChatService {
+export default interface IChatService {
     createChat(accessToken: string, role: 'user' | 'admin', message: string): Promise<string>;
-    getChatHistory(accessToken: string): Promise<ChatDTO[]>;
-    getAllChatSessions(): Promise<{ userId: string; chats: ChatDTO[]}[]>;
+    getChatHistory(accessToken: string): Promise<IChatDTO[]>;
+    getAllChatSessions(): Promise<{ userId: string; chats: IChatDTO[]}[]>;
 }
-
-export default IChatService;
-

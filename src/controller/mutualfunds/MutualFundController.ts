@@ -10,22 +10,10 @@ import IMutualFundService from '../../services/mutualfunds/interfaces/IMutualFun
 class MutualFundController implements IMutualFundController {
     private readonly _mutualFundService: IMutualFundService;
 
-    /**
-     * Initializes a new instance of the MutualFundController.
-     * @param mutualFundService - Service implementation for handling business logic.
-     */
     constructor(mutualFundService: IMutualFundService) {
         this._mutualFundService = mutualFundService;
     }
 
-    /**
-     * Synchronizes Mutual Fund Net Asset Value (NAV) data from an external source.
-     * Fetches the latest NAV values and updates the database.
-     *
-     * @param request - Express Request object.
-     * @param response - Express Response object.
-     * @returns A promise that resolves to void.
-     */
     async syncNavData(request: Request, response: Response): Promise<void> {
         try {
             // Delegate NAV synchronization task to the service layer
@@ -51,16 +39,6 @@ class MutualFundController implements IMutualFundController {
         }
     }
 
-    /**
-     * Handles incoming requests to search for mutual funds by scheme name or code.
-     *
-     * Validates the query parameter and delegates the search operation to the service layer.
-     * Returns a list of matching mutual fund records to the client.
-     *
-     * @param {Request} request - Express Request object containing the search query.
-     * @param {Response} response - Express Response object used to send the response.
-     * @returns {Promise<void>} - A promise that resolves once the response is sent.
-     */
     async searchMutualFunds(request: Request, response: Response): Promise<void> {
         try {
             const { keyword } = request.query;
@@ -87,16 +65,6 @@ class MutualFundController implements IMutualFundController {
         }
     }
 
-    /**
-     * Handles incoming requests to retrieve mutual fund details by scheme code.
-     *
-     * Validates the 'schemCode' query parameter from the request, delegates the data-fetching
-     * operation to the service layer, and sends the response to the client.
-     *
-     * @param {Request} request - Express Request object containing the incoming HTTP request.
-     * @param {Response} response - Express Response object used to send the response.
-     * @returns {Promise<void>} - A promise that resolves once the response is sent.
-     */
     async getMutualFundDetails(request: Request, response: Response): Promise<void> {
         try {
             const { schemCode } = request.query;

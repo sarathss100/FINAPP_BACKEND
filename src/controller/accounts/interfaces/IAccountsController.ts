@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-interface IAccountsController {
+export default interface IAccountsController {
     addAccount(request: Request, response: Response): Promise<void>;
     updateAccount(request: Request, response: Response): Promise<void>;
     removeAccount(request: Request, response: Response): Promise<void>;
@@ -10,5 +10,3 @@ interface IAccountsController {
     getTotalDebt(request: Request, response: Response): Promise<void>;
     getTotalInvestment(request: Request, response: Response): Promise<void>;
 }
-
-export default IAccountsController;

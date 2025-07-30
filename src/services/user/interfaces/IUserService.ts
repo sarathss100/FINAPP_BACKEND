@@ -1,7 +1,7 @@
-import IProfile from './IProfile';
+import IProfileDTO from '../../../dtos/user/IProfileDTO';
 
 interface IUserService {
-    getUserProfileDetails(accessToken: string): Promise<IProfile>;
+    getUserProfileDetails(accessToken: string): Promise<IProfileDTO>;
     updateUserProfilePicture(file: Express.Multer.File, accessToken: string): Promise<string>;
     getUserProfilePictureUrl(accessToken: string): Promise<string>;
     toggleTwoFactorAuthentication(accessToken: string): Promise<boolean>;

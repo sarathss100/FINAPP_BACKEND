@@ -6,11 +6,6 @@ import InvestmentService from '../services/investments/InvestmentService';
 
 const investmentService: IInvestmentService = InvestmentService.instance;
 
-/**
- * Cron job that runs daily to update gold prices for all GOLD-type investments.
- *
- * Fetches latest price per gram and updates investment values in bulk.
- */
 const updateGoldPricesCron = new CronJob(
     '0 0 8 * * *', // Runs daily at 8 AM UTC
     async () => {

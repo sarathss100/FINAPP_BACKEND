@@ -1,8 +1,5 @@
-import { IFaqDTO } from "../../../dtos/base/FaqDto";
+import IFaqDocument from "../../../model/admin/interfaces/IFaq";
 
-interface IPublicRepository {
-    getFaqs(): Promise<IFaqDTO[] | null>
+export default interface IPublicRepository {
+    getFaqs(): Promise<IFaqDocument[]>
 }
-
-
-export default IPublicRepository;

@@ -57,7 +57,7 @@ export const AccountSchema = new Schema(
         location: {
             type: String,
             enum: ['Home', 'Safe', 'Wallet', 'Office']
-        }
+        },
     },
     {
         timestamps: true

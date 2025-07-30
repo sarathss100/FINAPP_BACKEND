@@ -4,8 +4,9 @@ import transactionTemplates from '../../../aa-simulator/src/data/transaction/tra
 import { TransactionPayload } from "../data/transaction/types";
 import { ITransactionDTO } from "../../../dtos/transaction/TransactionDto";
 import { TransactionGeneratorService } from "../services/transactionService";
-import IAccountsManagementRepository from "../../../repositories/accounts/interfaces/IAccountsManagementRepository";
-import AccountManagementRepository from "../../../repositories/accounts/AccountsManagementRepository";
+import IAccountsManagementRepository from "../../../repositories/accounts/interfaces/IAccountsRepository";
+import AccountManagementRepository from "../../../repositories/accounts/AccountsRepository";
+import UserMapper from "../../../mappers/user/UserMapper";
 
 const adminRepository: IAdminRepository = AdminRepository.instance;
 const accountsRepository: IAccountsManagementRepository = AccountManagementRepository.instance;
@@ -38,9 +39,10 @@ export class TransactionGenerator {
         try {
             // Pick random user
             const randomUser = await this.getRandomUser();
+            const resultDTO = UserMapper.toIAuthUserDTO(randomUser);
 
             // Pick random account
-            const randomAccount = await this.getRandomAccount(randomUser.userId);
+            const randomAccount = await this.getRandomAccount(resultDTO.userId);
             if (!randomAccount?._id) {
                 throw new Error('No valid account found for user');
             }
@@ -61,8 +63,8 @@ export class TransactionGenerator {
 
             // Build transaction payload
             const transactionData: ITransactionDTO = {
-                user_id: randomUser.userId,
-                account_id: randomAccount._id,
+                user_id: resultDTO.userId,
+                account_id: randomAccount._id.toString(),
                 transaction_type: template.transaction_type as "EXPENSE" | "INCOME",
                 type: template.type as TransactionPayload['type'],
                 category: template.category as TransactionPayload['category'],
@@ -77,7 +79,7 @@ export class TransactionGenerator {
             };
 
             // Submit transaction to main application
-            await TransactionGeneratorService.submitTransaction(transactionData, randomUser);
+            await TransactionGeneratorService.submitTransaction(transactionData, resultDTO);
 
         } catch (error) {
             console.error(`Transaction generation failed:`, error);

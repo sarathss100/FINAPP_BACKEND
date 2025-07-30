@@ -1,5 +1,5 @@
 
-interface IProfile {
+export default interface IProfileDTO {
     userId: string,
     firstName: string,
     lastName: string,
@@ -8,5 +8,3 @@ interface IProfile {
     subscription_status: boolean,
     profilePictureUrl: string, 
 }
-
-export default IProfile;

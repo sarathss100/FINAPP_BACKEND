@@ -1,19 +1,19 @@
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
-interface IUser extends Document {
+export default interface IUserDocument extends Document {
+    _id: string | Types.ObjectId;
     first_name: string;
     last_name: string;
     phone_number: string;
     password: string;
     role: string;
-    status: boolean;
     is2FA: boolean;
     isDeleted: boolean;
-    subscription_status: boolean;
-    profile_picture_url: string;
-    profile_picture_id: string;
+    status: boolean;
+    profile_picture_url?: string;
+    profile_picture_id?: string;
+    subscription_status?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
+    __v?: number;
 }
-
-export default IUser;

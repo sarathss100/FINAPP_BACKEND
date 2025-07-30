@@ -1,13 +1,12 @@
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
-// Define the Faq interface
-interface IFaq extends Document {
+export default interface IFaqDocument extends Document {
+    _id: string | Types.ObjectId,
     question: string;
     answer: string;
-    isDeleted: boolean;
+    isDeleted?: boolean;
     isPublished?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
+    __v?: number;
 }
-
-export default IFaq;

@@ -1,16 +1,13 @@
 import { generateAccessToken } from "../../../utils/auth/tokenUtils";
-import IUserDetails from "../../../repositories/admin/interfaces/IUserDetails";
-import { IDebtDTO } from "../../../dtos/debt/DebtDto";
+import IDebtDTO from "../../../dtos/debt/DebtDTO";
 import IDebtService from "../../../services/debt/interfaces/IDebtService";
 import DebtService from "../../../services/debt/DebtService";
+import IAuthUserDTO from "../../../dtos/auth/IAuthUserDTO";
 
 const debtService: IDebtService = DebtService.instance;
 
 export class DebtGeneratorService {
-    // private static BASE_URL = process.env.BASE_URL;
-    // private static TIMEOUT = 15000;
-
-    static async submitDebt(debtData: IDebtDTO, user: IUserDetails) {
+    static async submitDebt(debtData: IDebtDTO, user: IAuthUserDTO) {
 
         try {
             const refinedUserData = {
@@ -25,23 +22,7 @@ export class DebtGeneratorService {
 
             await debtService.createDebt(accessToken, debtData);
 
-            // Submit to main application
-            // const response = await axios.post(
-            //     `${this.BASE_URL}/api/transactions`,
-            //     transactionData,
-            //     {
-            //         headers: {
-            //             'Authorization': `Bearer ${accessToken}`,
-            //             'Content-Type': 'application/json',
-            //             'X-Source': 'account-aggregator-simulator',
-            //             'X-User-Agent': 'AA-Simulator/1.0'
-            //         },
-            //         timeout: this.TIMEOUT
-            //     }
-            // );
-
             console.log(`Debt submitted successfully`);
-
         } catch (error) {
             console.error(`Failed to submit Debt`);
             throw error;

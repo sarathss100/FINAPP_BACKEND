@@ -5,7 +5,6 @@ import IInsuranceService from '../services/insurances/interfaces/IInsuranceServi
 
 const insuranceService: IInsuranceService = InsuranceService.instance;
 
-// Run daily at 12.00 AM (UTC time)
 const job = new CronJob('0 0 0 * * *', async () => {
     console.log(`[CRON] Running daily expiry check at ${moment().format()}`);
     try {

@@ -1,14 +1,9 @@
-import { SignupDto } from '../../../dtos/auth/SignupDto';
-import IAuthUser from '../../base/interfaces/IAuthUser';
-import { ResetPasswordDto } from '../../../dtos/auth/ResetPasswordDto';
-import IUser from '../../../dtos/base/UserDto';
+import IUserDocument from '../../../model/user/interfaces/IUser';
 
-interface IAuthRepository {
-    createUser(data: SignupDto): Promise<IAuthUser>;
-    findByPhoneNumber(phoneNumber: string): Promise<IAuthUser | null>;
-    resetPassword(data: ResetPasswordDto): Promise<boolean | null>;
+export default interface IAuthRepository {
+    createUser(data: Partial<IUserDocument>): Promise<IUserDocument>;
+    findByPhoneNumber(phoneNumber: string): Promise<IUserDocument>;
+    resetPassword(data: Partial<IUserDocument>): Promise<boolean>;
     restoreUserAccount(userId: string): Promise<void>;
-    getUserDetails(userId: string): Promise<IUser>;
-}
-
-export default IAuthRepository;
+    getUserDetails(userId: string): Promise<IUserDocument>;
+} 

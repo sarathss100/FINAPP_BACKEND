@@ -5,11 +5,6 @@ import IDebtService from '../services/debt/interfaces/IDebtService';
 
 const debtService: IDebtService = DebtService.instance;
 
-/**
- * Cron job that runs daily at midnight (UTC) to check and update expired debts.
- *
- * Any debt with a nextDueDate earlier than the current date will be marked as expired.
- */
 const markExpiryDebts = new CronJob('0 0 0 * * *', async () => {
     console.log(`[CRON] Running daily debt expiry check at ${moment().format()}`);
     try {

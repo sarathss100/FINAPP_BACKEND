@@ -5,11 +5,6 @@ import InvestmentService from '../services/investments/InvestmentService';
 
 const investmentService: IInvestmentService = InvestmentService.instance;
 
-/**
- * Cron job that runs daily to recalculate bond investment values.
- *
- * Uses internal calculations to update current value and profit/loss.
- */
 const updateBondPricesCron = new CronJob(
     '0 0 7 * * *', // Runs daily at 7 AM UTC
     async () => {

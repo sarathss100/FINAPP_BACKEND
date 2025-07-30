@@ -1,31 +1,28 @@
 import { UserModel } from '../../model/user/model/UserModel';
-import IAuthUser from './interfaces/IAuthUser';
 import IUserBaseRespository from './interfaces/IUserBaseRespository';
-import { FaqModel } from '../../model/admin/model/FaqModel';
-import { IFaqDTO } from '../../dtos/base/FaqDto';
+import IBaseRepository from '../base_repo/interface/IBaseRepository';
+import IUserDocument from '../../model/user/interfaces/IUser';
+import BaseRepository from '../base_repo/BaseRepository';
 
-class UserBaseRepository implements IUserBaseRespository {
-    // Finds a user by their phone number.
-    async findByPhoneNumber(phoneNumber: string): Promise<IAuthUser | null> {
-        const user = await UserModel.findOne({ phone_number: phoneNumber });
+export default class UserBaseRepository implements IUserBaseRespository {
+    public baseRepo: IBaseRepository<IUserDocument> = new BaseRepository<IUserDocument>(UserModel);
 
-        if (!user) return null;
+    async getUserDetails(userId: string): Promise<IUserDocument> {
+        try {
+            const result = await this.baseRepo.findById(userId);
 
-        // Return sanitized user data conforming to IAuthUser interface
-        return {
-            userId: user.id,
-            phoneNumber: user.phone_number,
-            status: user.status,
-            role: user.role,
-            hashedPassword: user.password,
-            is2FA: user.is2FA,
-        };
+            if (!result) {
+                throw new Error(`User with ID ${userId} not found`);
+            }
+            
+            return result;
+        } catch (error) {
+            throw new Error(`${(error as Error).message}`);
+        }
     }
-
-    // Toggles the Two-Factor Authentication (2FA) status for a specific user.
+    
     async toggleTwoFactorAuthentication(userId: string): Promise<boolean> {
         try {
-            // Fetch only the `is2FA` field of the user
             const user = await UserModel.findOne({ _id: userId }, { is2FA: 1 });
 
             if (!user) {
@@ -36,20 +33,14 @@ class UserBaseRepository implements IUserBaseRespository {
             const newIs2FAValue = !user.is2FA;
 
             // Update the user document in the database
-            const result = await UserModel.updateOne(
+            const result = await this.baseRepo.updateOne(
                 { _id: userId },
                 { $set: { is2FA: newIs2FAValue } }
             );
 
-            if (result.modifiedCount === 0) {
-                throw new Error(`Failed to update 2FA status for user ID ${userId}`);
-            }
-
-            // Return the new 2FA status
-            return newIs2FAValue;
+            return !!result;
         } catch (error) {
-            console.error(`Error toggling 2FA for user ID ${userId}:`, error);
-            throw error; // Re-throw the error for upstream handling
+            throw new Error((error as Error).message);
         }
     }
 
@@ -66,47 +57,14 @@ class UserBaseRepository implements IUserBaseRespository {
             const newSubscriptionStatus = !user.subscription_status;
 
             // Update the user's subscription status in the database
-            const result = await UserModel.updateOne(
+            const result = await this.baseRepo.updateOne(
                 { _id: userId },
                 { $set: { subscription_status: newSubscriptionStatus } }
             );
 
-            if (result.modifiedCount === 0) {
-                throw new Error(`Failed to update subscription status for user ID ${userId}`);
-            }
-
-            // Return the updated subscription status
-            return newSubscriptionStatus;
+            return !!result;
         } catch (error) {
-            console.error(`Error updating subscription status for user ID ${userId}:`, error);
-            throw error; // Re-throw the error for upstream handling
-        }
-    }
-
-    // Fetches all FAQ entries from the database for administrative purposes.
-    async getAllFaqs(): Promise<IFaqDTO[] | null> {
-        try {
-            const result = await FaqModel.find();
-
-            if (result.length) {
-                const mappedData: IFaqDTO[] = result.map((data) => ({
-                    _id: data._id?.toString(),
-                    question: data.question,
-                    answer: data.answer,
-                    isDeleted: data.isDeleted,
-                    isPublished: data.isPublished,
-                    createdAt: data.createdAt,
-                    updatedAt: data.updatedAt
-                }));
-                return mappedData;
-            } else {
-                return null;
-            }
-        } catch (error) {
-            console.error(`Error fetching FAQs in Admin Repository:`, error);
-            throw new Error(`Failed to fetch FAQs: ${error instanceof Error ? error.message : String(error)}`);
+            throw new Error((error as Error).message);
         }
     }
 }
-
-export default UserBaseRepository;

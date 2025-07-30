@@ -1,7 +1,7 @@
-import { IDebtDTO } from '../../../dtos/debt/DebtDto';
+import IDebtDTO from '../../../dtos/debt/DebtDTO';
 import { ComparisonResult } from '../../../utils/debt/simulateResult';
 
-interface IDebtService {
+export default interface IDebtService {
     createDebt(accessToken: string, debtData: IDebtDTO): Promise<IDebtDTO>;
     getTotalDebt(accessToken: string): Promise<number>;
     getTotalOutstandingDebt(accessToken: string): Promise<number>;
@@ -16,6 +16,4 @@ interface IDebtService {
     markAsPaid(debtId: string): Promise<boolean>;
     getDebtsForNotifyUpcomingDebtPayments(): Promise<IDebtDTO[]>;
 }
-
-export default IDebtService;
 

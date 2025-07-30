@@ -1,4 +1,4 @@
-import { IGoalDTO } from '../../../dtos/goal/GoalDto';
+import { IGoalDTO } from '../../../dtos/goal/GoalDTO';
 import ISmartAnalysisResult from './ISmartAnalysisResult';
 import IGoalCategory from './IGoalCategory';
 

@@ -3,13 +3,14 @@ import IAdminController from './interfaces/IAdminController';
 import { StatusCodes } from '../../constants/statusCodes';
 import { sendSuccessResponse, sendErrorResponse } from '../../utils/responseHandler';
 import { Request, Response } from 'express';
-import { AppError, ValidationError } from '../../error/AppError';
+import { ValidationError } from '../../error/AppError';
 import { ErrorMessages } from '../../constants/errorMessages';
 import { SuccessMessages } from '../../constants/successMessages';
 import faqSchema from '../../validation/base/faq.validation';
 import faqQuerySchema from '../../validation/admin/faqQueryValidation';
+import { handleControllerError } from '../../utils/controllerUtils';
 
-class AdminController implements IAdminController {
+export default class AdminController implements IAdminController {
     private readonly _adminService: IAdminService;
 
     constructor(adminService: IAdminService) {
@@ -18,46 +19,36 @@ class AdminController implements IAdminController {
 
     async getAllUsers(request: Request, response: Response): Promise<void> {
         try {
-            // Call the getAllUsers method from AuthService
+            // Call the getAllUsers method from AuthService 
             const usersDetails = await this._adminService.getAllUsers();
     
-            if (usersDetails) {
-                sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { ...usersDetails });
-            }
-            
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { ...usersDetails });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
     async toggleUserStatus(request: Request, response: Response): Promise<void> {
         try {
-
             const { userId, status } = request.body;
-
-            if (!userId || typeof status !== 'boolean') {
-                throw new ValidationError(ErrorMessages.INVALID_INPUT, StatusCodes.INVALID_INPUT)
-            }
             
             // Call the toggleUserStatus in the adminService
-            const isUpdated = await this._adminService.toggleUserStatus(userId, status);
+            await this._adminService.toggleUserStatus(userId, status);
     
-            if (isUpdated) {
-                sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS);
-            } else {
-                sendErrorResponse(response, StatusCodes.BAD_REQUEST, ErrorMessages.STATUS_UPDATE_FAILED);
-            }
-            
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS);
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
+        }
+    }
+
+    async getNewRegistrationCount(request: Request, response: Response): Promise<void> {
+        try {
+            // Call the getNewRegistrationCount method from AuthService
+            const newRegistrationCount = await this._adminService.getNewRegistrationCount();
+    
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { newRegistrationCount }); 
+        } catch (error) {
+            handleControllerError(response, error);
         }
     }
 
@@ -74,18 +65,10 @@ class AdminController implements IAdminController {
             
             // Call the add FAQ in the adminService
             const isAdded = await this._adminService.addFaq({ question, answer });
-    
-            if (isAdded) {
-                sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.FAQ_ADDED, { isAdded });
-            } else {
-                sendErrorResponse(response, StatusCodes.BAD_REQUEST, ErrorMessages.FAILED_TO_ADD_THE_FAQ);
-            }
+
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.FAQ_ADDED, { isAdded });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -107,12 +90,7 @@ class AdminController implements IAdminController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.FAQ_FETCHED_SUCCESSFULLY, { ...faqDetails });
         } catch (error) {
-            console.error(`Error fetching FAQs:`, error);
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -121,30 +99,12 @@ class AdminController implements IAdminController {
             // Call the getall FAQ details in the adminService
             const faqDetails = await this._adminService.getAllFaqs();
 
-            if (faqDetails) {
-                sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.FAQ_ADDED, { faqDetails });
-            } else {
-                sendErrorResponse(response, StatusCodes.BAD_REQUEST, ErrorMessages.FAILED_TO_ADD_THE_FAQ);
-            }
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.FAQ_ADDED, { faqDetails });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
-    /**
-     * Controller to handle FAQ deletion via HTTP DELETE request.
-     *
-     * Extracts the FAQ ID from the request parameters, calls the service to delete the FAQ,
-     * and sends an appropriate success or error response.
-     *
-     * @param {Request} request - Express Request object containing the FAQ ID in `params.id`.
-     * @param {Response} response - Express Response object to send the response.
-     * @returns {Promise<void>} Sends response via Express; does not return a value.
-     */
     async deleteFaq(request: Request, response: Response): Promise<void> {
         try {
             const faqId: string = request.params.id;
@@ -154,24 +114,10 @@ class AdminController implements IAdminController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.FAQ_DELETED_SUCCESSFULLY, { isRemoved });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
-    /**
-     * Controller to handle toggling the publish status of an FAQ via an HTTP PATCH request.
-     *
-     * Extracts the FAQ ID from the request parameters, calls the service to toggle the
-     * 'isPublished' status of the FAQ, and sends an appropriate success or error response.
-     *
-     * @param {Request} request - Express Request object containing the FAQ ID in `params.id`.
-     * @param {Response} response - Express Response object to send the response.
-     * @returns {Promise<void>} Sends response via Express; does not return a value.
-     */
     async togglePublish(request: Request, response: Response): Promise<void> {
         try {
             const faqId: string = request.params.id;
@@ -181,28 +127,12 @@ class AdminController implements IAdminController {
         
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.FAQ_UPDATED_SUCCESSFULLY, { isToggled });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
-    /**
-     * Controller to handle updating an FAQ entry via an HTTP PATCH request.
-     *
-     * Extracts the FAQ ID from the request parameters and the update data from the request body.
-     * Validates the input using the FAQ schema, calls the service to update the FAQ,
-     * and sends an appropriate success or error response.
-     *
-     * @param {Request} request - Express Request object containing the FAQ ID in `params.id` and update data in `body`.
-     * @param {Response} response - Express Response object to send the response.
-     * @returns {Promise<void>} Sends response via Express; does not return a value.
-     */
     async updateFaq(request: Request, response: Response): Promise<void> {
         try {
-            
             const faqId: string = request.params.id;
         
             // Validate the request body using zod
@@ -217,31 +147,7 @@ class AdminController implements IAdminController {
         
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.FAQ_UPDATED_SUCCESSFULLY, { isUpdated });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
-        }
-    }
-
-    async getNewRegistrationCount(request: Request, response: Response): Promise<void> {
-        try {
-            // Call the getNewRegistrationCount method from AuthService
-            const newRegistrationCount = await this._adminService.getNewRegistrationCount();
-    
-            if (newRegistrationCount !== undefined) {
-                sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { newRegistrationCount });
-            } else {
-                sendErrorResponse(response, StatusCodes.BAD_REQUEST, ErrorMessages.FAILED_TO_FETCH_REGISTRATION_COUNT);
-            }
-            
-        } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -250,17 +156,9 @@ class AdminController implements IAdminController {
             // Call the getHealthStatus method from AuthService
             const healthStatus = await this._adminService.getHealthStatus();
     
-            if (healthStatus) {
-                sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { healthStatus });
-            } else {
-                sendErrorResponse(response, StatusCodes.BAD_REQUEST, ErrorMessages.FAILED_TO_FETCH_HEALTH_STATUS);
-            }
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { healthStatus });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -269,19 +167,9 @@ class AdminController implements IAdminController {
             // Call the get System Metrics method from AuthService
             const usageStatics = await this._adminService.getSystemMetrics();
     
-            if (usageStatics) {
-                sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { usageStatics });
-            } else {
-                sendErrorResponse(response, StatusCodes.BAD_REQUEST, ErrorMessages.FAILED_TO_FETCH_HEALTH_STATUS);
-            }
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { usageStatics });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 }
-
-export default AdminController;

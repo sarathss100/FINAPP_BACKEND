@@ -1,4 +1,4 @@
-import { IGoalDTO } from '../../dtos/goal/GoalDto';
+import { IGoalDTO } from '../../dtos/goal/GoalDTO';
 import IGoalManagementRepository from './interfaces/IGoalManagementRepository';
 import { GoalModel } from '../../model/goal/model/GoalModel';
 import mongoose from 'mongoose';

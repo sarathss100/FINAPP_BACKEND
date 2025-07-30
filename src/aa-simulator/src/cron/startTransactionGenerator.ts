@@ -3,6 +3,7 @@ import cron from 'node-cron';
 
 export const generateSingleTransaction = async function() {
     console.log(`Generate random transaction...`);
+
     try {
         await TransactionGenerator.generateTransaction();
     } catch (error) {
@@ -12,14 +13,12 @@ export const generateSingleTransaction = async function() {
 
 export const startTransactionGenerator = function() {
     console.log(`Transaction Generator Application Start`);
-    // Generate initial transaction
-    setTimeout(generateSingleTransaction, 2000);
 
-    // Schedule cron job for every 10 minutes: */10 * * * * 
+    // Schedule Job at Every 4 hours
     cron.schedule('*0 */4 * * *', async () => {
         console.log(`\nCron Job Triggered - ${new Date().toLocaleString()}`);
         await generateSingleTransaction();
     });
 
-    console.log(`Cron job scheduled: Every 10 minutes`);
+    console.log(`Cron job scheduled: Every 4 Hours`);
 };

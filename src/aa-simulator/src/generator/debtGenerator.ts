@@ -1,10 +1,11 @@
 import debtTemplates from '../../../aa-simulator/src/data/debt/debtTemplates.json';
-import { IDebtDTO } from '../../../dtos/debt/DebtDto';
-import IAccountsManagementRepository from '../../../repositories/accounts/interfaces/IAccountsManagementRepository';
-import AccountManagementRepository from '../../../repositories/accounts/AccountsManagementRepository';
+import IDebtDTO from '../../../dtos/debt/DebtDTO';
+import IAccountsManagementRepository from '../../../repositories/accounts/interfaces/IAccountsRepository';
+import AccountManagementRepository from '../../../repositories/accounts/AccountsRepository';
 import IAdminRepository from '../../../repositories/admin/interfaces/IAdminRepository';
 import AdminRepository from '../../../repositories/admin/AdminRepository';
 import { DebtGeneratorService } from '../services/debtService';
+import UserMapper from '../../../mappers/user/UserMapper';
 
 const adminRepository: IAdminRepository = AdminRepository.instance;
 const accountsRepository: IAccountsManagementRepository = AccountManagementRepository.instance;
@@ -61,8 +62,10 @@ export class DebtGenerator {
         try {
             // Pick random user
             const randomUser = await this.getRandomUser();
+            const resultDTO = UserMapper.toIAuthUserDTO(randomUser);
+            
             // Pick random account
-            const randomAccount = await this.getRandomAccount(randomUser.userId);
+            const randomAccount = await this.getRandomAccount(resultDTO.userId);
 
             // Pick random debt template
             const template = this.getRandomFromArray(debtTemplates.templates);
@@ -85,7 +88,7 @@ export class DebtGenerator {
 
             const debtData: IDebtDTO = {
                 _id: '',
-                userId: randomUser.userId,
+                userId: resultDTO.userId,
                 accountId: randomAccount?._id ? String(randomAccount._id) : null,
                 debtName,
                 initialAmount,
@@ -112,9 +115,9 @@ export class DebtGenerator {
             };
 
             // Submit Debt to main application
-            await DebtGeneratorService.submitDebt(debtData, randomUser);
+            await DebtGeneratorService.submitDebt(debtData, resultDTO);
 
-            console.log(`Debt created: ${debtName} for user ${randomUser.userId}`);
+            console.log(`Debt created: ${debtName} for user ${resultDTO.userId}`);
         } catch (error) {
             console.error(`Debt generation failed:`, error);
         }

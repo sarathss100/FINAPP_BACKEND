@@ -1,6 +1,6 @@
-import { IAccountDTO } from '../../../dtos/accounts/AccountsDTO';
+import { IAccountDTO } from '../../../dtos/accounts/IAccountsDTO';
 
-interface IAccountsService {
+export default interface IAccountsService {
     addAccount(accessToken: string, accountData: IAccountDTO): Promise<IAccountDTO>;
     updateAccount(accessToken: string, accountId: string, accountData: Partial<IAccountDTO>): Promise<IAccountDTO>;
     removeAccount(accountId: string): Promise<boolean>;
@@ -10,5 +10,3 @@ interface IAccountsService {
     getTotalDebt(accessToken: string): Promise<number>;
     getTotalInvestment(accessToken: string): Promise<number>;
 }
-
-export default IAccountsService;

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-interface IUserController {
+export default interface IUserController {
     getUserProfileDetails(request: Request, response: Response): Promise<void>;
     uploadProfilePicture(request: Request, response: Response): Promise<void>;
     getUserProfilePictureUrl(request: Request, response: Response): Promise<void>;
@@ -8,5 +8,3 @@ interface IUserController {
     deleteUserAccount(request: Request, response: Response): Promise<void>;
     serveProfileImage(request: Request, response: Response): Promise<void>;
 }
-
-export default IUserController;

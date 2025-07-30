@@ -1,6 +1,6 @@
 import { Document, Types } from 'mongoose';
 
-export interface IDebt extends Document {
+export interface IDebtDocument extends Document {
     _id: Types.ObjectId;
     userId: string;
     accountId: string | null;
@@ -26,9 +26,10 @@ export interface IDebt extends Document {
     isGoodDebt: boolean;
     isCompleted: boolean;
     isExpired: boolean;
+    __v?: number;
 }
 
-export interface IDebtPayments extends Document {
+export interface IDebtPaymentsDocument extends Document {
     _id: Types.ObjectId;
     debtId: Types.ObjectId;
     amountPaid: number;
@@ -36,6 +37,7 @@ export interface IDebtPayments extends Document {
     interestAmount: number;
     paymentDate: Date;
     isLate: boolean;
+    __v?: number;
 }
 
 

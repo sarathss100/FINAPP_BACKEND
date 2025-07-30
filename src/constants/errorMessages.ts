@@ -12,6 +12,7 @@ export const ErrorMessages = {
     REFRESH_TOKEN_STORAGE_ERROR: 'An error occurred while storing the refresh token. Please try again later.',
     REFRESH_TOKEN_REMOVAL_ERROR: 'An error occurred while removing the refresh token. Please try again later.',
     PHONE_NUMBER_MISSING: 'Phone number is missing. Please provide a valid phone number.',
+    PASSWORD_MISSING: 'Password is missing. Please provide a valid password.',
     PHONE_NUMBER_NOT_FOUND: 'This phone number does not exist. Please check the phone number and try again.',
     STATUS_CHECK_FAILED: 'Failed to verify the user status. Please try again later or contact support.',
     AUTH_COOKIE_MISSING: 'Authorization cookie is missing. Please log in again to proceed.',

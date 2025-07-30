@@ -1,41 +1,34 @@
-import { decodeAndValidateToken } from '../../utils/auth/tokenUtils';
-import { AuthenticationError } from '../../error/AppError';
-import { ErrorMessages } from '../../constants/errorMessages';
-import { StatusCodes } from '../../constants/statusCodes';
 import IDebtService from './interfaces/IDebtService';
-import DebtManagementRepository from '../../repositories/debt/DebtManagementRepository';
-import { IDebtDTO } from '../../dtos/debt/DebtDto';
+import IDebtDTO from '../../dtos/debt/DebtDTO';
 import IDebtRepository from '../../repositories/debt/interfaces/IDebtRepository';
 import calculateLoanBreakdown from '../../utils/debt/emiCalculator';
 import { calculateLoanClosingMonth, calculateNextDueDate } from '../../utils/debt/dueDateCalculator';
 import { categorizeDebt } from '../../utils/debt/debtCategorizer';
 import { compareStrategies, ComparisonResult } from '../../utils/debt/simulateResult';
 import { eventBus } from '../../events/eventBus';
+import DebtRepository from '../../repositories/debt/DebtRepository';
+import { extractUserIdFromToken, wrapServiceError } from '../../utils/serviceUtils';
+import DebtMapper from '../../mappers/debts/DebtMapper';
 
-class DebtService implements IDebtService {
+export default class DebtService implements IDebtService {
     private static _instance: DebtService;
-    private _debtManagementRepository: IDebtRepository;
+    private _debtRepository: IDebtRepository;
 
-    constructor(debtManagementRepository: IDebtRepository) {
-        this._debtManagementRepository = debtManagementRepository;
+    constructor(debtRepository: IDebtRepository) {
+        this._debtRepository = debtRepository;
     }
 
     public static get instance(): DebtService {
         if (!DebtService._instance) {
-            const repo = DebtManagementRepository.instance;
+            const repo = DebtRepository.instance;
             DebtService._instance = new DebtService(repo);
         }
         return DebtService._instance;
     }
 
-    // Creates a new debt record for the authenticated user.
     async createDebt(accessToken: string, debtData: IDebtDTO): Promise<IDebtDTO> {
         try {
-            // Decode and validate the access token to extract the user ID
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
 
             const monthlyPayment = await calculateLoanBreakdown({
                 initialAmount: debtData.initialAmount,
@@ -65,230 +58,186 @@ class DebtService implements IDebtService {
 
             delete refinedData._id;
 
+            const mappedDocument = DebtMapper.toModel(refinedData);
+
             // Delegate to the repository to create the debt record
-            const debtDetails = await this._debtManagementRepository.createDebt(refinedData, userId);
+            const debtDetails = await this._debtRepository.createDebt(mappedDocument, userId);
+
+            const resultDTO = DebtMapper.toDTO(debtDetails);
 
             // Emit socket event to notify user about debt Creation
-            eventBus.emit('debt_created', debtDetails);
+            eventBus.emit('debt_created', resultDTO);
 
-            return debtDetails;
+            return resultDTO;
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error creating debt:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while creating debt:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Calculates the total outstanding debt for the authenticated user.
     async getTotalDebt(accessToken: string): Promise<number> {
         try {
-            // Decode and validate the access token to extract the user ID
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
         
             // Delegate to the repository to calculate the total outstanding debt
-            const totalDebt = await this._debtManagementRepository.getTotalDebt(userId);
+            const totalDebt = await this._debtRepository.getTotalDebt(userId);
         
             return totalDebt;
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error fetching total outstanding debt:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while getting total debt:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Calculates the total outstanding debt for the authenticated user.
     async getTotalOutstandingDebt(accessToken: string): Promise<number> {
         try {
-            // Decode and validate the access token to extract the user ID
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
         
             // Delegate to the repository to calculate the total outstanding debt
-            const totalOutstandingDebt = await this._debtManagementRepository.getTotalOutstandingDebt(userId);
+            const totalOutstandingDebt = await this._debtRepository.getTotalOutstandingDebt(userId);
         
             return totalOutstandingDebt;
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error fetching total outstanding debt:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while getting total outstanding debt:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Calculates the total monthly payment across all active debts for the authenticated user.
     async getTotalMonthlyPayment(accessToken: string): Promise<number> {
         try {
-            // Decode and validate the access token to extract the user ID
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
         
             // Delegate to the repository to calculate the total monthly payment
-            const totalMonthlyPayment = await this._debtManagementRepository.getTotalMonthlyPayment(userId);
+            const totalMonthlyPayment = await this._debtRepository.getTotalMonthlyPayment(userId);
         
             return totalMonthlyPayment;
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error fetching total monthly payment:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while getting total monthly debt payment:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Calculates the longest difference in months between the end date of any active debt 
-    // and the current date for the authenticated user.
     async getLongestTenure(accessToken: string): Promise<number> {
         try {
-            // Decode and validate the access token to extract the user ID
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
         
             // Delegate to the repository to calculate the max tenure
-            const maxTenure = await this._debtManagementRepository.getLongestTenure(userId);
+            const maxTenure = await this._debtRepository.getLongestTenure(userId);
         
             return maxTenure;
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error fetching longest tenure:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while fetching longest tenure:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Retrieves debts categorized as either 'Good Debt' or 'Bad Debt' for the authenticated user.
     async getDebtCategorized(accessToken: string, category: string): Promise<IDebtDTO[]> {
         try {
-            // Decode and validate the access token to extract the user ID
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
         
             // Delegate to the repository to fetch categorized debts
-            const debtDetails = await this._debtManagementRepository.getDebtCategorized(userId, category);
+            const debtDetails = await this._debtRepository.getDebtCategorized(userId, category);
+
+            const resultDTO = DebtMapper.toDTOs(debtDetails);
         
-            return debtDetails;
+            return resultDTO;
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error fetching categorized debts:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while getting debt categorized:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Compares debt repayment strategies (e.g., Avalanche vs Snowball) for the authenticated user.
     async getRepaymentStrategyComparison(accessToken: string, extraAmount: number): Promise<ComparisonResult> {
         try {
-            // Decode and validate the access token to extract the user ID
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
         
             // Delegate to the repository to fetch categorized debts
-            const debtDetails = await this._debtManagementRepository.getRepaymentStrategyComparison(userId);
+            const debtDetails = await this._debtRepository.getRepaymentStrategyComparison(userId);
         
             // Simulate Repayment and get the comparison result
             const comparisonResult = await compareStrategies(debtDetails, extraAmount);
         
             return comparisonResult;
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error fetching and comparing repayment strategies:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while getting repayment startegy by comparison:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Retrieves all active debts associated with the authenticated user.
     async getAllDebts(accessToken: string): Promise<IDebtDTO[]> {
         try {
-            // Decode and validate the access token to extract the user ID
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
         
             // Delegate to the repository to fetch categorized debts
-            const debtDetails = await this._debtManagementRepository.getAllDebts(userId);
+            const debtDetails = await this._debtRepository.getAllDebts(userId);
 
-            return debtDetails;
+            const resultDTO = DebtMapper.toDTOs(debtDetails);
+
+            return resultDTO;
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error fetching debts:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while fetching all debts:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Deletes a specific debt record by its ID.
     async deleteDebt(debtId: string): Promise<boolean> {
         try {
             // Delegate to the repository to delete the debt
-            const removedDebt = await this._debtManagementRepository.deleteDebt(debtId);
+            const removedDebt = await this._debtRepository.deleteDebt(debtId);
+
+            const resultDTO = DebtMapper.toDTO(removedDebt);
 
             // Emit socket event to notify user about debt Creation
-            eventBus.emit('debt_removed', removedDebt);
+            eventBus.emit('debt_removed', resultDTO);
         
-            return removedDebt._id ? true : false;
+            return resultDTO._id ? true : false;
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error deleting debt:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while deleting debt:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Updates the expiry status for debts with a past nextDueDate.
     async updateExpiry(): Promise<void> {
         try {
-            await this._debtManagementRepository.updateExpiry();
+            await this._debtRepository.updateExpiry();
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error updating debt expiry:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while updating debt expiry:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Marks debts as completed if their end date has passed.
     async markEndedDebtsAsCompleted(): Promise<void> {
         try {
-            await this._debtManagementRepository.markEndedDebtsAsCompleted();
+            await this._debtRepository.markEndedDebtsAsCompleted();
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error updating ended debts as completed:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while mark all debts completed:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Marks a specific debt as paid by updating its next due date and resetting the expired flag.
     async markAsPaid(debtId: string): Promise<boolean> {
         try {
             // Delegate to the repository to mark the debt as paid
-            const markAsPaid = await this._debtManagementRepository.markAsPaid(debtId);
+            const markAsPaid = await this._debtRepository.markAsPaid(debtId);
         
             return markAsPaid;
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error marking debt as paid:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while debt mark as paid:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Retrieves debts that need to be checked for upcoming payment notifications.
     async getDebtsForNotifyUpcomingDebtPayments(): Promise<IDebtDTO[]> {
         try {
             // Fetch active debts from the repository for upcoming payment checks
-            const debts = await this._debtManagementRepository.getDebtForNotifyUpcomingDebtPayments();
+            const debts = await this._debtRepository.getDebtForNotifyUpcomingDebtPayments();
 
-            return debts;
+            const resultDTO = DebtMapper.toDTOs(debts);
+
+            return resultDTO;
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error fetching debts for upcoming payment notifications:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while fetching upcoming debt payments:', error);
+            throw wrapServiceError(error);
         }
     }
 }
-
-export default DebtService;

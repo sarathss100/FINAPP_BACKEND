@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-interface IAdminController {
+export default interface IAdminController {
     getAllUsers(request: Request, response: Response): Promise<void>;
     toggleUserStatus(request: Request, response: Response): Promise<void>;
     addFaq(request: Request, response: Response): Promise<void>;
@@ -13,5 +13,3 @@ interface IAdminController {
     deleteFaq(request: Request, respons: Response): Promise<void>;
     togglePublish(request: Request, respons: Response): Promise<void>;
 }
-
-export default IAdminController;

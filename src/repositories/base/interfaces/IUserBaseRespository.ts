@@ -1,11 +1,9 @@
-import IAuthUser from './IAuthUser';
-import { IFaqDTO } from '../../../dtos/base/FaqDto';
+import IUserDocument from '../../../model/user/interfaces/IUser';
 
 interface IUserBaseRespository {
-    findByPhoneNumber(phoneNumber: string): Promise<IAuthUser | null>;
+    getUserDetails(userId: string): Promise<IUserDocument>;
     toggleTwoFactorAuthentication(userId: string): Promise<boolean>;
     updateSubscriptionStatus(userId: string): Promise<boolean>;
-    getAllFaqs(): Promise<IFaqDTO[] | null>;
 }
 
 export default IUserBaseRespository;

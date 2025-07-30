@@ -1,37 +1,30 @@
-import { decodeAndValidateToken } from '../../utils/auth/tokenUtils';
-import { AuthenticationError } from '../../error/AppError';
-import { ErrorMessages } from '../../constants/errorMessages';
-import { StatusCodes } from '../../constants/statusCodes';
-import { IAccountDTO } from '../../dtos/accounts/AccountsDTO';
+import { IAccountDTO } from '../../dtos/accounts/IAccountsDTO';
 import IAccountsService from './interfaces/IAccountsService';
-import IAccountsManagementRepository from '../../repositories/accounts/interfaces/IAccountsManagementRepository';
-import AccountManagementRepository from '../../repositories/accounts/AccountsManagementRepository';
 import { eventBus } from '../../events/eventBus';
+import AccountMapper from '../../mappers/accounts/AccountsMapper';
+import { extractUserIdFromToken, wrapServiceError } from '../../utils/serviceUtils';
+import IAccountsRepository from '../../repositories/accounts/interfaces/IAccountsRepository';
+import AccountsRepository from '../../repositories/accounts/AccountsRepository';
 
-class AccountsService implements IAccountsService {
+export default class AccountsService implements IAccountsService {
     private static _instance: AccountsService;
-    private _accountRepository: IAccountsManagementRepository;
+    private _accountRepository: IAccountsRepository;
 
-    constructor(accountRepository: IAccountsManagementRepository) {
+    constructor(accountRepository: IAccountsRepository) {
         this._accountRepository = accountRepository;
     }
 
     public static get instance(): AccountsService {
         if (!AccountsService._instance) {
-            const repo = AccountManagementRepository.instance;
+            const repo = AccountsRepository.instance;
             AccountsService._instance = new AccountsService(repo);
         }
         return AccountsService._instance;
     }
 
-    // Creates a new account for the authenticated user.
     async addAccount(accessToken: string, accountData: IAccountDTO): Promise<IAccountDTO> {
         try {
-            // Decode and validate the access token to extract the user ID associated with it.
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
 
             // Add user-related metadata (user_id, created_by, last_updated_by) to the account data.
             const enrichedAccountData: IAccountDTO = {
@@ -41,52 +34,51 @@ class AccountsService implements IAccountsService {
                 last_updated_by: userId,
             };
 
+            // map the IAccountDTO to Match IAccountDocument
+            const mappedData = AccountMapper.toModel(enrichedAccountData);
+
             // Call the repository to create the account using the extracted user ID and provided account data.
-            const createdAccount = await this._accountRepository.addAccount(enrichedAccountData);
+            const createdAccount = await this._accountRepository.addAccount(mappedData);
+
+            const resultDTO = AccountMapper.toDTO(createdAccount);
 
             // Emit socket event to notify user about new notification
-            eventBus.emit('account_created', createdAccount);
+            eventBus.emit('account_created', resultDTO);
 
-            return createdAccount;
+            return resultDTO;
         } catch (error) {
-            // Log and re-throw the error to propagate it to the caller.
             console.error('Error creating account:', error);
-            throw error instanceof Error
-                ? error
-                : new Error((error as Error).message || 'Unknown error occurred');
+            throw wrapServiceError(error);
         }
     }
 
-    // Updates an existing account for the authenticated user.
     async updateAccount(accessToken: string, accountId: string, accountData: Partial<IAccountDTO>): Promise<IAccountDTO> {
         try {
-            // Decode and validate the access token to extract the user ID associated with it.
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
         
             // Add user-related metadata (user_id, last_updated_by) to the account data.
            const updatedAccountData = { user_id: userId, last_updated_by: userId, ...accountData };
+
+            // map the IAccountDTO to Match IAccountDocument
+            const mappedData = AccountMapper.toModel(updatedAccountData);
         
             // Call the repository to update the account using the account ID and provided data.
-            const updatedAccount = await this._accountRepository.updateAccount(accountId, updatedAccountData);
+            const updatedAccount = await this._accountRepository.updateAccount(accountId, mappedData);
+
+            const resultDTO = AccountMapper.toDTO(updatedAccount);
 
             // Emit socket event to notify user about new notification
-            eventBus.emit('account_updated', updatedAccount);
+            eventBus.emit('account_updated', resultDTO);
         
-            return updatedAccount;
+            return resultDTO;
         } catch (error) {
-            // Log and re-throw the error to propagate it to the caller.
             console.error('Error updating Account:', error);
-            throw new Error((error as Error).message);
+            throw wrapServiceError(error);
         }
     }
 
-    // Removes an existing account by its unique identifier.
     async removeAccount(accountId: string): Promise<boolean> {
         try {
-            // Call the repository to remove the account using the provided account ID.
             const removedAccountDetails = await this._accountRepository.removeAccount(accountId);
 
             // Emit socket event to notify user about new notification
@@ -94,40 +86,30 @@ class AccountsService implements IAccountsService {
 
             return removedAccountDetails._id ? true : false;
         } catch (error) {
-            // Log and re-throw the error to propagate it to the caller.
             console.error('Error removing Account:', error);
-            throw new Error((error as Error).message);
+            throw wrapServiceError(error);
         }
     }
 
-    // Retrieves all accounts associated with the authenticated user.
     async getUserAccounts(accessToken: string): Promise<IAccountDTO[]> {
         try {
-            // Decode and validate the access token to extract the user ID associated with it.
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
 
             // Call the repository to retrieve the accounts associated with the extracted user ID.
             const accountDetails = await this._accountRepository.getUserAccounts(userId);
 
-            return accountDetails;
+            const resultDTO = AccountMapper.toDTOs(accountDetails);
+
+            return resultDTO;
         } catch (error) {
-            // Log and re-throw the error to propagate it to the caller.
             console.error('Error retrieving user accounts:', error);
-            throw new Error((error as Error).message);
+            throw wrapServiceError(error);
         }
     }
 
-    // Retrieves all accounts associated with the authenticated user.
     async getTotalBalance(accessToken: string): Promise<number> {
         try {
-            // Decode and validate the access token to extract the user ID associated with it.
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
 
             // Call the repository to retrieve the accounts associated with the extracted user ID.
             const accountDetails = await this._accountRepository.getUserAccounts(userId);
@@ -151,20 +133,14 @@ class AccountsService implements IAccountsService {
 
             return totalBalance;
         } catch (error) {
-            // Log and re-throw the error to propagate it to the caller.
             console.error('Error retrieving totalBalance:', error);
-            throw new Error((error as Error).message);
+            throw wrapServiceError(error);
         }
     }
 
-    // Calculates the total balance of all bank accounts associated with the authenticated user.
     async getTotalBankBalance(accessToken: string): Promise<number> {
         try {
-            // Decode and validate the access token to extract the user ID associated with it.
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
 
             // Call the repository to retrieve the accounts associated with the extracted user ID.
             const accountDetails = await this._accountRepository.getUserAccounts(userId);
@@ -178,20 +154,14 @@ class AccountsService implements IAccountsService {
 
             return totalBankBalance;
         } catch (error) {
-            // Log and re-throw the error to propagate it to the caller.
             console.error('Error retrieving total Bank Balance:', error);
-            throw new Error((error as Error).message);
+            throw wrapServiceError(error);
         }
     }
 
-    // Calculates the total debt balance across all debt-type accounts associated with the authenticated user.
     async getTotalDebt(accessToken: string): Promise<number> {
         try {
-            // Decode and validate the access token to extract the user ID associated with it.
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
         
             // Call the repository to retrieve the accounts associated with the extracted user ID.
             const accountDetails = await this._accountRepository.getUserAccounts(userId);
@@ -205,20 +175,14 @@ class AccountsService implements IAccountsService {
         
             return totalDebt;
         } catch (error) {
-            // Log and re-throw the error to propagate it to the caller.
             console.error('Error retrieving total debt:', error);
-            throw new Error((error as Error).message);
+            throw wrapServiceError(error);
         }
     }
 
-    // Calculates the total investment balance across all investment-type accounts associated with the authenticated user.
     async getTotalInvestment(accessToken: string): Promise<number> {
         try {
-            // Decode and validate the access token to extract the user ID associated with it.
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
 
             // Call the repository to retrieve the accounts associated with the extracted user ID.
             const accountDetails = await this._accountRepository.getUserAccounts(userId);
@@ -232,11 +196,8 @@ class AccountsService implements IAccountsService {
 
             return totalInvestment;
         } catch (error) {
-            // Log and re-throw the error to propagate it to the caller.
             console.error('Error retrieving total investment:', error);
-            throw new Error((error as Error).message);
+            throw wrapServiceError(error);
         }
     }
 }
-
-export default AccountsService;

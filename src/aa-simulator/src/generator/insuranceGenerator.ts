@@ -3,6 +3,7 @@ import IAdminRepository from '../../../repositories/admin/interfaces/IAdminRepos
 import AdminRepository from '../../../repositories/admin/AdminRepository';
 import { InsuranceDTO } from '../../../dtos/insurances/insuranceDTO';
 import { InsuranceGeneratorService } from '../services/insuranceService';
+import UserMapper from '../../../mappers/user/UserMapper';
 
 const adminRepository: IAdminRepository = AdminRepository.instance;
 
@@ -24,6 +25,7 @@ export class InsuranceGenerator {
         try {
             // Pick random user
             const randomUser = await this.getRandomUser();
+            const resultDTO = UserMapper.toIAuthUserDTO(randomUser);
 
             // Pick random insurance template
             const template = this.getRandomFromArray(insuranceTemplates.templates);
@@ -40,7 +42,7 @@ export class InsuranceGenerator {
             nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
 
             const insuranceData: InsuranceDTO = {
-                userId: randomUser.userId,
+                userId: resultDTO.userId,
                 type: insuranceType,
                 coverage,
                 premium,
@@ -50,9 +52,9 @@ export class InsuranceGenerator {
             };
 
             // Submit Insurance to main application
-            await InsuranceGeneratorService.submitInsurance(insuranceData, randomUser);
+            await InsuranceGeneratorService.submitInsurance(insuranceData, resultDTO);
 
-            console.log(`Insurance created: ${insuranceType} for user ${randomUser.userId}`);
+            console.log(`Insurance created: ${insuranceType} for user ${resultDTO.userId}`);
         } catch (error) {
             console.error(`Insurance generation failed:`, error);
         }

@@ -1,5 +1,4 @@
-
-interface ITokenPayload {
+export default interface ITokenPayloadDTO {
     userId: string;
     phoneNumber: string;
     role: string;
@@ -7,5 +6,3 @@ interface ITokenPayload {
     exp?: number;
     iat?: number;
 }
-
-export default ITokenPayload;

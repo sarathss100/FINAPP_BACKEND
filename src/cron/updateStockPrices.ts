@@ -5,11 +5,6 @@ import InvestmentService from "../services/investments/InvestmentService";
 
 const investmentService: IInvestmentService = InvestmentService.instance;
 
-/**
- * Cron job that runs hourly to update stock prices for all STOCK-type investments.
- * 
- * Fetches live price data from external APIs and updates investment values in bulk.
- */
 const updateStockPrice = new CronJob(
     '0 0 0 * * *', 
     async () => {
@@ -21,9 +16,9 @@ const updateStockPrice = new CronJob(
             console.error(`[CRON] Failed to update stock prices`, error);
         }
     },
-    null, // onComplete callback 
-    true, // Start the job immediately when instantiated
-    'UTC' // Timezone
+    null,  
+    true, 
+    'UTC' 
 );
 
 export default updateStockPrice;

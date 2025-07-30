@@ -1,88 +1,68 @@
-// import { decodeAndValidateToken } from 'utils/auth/tokenUtils';
-// import { AuthenticationError } from 'error/AppError';
-// import { ErrorMessages } from 'constants/errorMessages';
-// import { StatusCodes } from 'constants/statusCodes';
 import IChatService from './interfaces/IChatService';
 import IChatRepository from '../../repositories/chats/interfaces/IChatRepository';
-import ChatManagementRepository from '../../repositories/chats/ChatManagementRepository';
 import getBotResponse from '../../services/openAi/OpenAIService';
-import { ChatDTO } from '../../dtos/chats/chatDTO';
-
+import { wrapServiceError } from '../../utils/serviceUtils';
+import ChatMapper from '../../mappers/chats/ChatsMapper';
+import ChatRepository from '../../repositories/chats/ChatRepository';
+import IChatDTO from '../../dtos/chats/chatDTO';
 // import ChatbotProvider from 'services/openAi/interfaces/ChatbotProvider';
 // import OpenAIService from 'services/openAi/OpenAIService';
 
-/**
- * Service class for managing chat records.
- * Handles business logic and authentication before delegating database operations to the repository.
- */
-class ChatService implements IChatService {
+export default class ChatService implements IChatService {
     private static _instance: ChatService;
-    private _chatManagementRepository: IChatRepository;
+    private _chatRepository: IChatRepository;
     // private _chatbotProvider: ChatbotProvider;
 
-    /**
-     * Constructs a new instance of the ChatService.
-     *
-     * @param {IChatRepository} chatRepository - The repository used for interacting with chat data.
-     */
-    constructor(chatManagementRepository: IChatRepository) {
-        this._chatManagementRepository = chatManagementRepository;
+    constructor(chatRepository: IChatRepository) {
+        this._chatRepository = chatRepository;
         // this._chatbotProvider = chatbotProvider 
     }
 
     public static get instance(): ChatService {
         if (!ChatService._instance) {
-            const repo = ChatManagementRepository.instance;
+            const repo = ChatRepository.instance;
             // const provider = new OpenAIService(process.env.OPENAI_API_KEY!);
             ChatService._instance = new ChatService(repo);
         }
         return ChatService._instance;
     }
 
-    // Creates a new chat record for the authenticated user.
-     
     async createChat(userId: string, role: 'user' | 'admin', message: string): Promise<string> {
         try {
-
             // Save user message 
-            await this._chatManagementRepository.createChat(userId, role, message);
+            await this._chatRepository.createChat(userId, role, message);
 
             // Get bot reply
             const botReply = await getBotResponse(message, userId);
 
             return botReply;
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error creating chat:', error);
-            throw new Error((error as Error).message);
+            console.error(`Error while creating new chat: `, error);
+            throw wrapServiceError(error);
         }
     }
 
-    async getChatHistory(userId: string): Promise<ChatDTO[]> {
+    async getChatHistory(userId: string): Promise<IChatDTO[]> {
         try {
-            // Save user message 
-            const history = await this._chatManagementRepository.getHistory(userId);
+            const history = await this._chatRepository.getHistory(userId);
 
-            return history;
+            const resultDTO = ChatMapper.toDTOs(history);
+
+            return resultDTO;
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error creating chat:', error);
-            throw new Error((error as Error).message);
+            console.error(`Error while getting Chat History: `, error);
+            throw wrapServiceError(error);
         }
     }
 
-    async getAllChatSessions(): Promise<{ userId: string; chats: ChatDTO[]}[]> {
+    async getAllChatSessions(): Promise<{ userId: string; chats: IChatDTO[]}[]> {
         try {
-            // Save user message 
-            const history = await this._chatManagementRepository.getAllChatSessions();
+            const history = await this._chatRepository.getAllChatSessions();
 
             return history;
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error creating chat:', error);
-            throw new Error((error as Error).message);
+            console.error(`Error while getting Chat Sessions: `, error);
+            throw wrapServiceError(error);
         }
     }
 }
-
-export default ChatService;

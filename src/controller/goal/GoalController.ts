@@ -7,7 +7,7 @@ import { Request, Response } from 'express';
 import { AppError, AuthenticationError, ServerError, ValidationError } from '../../error/AppError';
 import { SuccessMessages } from '../../constants/successMessages';
 import goalDTOSchema from '../../validation/goal/goal.validation';
-import { IGoalDTO } from '../../dtos/goal/GoalDto';
+import { IGoalDTO } from '../../dtos/goal/GoalDTO';
 
 class GoalController implements IGoalController {
     private readonly _goalService: IGoalService;
@@ -24,11 +24,9 @@ class GoalController implements IGoalController {
                 throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
             }
 
-            // Validate the request body using the Zod schema
             const parsedBody = goalDTOSchema.safeParse(request.body);
 
             if (!parsedBody.success) {
-                // If validation fails, extract the error details
                 const errors = parsedBody.error.errors.map(err => ({
                     field: err.path.join('.'),
                     message: err.message
@@ -39,10 +37,8 @@ class GoalController implements IGoalController {
                 throw new ValidationError(ErrorMessages.INVALID_INPUT, StatusCodes.BAD_REQUEST);
             }
 
-            // Extract the validated data
             const goalData = parsedBody.data;
-            
-            // Call the service layer to create the goal
+
             const createdGoal = await this._goalService.createGoal(accessToken, goalData);
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOAL_CREATED, { createdGoal } );
@@ -69,11 +65,9 @@ class GoalController implements IGoalController {
 
             const partialGoalDTOSchema = goalDTOSchema.partial();
 
-            // Validate the request body using the Zod schema
             const parsedBody = partialGoalDTOSchema.safeParse(request.body.goalData);
 
             if (!parsedBody.success) {
-                // If validation fails, extract the error details
                 const errors = parsedBody.error.errors.map(err => ({
                     field: err.path.join('.'),
                     message: err.message
@@ -83,10 +77,8 @@ class GoalController implements IGoalController {
                 throw new ValidationError(ErrorMessages.INVALID_INPUT, StatusCodes.BAD_REQUEST);
             }
 
-            // Extract the validated data
             const goalData = parsedBody.data;
-            
-            // Call the service layer to create the goal
+
             const createdGoal = await this._goalService.updateGoal(accessToken, goalId, goalData);
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.USER_GOAL_UPDATED, { createdGoal } );
