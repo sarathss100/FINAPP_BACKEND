@@ -1,13 +1,14 @@
 import { Request, Response } from 'express';
-import { AppError, ServerError, ValidationError } from '../../error/AppError';
+import { ServerError, ValidationError } from '../../error/AppError';
 import { ErrorMessages } from '../../constants/errorMessages';
 import { StatusCodes } from '../../constants/statusCodes';
-import { sendErrorResponse, sendSuccessResponse } from '../../utils/responseHandler';
+import { sendSuccessResponse } from '../../utils/responseHandler';
 import { SuccessMessages } from '../../constants/successMessages';
 import IMutualFundController from './interfaces/IMutualFundController';
 import IMutualFundService from '../../services/mutualfunds/interfaces/IMutualFundService';
+import { handleControllerError } from '../../utils/controllerUtils';
 
-class MutualFundController implements IMutualFundController {
+export default class MutualFundController implements IMutualFundController {
     private readonly _mutualFundService: IMutualFundService;
 
     constructor(mutualFundService: IMutualFundService) {
@@ -24,18 +25,11 @@ class MutualFundController implements IMutualFundController {
                 throw new ServerError(ErrorMessages.NAV_SYNC_FAILED);
             }
 
-            // Send success response with result status
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.NAV_SYNCHED, {
                 isNavDataSynched,
             });
         } catch (error) {
-            // Handle known application errors with custom status and message
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                // Handle unexpected generic errors
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -50,18 +44,11 @@ class MutualFundController implements IMutualFundController {
             // Delegate search task to the service layer
             const mutualFunds = await this._mutualFundService.searchMutualFunds(keyword);
 
-            // Send success response with search results
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.MUTUAL_FUND_SEARCH_SUCCESS, {
                 mutualFunds,
             });
         } catch (error) {
-            // Handle known application errors with custom status and message
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                // Handle unexpected generic errors
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -79,7 +66,6 @@ class MutualFundController implements IMutualFundController {
             // Delegate task to the service layer to fetch mutual fund details by scheme code
             const mutualFunds = await this._mutualFundService.getMutualFundDetails(schemCode);
 
-            // Send success response with the retrieved mutual fund data
             sendSuccessResponse(
                 response,
                 StatusCodes.OK,
@@ -87,15 +73,7 @@ class MutualFundController implements IMutualFundController {
                 { mutualFunds }
             );
         } catch (error) {
-            // Handle known application errors with custom status and message
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                // Handle unexpected generic errors
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 }
-
-export default MutualFundController;

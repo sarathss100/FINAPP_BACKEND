@@ -1,9 +1,7 @@
-import { IMutualFundDTO } from '../../../dtos/mutualfunds/MutualFundDTO';
+import IMutualFundDocument from '../../../model/mutualfunds/interfaces/IMutualFund';
 
-interface IMutualFundRepository {
-    syncBulkMutualFund(dataArray: IMutualFundDTO[]): Promise<boolean>;
-    searchMutualFunds(query: string): Promise<IMutualFundDTO[]>;
-    getMutualFundDetails(schemeCode: string): Promise<IMutualFundDTO>;
+export default interface IMutualFundRepository {
+    syncBulkMutualFund(dataArray: Partial<IMutualFundDocument>[]): Promise<boolean>;
+    searchMutualFunds(query: string): Promise<IMutualFundDocument[]>;
+    getMutualFundDetails(schemeCode: string): Promise<IMutualFundDocument>;
 }
-
-export default IMutualFundRepository;

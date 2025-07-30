@@ -1,9 +1,12 @@
-import { IMutualFundDTO } from '../../dtos/mutualfunds/MutualFundDTO';
 import IMutualFundRepository from './interfaces/IMutualFundRepository';
 import { MutualFundModel } from '../../model/mutualfunds/model/MutualFundModel';
+import IMutualFundDocument from '../../model/mutualfunds/interfaces/IMutualFund';
+import IBaseRepository from '../base_repo/interface/IBaseRepository';
+import BaseRepository from '../base_repo/BaseRepository';
 
-class MutualFundRepository implements IMutualFundRepository {
+export default class MutualFundRepository implements IMutualFundRepository {
     private static _instance: MutualFundRepository;
+    private baseRepo: IBaseRepository<IMutualFundDocument> = new BaseRepository<IMutualFundDocument>(MutualFundModel);
     public constructor() { }
     
     public static get instance(): MutualFundRepository {
@@ -13,8 +16,7 @@ class MutualFundRepository implements IMutualFundRepository {
         return MutualFundRepository._instance;
     }
     
-    // Performs a bulk upsert operation for mutual fund data in the database.
-    async syncBulkMutualFund(dataArray: IMutualFundDTO[]): Promise<boolean> { 
+    async syncBulkMutualFund(dataArray: Partial<IMutualFundDocument>[]): Promise<boolean> { 
         try {
 
             const bulkOps = dataArray.map((data) => ({
@@ -39,48 +41,36 @@ class MutualFundRepository implements IMutualFundRepository {
         }
     }
 
-    // Searches for mutual funds by matching the query against scheme names or codes.
-    async searchMutualFunds(query: string): Promise<IMutualFundDTO[]> { 
+    async searchMutualFunds(query: string): Promise<IMutualFundDocument[]> { 
         try {
             const regex = new RegExp(query, 'i');
         
-           const results = await MutualFundModel.find({
+           const results = await this.baseRepo.find({
                 $or: [
                    { scheme_name: { $regex: regex } },
                    { scheme_code: { $regex: regex } }
                ]
-            }).lean();
+            });
         
-            return results.map((doc) => ({
-                scheme_code: doc.scheme_code,
-                scheme_name: doc.scheme_name,
-                net_asset_value: doc.net_asset_value,
-                date: doc.date,
-            }));
+            return results;
         } catch (error) {
             throw new Error((error as Error).message);
         }
     }
 
-    // Retrieves detailed information about a specific mutual fund by its scheme code.
-    async getMutualFundDetails(schemeCode: string): Promise<IMutualFundDTO> { 
+    async getMutualFundDetails(schemeCode: string): Promise<IMutualFundDocument> { 
         try {
-            const result = await MutualFundModel.findOne({ scheme_code: schemeCode }).lean();
+            const result = await this.baseRepo.findOne({ scheme_code: schemeCode });
+
             if (!result) {
                 throw new Error('Mutual fund not found');
             }
-            const mutualFundDetails = {
-                scheme_code: result.scheme_code,
-                scheme_name: result.scheme_name,
-                net_asset_value: result.net_asset_value,
-                date: result.date,
-            };
             
-            return mutualFundDetails;
+            return result;
         } catch (error) {
             throw new Error((error as Error).message);
         }
     }
 }
 
-export default MutualFundRepository;
+

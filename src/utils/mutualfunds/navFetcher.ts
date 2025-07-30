@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { IMutualFundDTO } from '../../dtos/mutualfunds/MutualFundDTO';
+import IMutualFundDTO from '../../dtos/mutualfunds/MutualFundDTO';
 
 const NAV_URL = process.env.MUTUAL_FUND_URL || `https://www.amfiindia.com/spages/NAVAll.txt `;
 

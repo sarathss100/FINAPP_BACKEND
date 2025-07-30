@@ -1,9 +1,7 @@
-/**
- * DTO for Mutual Fund entity
- */
-export interface IMutualFundDTO {
-    scheme_code: string; // Required field
-    scheme_name: string; // Required field
-    net_asset_value: number; // Must be a number
-    date: Date; // Must be a valid date
+
+export default interface IMutualFundDTO {
+    scheme_code: string;
+    scheme_name: string;
+    net_asset_value: number;
+    date: Date;
 }
