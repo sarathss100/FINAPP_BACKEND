@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 
 export const NOTIFICATION_TYPES = [
     'DebtPaymentAlert',
@@ -8,7 +8,8 @@ export const NOTIFICATION_TYPES = [
 ] as const;
 
 export type NotificationType = typeof NOTIFICATION_TYPES[number];
-interface INotification extends Document {
+export default interface INotificationDocument extends Document {
+    _id: mongoose.Types.ObjectId;
     user_id: string;
     title: string;
     message: string;
@@ -17,7 +18,6 @@ interface INotification extends Document {
     meta?: string | object;
     archived: boolean;
     createdAt?: Date;
+    updatedAt?: Date;
+    __v?: number;
 }
-
-export default INotification;
-

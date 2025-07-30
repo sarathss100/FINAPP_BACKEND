@@ -1,5 +1,5 @@
 import mongoose, { Model } from 'mongoose';
-import INotification from '../interfaces/INotificaiton';
 import NotificaitonSchema from '../schema/NotificatonSchema';
+import INotificationDocument from '../interfaces/INotificaiton';
 
-export const NotificationModel: Model<INotification> = mongoose.model<INotification>('Notifications', NotificaitonSchema);
+export const NotificationModel: Model<INotificationDocument> = mongoose.model<INotificationDocument>('Notifications', NotificaitonSchema);

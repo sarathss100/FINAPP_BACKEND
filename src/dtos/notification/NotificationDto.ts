@@ -1,9 +1,6 @@
 import { NotificationType } from "../../model/notification/interfaces/INotificaiton";
 
-/**
- * DTO for Notification entity
- */
-export interface INotificationDTO {
+export default interface INotificationDTO {
     _id?: string,
     user_id?: string;
     title: string;
@@ -14,5 +11,4 @@ export interface INotificationDTO {
     archived: boolean;
     createdAt?: Date;
 }
-
 

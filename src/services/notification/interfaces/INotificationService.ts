@@ -1,6 +1,6 @@
-import { INotificationDTO } from '../../../dtos/notification/NotificationDto';
+import INotificationDTO from '../../../dtos/notification/NotificationDto';
 
-interface INotificationService {
+export default interface INotificationService {
     createNotification(accessToken: string, notificationData: INotificationDTO): Promise<INotificationDTO>;
     getNotifications(accessToken: string): Promise<INotificationDTO[]>;
     updateArchieveStatus(accessToken: string, notificationId: string): Promise<boolean>;
@@ -11,5 +11,3 @@ interface INotificationService {
     checkAndNotifyInsurancePayments(): Promise<void>;
     runScheduledNotifications(): Promise<void>;
 }
-
-export default INotificationService;
