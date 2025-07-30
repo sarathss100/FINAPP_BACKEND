@@ -1,7 +1,7 @@
 import { generateAccessToken } from "../../../utils/auth/tokenUtils";
 import IInsuranceService from "../../../services/insurances/interfaces/IInsuranceService";
 import InsuranceService from "../../../services/insurances/InsuranceService";
-import { InsuranceDTO } from "../../../dtos/insurances/insuranceDTO";
+import InsuranceDTO from "../../../dtos/insurances/insuranceDTO";
 import IAuthUserDTO from "../../../dtos/auth/IAuthUserDTO";
 
 const insuranceService: IInsuranceService = InsuranceService.instance;

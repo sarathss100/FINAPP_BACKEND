@@ -1,15 +1,15 @@
-import { sendErrorResponse, sendSuccessResponse } from '../../utils/responseHandler';
+import { sendSuccessResponse } from '../../utils/responseHandler';
 import { ErrorMessages } from '../../constants/errorMessages';
 import { StatusCodes } from '../../constants/statusCodes';
 import { Request, Response } from 'express';
 import { AppError } from '../../error/AppError';
 import { SuccessMessages } from '../../constants/successMessages';
-import { ZodError } from 'zod';
 import IInsuranceController from './interfaces/IInsuranceController';
 import IInsuranceService from '../../services/insurances/interfaces/IInsuranceService';
 import { insuranceDTOSchema } from '../../validation/insurances/insurance.validation';
+import { handleControllerError } from '../../utils/controllerUtils';
 
-class InsuranceController implements IInsuranceController {
+export default class InsuranceController implements IInsuranceController {
     private readonly _insuranceService: IInsuranceService;
 
     constructor(insuranceService: IInsuranceService) {
@@ -26,23 +26,9 @@ class InsuranceController implements IInsuranceController {
             // Delegate to the service layer
             const insurance = await this._insuranceService.createInsurance(accessToken, dto);
 
-            // Send success response
             sendSuccessResponse(response, StatusCodes.CREATED, SuccessMessages.OPERATION_SUCCESS, { insurance });
         } catch (error) {
-            if (error instanceof ZodError) {
-                // Format Zod validation errors
-                const errorMessages = error.errors.map(err => {
-                    const path = err.path.join('.');
-                    return `${path}: ${err.message}`;
-                }).join(', ');
-
-                sendErrorResponse(response, StatusCodes.BAD_REQUEST, `Validation failed: ${errorMessages}`);
-            } else if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                console.error('Unexpected error:', error);
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -59,12 +45,7 @@ class InsuranceController implements IInsuranceController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.INSURANCE_DELETED_SUCCESSFULLY,{ deleted: isInsuranceRemoved });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                console.error('Unexpected error:', error);
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -77,12 +58,7 @@ class InsuranceController implements IInsuranceController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.INSURANCE_COVERAGE_RETRIEVED,{ totalInsuranceCoverage });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                console.error('Unexpected error:', error);
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -95,12 +71,7 @@ class InsuranceController implements IInsuranceController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.INSURANCE_COVERAGE_RETRIEVED,{ totalPremium });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                console.error('Unexpected error:', error);
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -113,12 +84,7 @@ class InsuranceController implements IInsuranceController {
         
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.INSURANCES_RETRIEVED, { insuranceDetails });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                console.error('Unexpected error:', error);
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -131,12 +97,7 @@ class InsuranceController implements IInsuranceController {
         
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.NEXT_PAYMENT_DATE_RETRIEVED, { insurance });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                console.error('Unexpected error:', error);
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -149,14 +110,8 @@ class InsuranceController implements IInsuranceController {
         
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.PAYMENT_STATUS_UPDATED, { isUpdated });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                console.error('Unexpected error:', error);
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 }
 
-export default InsuranceController;

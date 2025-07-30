@@ -1,7 +1,7 @@
 import insuranceTemplates from '../../../aa-simulator/src/data/insurance/insuranceTemplates.json';
 import IAdminRepository from '../../../repositories/admin/interfaces/IAdminRepository';
 import AdminRepository from '../../../repositories/admin/AdminRepository';
-import { InsuranceDTO } from '../../../dtos/insurances/insuranceDTO';
+import InsuranceDTO from '../../../dtos/insurances/insuranceDTO';
 import { InsuranceGeneratorService } from '../services/insuranceService';
 import UserMapper from '../../../mappers/user/UserMapper';
 

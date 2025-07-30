@@ -1,199 +1,166 @@
-import { decodeAndValidateToken } from '../../utils/auth/tokenUtils';
-import { AuthenticationError } from '../../error/AppError';
-import { ErrorMessages } from '../../constants/errorMessages';
-import { StatusCodes } from '../../constants/statusCodes';
 import IInsuranceService from './interfaces/IInsuranceService';
-import InsuranceManagementRepository from '../../repositories/insurances/InsuranceManagementRepository';
-import { InsuranceDTO } from '../../dtos/insurances/insuranceDTO';
-import IInsuranceManagementRepository from '../../repositories/insurances/interfaces/IInsuranceManagementRepository';
+import InsuranceRepository from '../../repositories/insurances/InsuranceRepository';
+import InsuranceDTO from '../../dtos/insurances/insuranceDTO';
+import IInsuranceRepository from '../../repositories/insurances/interfaces/IInsuranceRepository';
 import { eventBus } from '../../events/eventBus';
+import { extractUserIdFromToken, wrapServiceError } from '../../utils/serviceUtils';
+import InsuranceMapper from '../../mappers/insurances/InsuranceMapper';
 
-class InsuranceService implements IInsuranceService {
+export default class InsuranceService implements IInsuranceService {
     private static _instance: InsuranceService;
-    private _insuranceRepository: IInsuranceManagementRepository;
+    private _insuranceRepository: IInsuranceRepository;
 
-    constructor(insuranceRepository: IInsuranceManagementRepository) {
+    constructor(insuranceRepository: IInsuranceRepository) {
         this._insuranceRepository = insuranceRepository;
     }
 
     public static get instance(): InsuranceService {
         if (!InsuranceService._instance) {
-            const repo = InsuranceManagementRepository.instance;
+            const repo = InsuranceRepository.instance;
             InsuranceService._instance = new InsuranceService(repo);
         }
         return InsuranceService._instance;
     }
 
-    // Creates a new insurance record for the authenticated user.
     async createInsurance(accessToken: string, insuranceData: InsuranceDTO): Promise<InsuranceDTO> {
         try {
-            // Decode and validate the access token to extract the user ID
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
 
             const refinedData = { ...insuranceData, status: insuranceData.payment_status === 'paid' ? 'active' : 'expired' };
 
+            const mappedModel = InsuranceMapper.toModel(refinedData);
+
             // Delegate to the repository to create the insurance record
-            const insuranceDetails = await this._insuranceRepository.createInsurance(refinedData, userId);
+            const insuranceDetails = await this._insuranceRepository.createInsurance(mappedModel, userId);
+
+            const resultDTO = InsuranceMapper.toDTO(insuranceDetails);
 
             // Emit socket event to notify user about debt Creation
-            eventBus.emit('insurance_created', insuranceDetails);
+            eventBus.emit('insurance_created', resultDTO);
 
-            return insuranceDetails;
+            return resultDTO;
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error creating insurance:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while creating insurance:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Removes an existing insurance record from the database.
     async removeInsurance(insuranceId: string): Promise<boolean> {
         try {
             // Delegate to the repository to delete the insurance record
             const insuranceDetails = await this._insuranceRepository.removeInsurance(insuranceId);
 
-            // Emit socket event to notify user about debt Creation
-            eventBus.emit('insurance_removed', insuranceDetails);
+            const resultDTO = InsuranceMapper.toDTO(insuranceDetails);
 
-            return insuranceDetails ? true : false;
+            // Emit socket event to notify user about debt Creation
+            eventBus.emit('insurance_removed', resultDTO);
+
+            return !!resultDTO;
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error deleting insurance:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while removing insurance:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Calculates the total coverage amount from all active insurance policies for the authenticated user.
     async getUserInsuranceCoverageTotal(accessToken: string): Promise<number> {
         try {
-            // Decode and validate the access token to extract the user ID
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
         
             // Delegate to the repository to calculate the total insurance coverage
             const totalInsuranceCoverage = await this._insuranceRepository.getUserInsuranceCoverageTotal(userId);
         
             return totalInsuranceCoverage;
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error calculating insurance coverage:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while calculating insurance coverage total:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Calculates the total premium amount from all active insurance policies for the authenticated user.
     async getUserTotalPremiumAmount(accessToken: string): Promise<number> {
         try {
-            // Decode and validate the access token to extract the user ID
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
         
             // Delegate to the repository to calculate the total insurance premium
             const totalPremium = await this._insuranceRepository.getUserTotalPremiumAmount(userId);
         
             return totalPremium;
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error calculating insurance premium:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while calculating total premium amount:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Retrieves all insurance records for the authenticated user.
     async getAllInsurances(accessToken: string): Promise<InsuranceDTO[]> {
         try {
-            // Decode and validate the access token to extract the user ID
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
         
             // Delegate to the repository to fetch all insurance records for the user
             const insuranceDetails = await this._insuranceRepository.getAllInsurances(userId);
+
+            const resultDTO = InsuranceMapper.toDTOs(insuranceDetails);
         
-            return insuranceDetails;
+            return resultDTO;
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error fetching insurance records:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while getting all insurances:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Retrieves the closest upcoming next payment date among all insurance records for the authenticated user.
-    async getClosestNextPaymentDate(accessToken: string): Promise<InsuranceDTO | null> {
+    async getClosestNextPaymentDate(accessToken: string): Promise<InsuranceDTO> {
         try {
-            // Decode and validate the access token to extract the user ID
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
         
             // Delegate to the repository to fetch the closest next payment date for the user
             const insurance = await this._insuranceRepository.getClosestNextPaymentDate(userId);
+
+            const resultDTO = InsuranceMapper.toDTO(insurance);
         
-            return insurance;
+            return resultDTO;
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error fetching closest next payment date:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while getting closest next payment date:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Marks the payment status of the specified insurance policy as paid.
     async markPaymentAsPaid(insuranceId: string): Promise<boolean> {
         try {
             // Delegate the update operation to the repository
             const insuranceDetails = await this._insuranceRepository.markPaymentAsPaid(insuranceId);
 
+            const resultDTO = InsuranceMapper.toDTO(insuranceDetails);
+
             // Emit socket event to notify user about debt Creation
-            eventBus.emit('insurance_paid', insuranceDetails);
+            eventBus.emit('insurance_paid', resultDTO);
         
-            return insuranceDetails._id ? true : false;
+            return !!resultDTO;
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error updating insurance payment status:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while marking payment status:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    /**
-     * Marks expired insurance policies by delegating the operation to the repository.
-     * This typically involves updating policies whose next payment date has passed and are still active.
-     */
     async markExpired(): Promise<void> {
         try {
             // Delegate the update operation to the repository
             await this._insuranceRepository.markExpiredInsurances();
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error updating insurance payment status:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while marking insurance expiry:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    /**
-     * Retrieves insurance policies that require payment notifications.
-     * This typically includes policies where the next payment date is approaching or overdue.
-     */
     async getInsuranceForNotifyInsurancePayments(): Promise<InsuranceDTO[]> {
         try {
             // Delegate the fetch operation to the repository
             const insurances = await this._insuranceRepository.getInsuranceForNotifyInsurancePayments();
 
-            return insurances; 
+            const resultDTO = InsuranceMapper.toDTOs(insurances);
+
+            return resultDTO; 
         } catch (error) {
-            // Log and rethrow the error for upstream handling
-            console.error('Error fetching insurance records for payment notification:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while creating notifications:', error);
+            throw wrapServiceError(error);
         }
     }
 }
 
-export default InsuranceService;
