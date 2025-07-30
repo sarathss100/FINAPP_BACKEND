@@ -1,8 +1,8 @@
-import { IGoalDTO } from '../../../dtos/goal/GoalDTO';
-import ISmartAnalysisResult from './ISmartAnalysisResult';
-import IGoalCategory from './IGoalCategory';
+import IGoalDTO from '../../../dtos/goal/GoalDTO';
+import ISmartAnalysisResult from '../../../dtos/goal/ISmartAnalysisResultDTO';
+import IGoalCategory from '../../../dtos/goal/IGoalCategoryDTO';
 
-interface IGoalService {
+export default interface IGoalService {
     createGoal(accessToken: string, goalData: IGoalDTO): Promise<IGoalDTO>;
     updateGoal(accessToken: string, goalId: string, goalData: Partial<IGoalDTO>): Promise<IGoalDTO>;
     removeGoal(goalId: string): Promise<boolean>;
@@ -18,5 +18,3 @@ interface IGoalService {
     updateTransaction(accessToken: string, goalId: string, transactionData: { amount: number; transaction_id?: string; date?: Date }): Promise<boolean>;
     getGoalsForNotifyMonthlyGoalPayments(): Promise<IGoalDTO[]>;
 }
-
-export default IGoalService;

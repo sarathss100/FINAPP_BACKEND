@@ -1,6 +1,6 @@
-import { InsuranceDTO } from '../../../dtos/insurances/insuranceDTO';
+import InsuranceDTO from '../../../dtos/insurances/insuranceDTO';
 
-interface IInsuranceService {
+export default interface IInsuranceService {
     createInsurance(accessToken: string, insuranceData: InsuranceDTO): Promise<InsuranceDTO>;
     removeInsurance(insuranceId: string): Promise<boolean>;
     getUserInsuranceCoverageTotal(accessToken: string): Promise<number>;
@@ -11,6 +11,3 @@ interface IInsuranceService {
     markExpired(): Promise<void>;
     getInsuranceForNotifyInsurancePayments(): Promise<InsuranceDTO[]>;
 }
-
-export default IInsuranceService;
-

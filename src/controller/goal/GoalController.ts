@@ -1,15 +1,16 @@
 import IGoalService from '../../services/goal/interfaces/IGoalService';
 import IGoalController from './interfaces/IGoalController';
-import { sendErrorResponse, sendSuccessResponse } from '../../utils/responseHandler';
+import { sendSuccessResponse } from '../../utils/responseHandler';
 import { ErrorMessages } from '../../constants/errorMessages';
 import { StatusCodes } from '../../constants/statusCodes';
 import { Request, Response } from 'express';
-import { AppError, AuthenticationError, ServerError, ValidationError } from '../../error/AppError';
+import { AuthenticationError, ServerError, ValidationError } from '../../error/AppError';
 import { SuccessMessages } from '../../constants/successMessages';
 import goalDTOSchema from '../../validation/goal/goal.validation';
-import { IGoalDTO } from '../../dtos/goal/GoalDTO';
+import IGoalDTO from '../../dtos/goal/GoalDTO';
+import { handleControllerError } from '../../utils/controllerUtils';
 
-class GoalController implements IGoalController {
+export default class GoalController implements IGoalController {
     private readonly _goalService: IGoalService;
 
     constructor(goalService: IGoalService) {
@@ -19,7 +20,6 @@ class GoalController implements IGoalController {
     async createGoal(request: Request, response: Response): Promise<void> {
         try {
             const { accessToken } = request.cookies;
-
             if (!accessToken) {
                 throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
             }
@@ -43,11 +43,7 @@ class GoalController implements IGoalController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOAL_CREATED, { createdGoal } );
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -83,11 +79,7 @@ class GoalController implements IGoalController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.USER_GOAL_UPDATED, { createdGoal } );
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -111,11 +103,7 @@ class GoalController implements IGoalController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOAL_REMOVED);
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -131,11 +119,7 @@ class GoalController implements IGoalController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOALS_RETRIEVED, { ...userGoalDetails });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -151,11 +135,7 @@ class GoalController implements IGoalController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOALS_RETRIEVED, { totalActiveGoalAmount });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -171,11 +151,7 @@ class GoalController implements IGoalController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOALS_RETRIEVED, { totalInitialGoalAmount });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -191,11 +167,7 @@ class GoalController implements IGoalController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOALS_LONGEST_TIME_REMAINING, { longestTimePeriod });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -211,11 +183,7 @@ class GoalController implements IGoalController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOALS_ANALYSIS_RESULT, { ...analysisResult });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -231,11 +199,7 @@ class GoalController implements IGoalController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOAL_BY_CATEGORY, { goalsByCategory });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -251,11 +215,7 @@ class GoalController implements IGoalController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOAL_DAILY_CONTRIBUTION, { dailyContribution });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -271,11 +231,7 @@ class GoalController implements IGoalController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOAL_MONTHLY_CONTRIBUTION, { monthlyContribution });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -297,11 +253,7 @@ class GoalController implements IGoalController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOALS_RETRIEVED, { goalDetails });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 
@@ -324,13 +276,9 @@ class GoalController implements IGoalController {
 
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.GOAL_TRANSACTION_UPDATED, { isUpdated });
         } catch (error) {
-            if (error instanceof AppError) {
-                sendErrorResponse(response, error.statusCode, error.message);
-            } else {
-                sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-            }
+            handleControllerError(response, error);
         }
     }
 }
 
-export default GoalController;
+
