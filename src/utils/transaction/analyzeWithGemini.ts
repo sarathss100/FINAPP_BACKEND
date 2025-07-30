@@ -1,5 +1,5 @@
-import { IGoalDTO } from '../../dtos/goal/GoalDTO';
-import ISmartAnalysisResult from '../../services/goal/interfaces/ISmartAnalysisResult';
+import IGoalDTO from '../../dtos/goal/GoalDTO';
+import ISmartAnalysisResult from '../../dtos/goal/ISmartAnalysisResultDTO';
    
 /**
 * Parses the Gemini API response

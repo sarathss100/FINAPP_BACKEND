@@ -13,6 +13,7 @@ export const PREDEFINED_GOAL_CATEGORIES = [
 export type GoalCategory = typeof PREDEFINED_GOAL_CATEGORIES[number] | string;
 
 export default interface IGoalDocument extends Document {
+    _id: Types.ObjectId;
     user_id: Types.ObjectId;
     tenant_id?: Types.ObjectId; 
     goal_name: string; 
@@ -46,4 +47,5 @@ export default interface IGoalDocument extends Document {
     }>; 
     createdAt?: Date; 
     updatedAt?: Date; 
+    __v?: number;
 }

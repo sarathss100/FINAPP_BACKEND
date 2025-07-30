@@ -1,5 +1,5 @@
 
-interface IGoalCategory {
+export default interface IGoalCategoryDTO {
     shortTermGoalsCurrntAmount: number; 
     shortTermGoalsTargetAmount: number; 
     mediumTermGoalsCurrntAmount: number; 
@@ -7,5 +7,3 @@ interface IGoalCategory {
     longTermGoalsCurrntAmount: number; 
     longTermGoalsTargetAmount: number; 
 }
-
-export default IGoalCategory;

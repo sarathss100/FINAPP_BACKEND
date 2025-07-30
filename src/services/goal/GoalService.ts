@@ -1,87 +1,83 @@
-import { IGoalDTO } from '../../dtos/goal/GoalDTO';
+import IGoalDTO from '../../dtos/goal/GoalDTO';
 import IGoalService from './interfaces/IGoalService';
-import { decodeAndValidateToken } from '../../utils/auth/tokenUtils';
-import IGoalManagementRepository from '../../repositories/goal/interfaces/IGoalManagementRepository';
-import { AuthenticationError, NotFoundError } from '../../error/AppError';
+import IGoalRepository from '../../repositories/goal/interfaces/IGoalRepository';
+import { NotFoundError } from '../../error/AppError';
 import { ErrorMessages } from '../../constants/errorMessages';
 import { StatusCodes } from '../../constants/statusCodes';
 import formatDuration from '../../utils/dateFormatter';
-import ISmartAnalysisResult from './interfaces/ISmartAnalysisResult';
-import IGoalCategory from './interfaces/IGoalCategory';
 import { createGeminiPrompt, parseGeminiResponse } from '../../utils/transaction/analyzeWithGemini';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import GoalManagementRepository from '../../repositories/goal/GoalManagementRepository';
+import GoalRepository from '../../repositories/goal/GoalRepository';
 import { eventBus } from '../../events/eventBus';
+import { extractUserIdFromToken, wrapServiceError } from '../../utils/serviceUtils';
+import GoalMapper from '../../mappers/goals/GoalMapper';
+import ISmartAnalysisResultDTO from '../../dtos/goal/ISmartAnalysisResultDTO';
+import IGoalCategoryDTO from '../../dtos/goal/IGoalCategoryDTO';
 
 class GoalService implements IGoalService {
     private static _instance: GoalService;
-    private _goalRepository: IGoalManagementRepository;
+    private _goalRepository: IGoalRepository;
 
-    constructor(goalRepository: IGoalManagementRepository) {
+    constructor(goalRepository: IGoalRepository) {
         this._goalRepository = goalRepository;
     }
 
     public static get instance(): GoalService {
         if (!GoalService._instance) {
-            const repo = GoalManagementRepository.instance;
+            const repo = GoalRepository.instance;
             GoalService._instance = new GoalService(repo);
         }
         return GoalService._instance;
     }
 
-    // Creates a new goal for the authenticated user.
     async createGoal(accessToken: string, goalData: IGoalDTO): Promise<IGoalDTO> {
         try {
-            // Decode and validate the access token to extract the user ID associated with it.
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
 
             // Add user-related metadata (user_id, created_by, last_updated_by) to the goal data.
             const updatedGoalData = { user_id: userId, created_by: userId, last_updated_by: userId, ...goalData };
 
+            const mappedModel = GoalMapper.toModel(updatedGoalData);
+
             // Call the repository to create the goal using the extracted user ID and provided goal data.
-            const createdGoal = await this._goalRepository.createGoal(updatedGoalData);
+            const createdGoal = await this._goalRepository.createGoal(mappedModel);
+
+            const resultDTO = GoalMapper.toDTO(createdGoal);
 
             // Emit socket event to notify user about new goal created
-            eventBus.emit('goal_created', createdGoal);
+            eventBus.emit('goal_created', resultDTO);
 
-            return createdGoal;
+            return resultDTO;
         } catch (error) {
-            // Log and re-throw the error to propagate it to the caller.
-            console.error('Error creating goal:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while creating goal:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Updates an existing goal for the authenticated user.
     async updateGoal(accessToken: string, goalId: string, goalData: Partial<IGoalDTO>): Promise<IGoalDTO> {
         try {
-            // Decode and validate the access token to extract the user ID associated with it.
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
 
             // Add user-related metadata (user_id, last_updated_by) to the goal data.
             const updatedGoalData = { user_id: userId, last_updated_by: userId, ...goalData };
 
+            const mappedModel = GoalMapper.toModel(updatedGoalData);
+
             // Call the repository to update the goal using the extracted user ID, goal ID, and provided goal data.
-            const updatedGoal = await this._goalRepository.updateGoal(goalId, updatedGoalData);
+            const updatedGoal = await this._goalRepository.updateGoal(goalId, mappedModel);
+
+            const resultDTO = GoalMapper.toDTO(updatedGoal);
 
             // Emit socket event to notify user about goal updation
-            eventBus.emit('goal_updated', updatedGoal);
+            eventBus.emit('goal_updated', resultDTO);
 
-            return updatedGoal;
+            return resultDTO;
         } catch (error) {
-            // Log and re-throw the error to propagate it to the caller.
-            console.error('Error updating goal:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while updating goal:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Removes an existing goal by its unique identifier.
     async removeGoal(goalId: string): Promise<boolean> {
         try {
             // Call the repository to remove the goal using the provided goal ID.
@@ -92,40 +88,30 @@ class GoalService implements IGoalService {
 
             return removedGoal._id ? true : false;
         } catch (error) {
-            // Log and re-throw the error to propagate it to the caller.
-            console.error('Error removing goal:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while removing goal:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Retrieves all goals associated with the authenticated user.
     async getUserGoals(accessToken: string): Promise<IGoalDTO[]> {
         try {
-            // Decode and validate the access token to extract the user ID associated with it.
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
 
             // Call the repository to retrieve the goals associated with the extracted user ID.
             const goalDetails = await this._goalRepository.getUserGoals(userId);
 
-            return goalDetails;
+            const resultDTO = GoalMapper.toDTOs(goalDetails);
+
+            return resultDTO;
         } catch (error) {
-            // Log and re-throw the error to propagate it to the caller.
-            console.error('Error retrieving user goals:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while getting user goals:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Retrieves all goals associated with the authenticated user.
     async getTotalActiveGoalAmount(accessToken: string): Promise<number> {
         try {
-            // Decode and validate the access token to extract the user ID associated with it.
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
 
             // Call the repository to retrieve the goals associated with the extracted user ID.
             const goalDetails = await this._goalRepository.getUserGoals(userId);
@@ -143,21 +129,14 @@ class GoalService implements IGoalService {
 
             return totalActiveGoalAmount;
         } catch (error) {
-            // Log and re-throw the error to propagate it to the caller.
-            console.error('Error retrieving user goals:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while getting total active goal amount:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Calculates the total initial (target) amount of all incomplete goals 
-    // associated with the authenticated user.
     async getTotalInitialGoalAmount(accessToken: string): Promise<number> {
         try {
-            // Decode and validate the access token to extract the user ID associated with it.
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
 
             // Call the repository to retrieve the goals associated with the extracted user ID.
             const goalDetails = await this._goalRepository.getUserGoals(userId);
@@ -176,20 +155,14 @@ class GoalService implements IGoalService {
 
             return totalInitialGoalAmount;
         } catch (error) {
-            // Log and re-throw the error to propagate it to the caller.
-            console.error('Error calculating total initial goal amount:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while getting total initial goal amount:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Retrieves the longest target time period among incomplete goals associated with the authenticated user.
     async findLongestTimePeriod(accessToken: string): Promise<string> {
         try {
-            // Decode and validate the access token to extract the user ID associated with it.
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
 
             // Retrieve all goals associated with the extracted user ID from the repository.
             const goalDetails = await this._goalRepository.getUserGoals(userId);
@@ -224,14 +197,12 @@ class GoalService implements IGoalService {
         
             return formattedDuration || `0 Y, 0 M, 0 D`;
         } catch (error) {
-            // Log the error and re-throw it to propagate the error to the caller.
-            console.error('Error while calculating the longest target time period:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while getting longest time period:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Performs manual SMART analysis when Gemini API is unavailable
-    private performManualAnalysis(goals: IGoalDTO[]): ISmartAnalysisResult {
+    private performManualAnalysis(goals: IGoalDTO[]): ISmartAnalysisResultDTO {
         // Initialize aggregates for overall analysis.
         let totalSpecificScore = 0,
             totalMeasurableScore = 0,
@@ -374,23 +345,21 @@ class GoalService implements IGoalService {
         }
     }
 
-    // Analyzes the SMART compliance of existing goals for the authenticated user.
-    async analyzeGoal(accessToken: string): Promise<ISmartAnalysisResult> {
+    async analyzeGoal(accessToken: string): Promise<ISmartAnalysisResultDTO> {
         try {
-            // Decode and validate the access token to extract the user ID associated with it.
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
 
             // Retrieve the goal data from the repository using the user ID.
             const goals = await this._goalRepository.getUserGoals(userId);
-            if (!goals || goals.length === 0) {
+
+            const resultDTO = GoalMapper.toDTOs(goals);
+
+            if (!resultDTO || resultDTO.length === 0) {
                 throw new NotFoundError(ErrorMessages.NO_GOALS_FOUND, StatusCodes.NOT_FOUND);
             }
 
             // If there are no active goals (all completed), return early
-            const activeGoals = goals.filter(goal => !goal.is_completed);
+            const activeGoals = resultDTO.filter(goal => !goal.is_completed);
 
             if (activeGoals.length === 0) {
                 return {
@@ -413,7 +382,7 @@ class GoalService implements IGoalService {
             // Try Gemini API first, fall back to manual mode if it fails
             try {
                 // Create prompt for Gemini API
-                const prompt = createGeminiPrompt(goals);
+                const prompt = createGeminiPrompt(resultDTO);
 
                 // Initialize Gemini API
                 const geminiApiKey = process.env.GEMINI_API_KEY || '';
@@ -433,26 +402,24 @@ class GoalService implements IGoalService {
                 console.warn('Gemini API failed, falling back to manual analysis:', geminiError);
                 
                 // Fall back to manual analysis
-                return this.performManualAnalysis(goals);
+                return this.performManualAnalysis(resultDTO);
             }
         } catch (error) {
-            // Log and re-throw the error to propagate it to the caller.
-            console.error('Error analyzing goal:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while analyzing goal:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    async goalsByCategory(accessToken: string): Promise<IGoalCategory> {
+    async goalsByCategory(accessToken: string): Promise<IGoalCategoryDTO> {
         try {
-            // Decode and validate the access token to extract the user ID associated with it.
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
 
             // Call the repository to retrieve the goals associated with the extracted user ID.
             const goals = await this._goalRepository.getUserGoals(userId);
-            if (!goals || goals.length === 0) {
+
+            const resultDTO = GoalMapper.toDTOs(goals);
+
+            if (!resultDTO || resultDTO.length === 0) {
                 throw new NotFoundError(ErrorMessages.NO_GOALS_FOUND, StatusCodes.NOT_FOUND);
             }
 
@@ -466,7 +433,7 @@ class GoalService implements IGoalService {
             const FIVE_YEARS_IN_MS = 5 * ONE_YEAR_IN_MS;
             
             // Iterate through the goals and categorize based on time difference
-            for (const goal of goals) {
+            for (const goal of resultDTO) {
                 if (goal.is_completed) {
                     continue; // Skip completed goals
                 } 
@@ -497,22 +464,18 @@ class GoalService implements IGoalService {
 
             return { shortTermGoalsCurrntAmount, shortTermGoalsTargetAmount, mediumTermGoalsCurrntAmount, mediumTermGoalsTargetAmount, longTermGoalsCurrntAmount, longTermGoalsTargetAmount };
         } catch (error) {
-            // Log and re-throw the error to propagate it to the caller.
-            console.error('Error categorizing goals:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while categorizing goals:', error);
+            throw wrapServiceError(error);
         }
     }
 
     async dailyContribution(accessToken: string): Promise<number> {
         try {
-            // Decode and validate the access token to extract the user ID associated with it.
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
 
             // Call the repository to retrieve the goals associated with the extracted user ID.
             const goals = await this._goalRepository.getUserGoals(userId);
+
             if (!goals || goals.length === 0) {
                 throw new NotFoundError(ErrorMessages.NO_GOALS_FOUND, StatusCodes.NOT_FOUND);
             }
@@ -528,22 +491,18 @@ class GoalService implements IGoalService {
 
             return totalDailyContribution;
         } catch (error) {
-            // Log and re-throw the error to propagate it to the caller.
-            console.error('Error calculating daily contribution:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while calculating daily contribution goals:', error);
+            throw wrapServiceError(error);
         }
     }
 
     async monthlyContribution(accessToken: string): Promise<number> {
         try {
-            // Decode and validate the access token to extract the user ID associated with it.
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
 
             // Call the repository to retrieve the goals associated with the extracted user ID.
             const goals = await this._goalRepository.getUserGoals(userId);
+
             if (!goals || goals.length === 0) {
                 throw new NotFoundError(ErrorMessages.NO_GOALS_FOUND, StatusCodes.NOT_FOUND);
             }
@@ -562,77 +521,101 @@ class GoalService implements IGoalService {
 
             return totalMonthlyContribution;
         } catch (error) {
-            // Log and re-throw the error to propagate it to the caller.
-            console.error('Error calculating monthly contribution:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while calculating monthly contribution:', error);
+            throw wrapServiceError(error);
         }
     }
 
     async getGoalById(accessToken: string, goalId: string): Promise<IGoalDTO> { 
         try {
-            // Decode and validate the access token to extract the user ID associated with it.
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
 
             // Call the repository to retrieve the goal by its ID.
             const goal = await this._goalRepository.getGoalById(goalId);
-            if (!goal) {
+             
+            const resultDTO = GoalMapper.toDTO(goal);
+
+            if (!resultDTO) {
                 throw new NotFoundError(ErrorMessages.NO_GOALS_FOUND, StatusCodes.NOT_FOUND);
             }
 
-            const daysLeftToTargetDate = Math.max(0, Math.ceil((new Date(goal.target_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
-            const dailyContribution = goal.is_completed ? 0 : (goal.current_amount ?? 0) / daysLeftToTargetDate;
+            const daysLeftToTargetDate = Math.max(0, Math.ceil((new Date(resultDTO.target_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
+            const dailyContribution = resultDTO.is_completed ? 0 : (resultDTO.current_amount ?? 0) / daysLeftToTargetDate;
 
-            const monthsLeftToTargetDate = Math.max(0, Math.ceil((new Date(goal.target_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30)));
-            const monthlyContribution = goal.is_completed ? 0 : (goal.current_amount ?? 0) / monthsLeftToTargetDate;
+            const monthsLeftToTargetDate = Math.max(0, Math.ceil((new Date(resultDTO.target_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30)));
+            const monthlyContribution = resultDTO.is_completed ? 0 : (resultDTO.current_amount ?? 0) / monthsLeftToTargetDate;
             
-            const { _id, goal_name, goal_category, target_amount, initial_investment, current_amount, currency, target_date, contribution_frequency, priority_level, description, reminder_frequency, goal_type, tags, dependencies } = goal;
-            return { _id, user_id: userId, goal_name, goal_category, target_amount, initial_investment, current_amount, currency, target_date, contribution_frequency, priority_level, description, reminder_frequency, goal_type, tags, dependencies, is_completed: goal.is_completed, created_by: goal.created_by, last_updated_by: goal.last_updated_by?.toString(), dailyContribution: dailyContribution || 0, monthlyContribution: monthlyContribution || 0 };
+            const { 
+                _id, goal_name, 
+                goal_category, 
+                target_amount, 
+                initial_investment, 
+                current_amount, 
+                currency, 
+                target_date, 
+                contribution_frequency, 
+                priority_level, 
+                description, 
+                reminder_frequency, 
+                goal_type, 
+                tags, 
+                dependencies 
+            } = resultDTO;
+            return { 
+                _id: _id?.toString(), 
+                user_id: userId, goal_name, 
+                goal_category, target_amount, 
+                initial_investment, 
+                current_amount, 
+                currency, 
+                target_date, 
+                contribution_frequency, 
+                priority_level, 
+                description, 
+                reminder_frequency, 
+                goal_type, 
+                tags, 
+                dependencies: dependencies?.map(t => t.toString()), 
+                is_completed: goal.is_completed, 
+                created_by: goal.created_by?.toString(), 
+                last_updated_by: goal.last_updated_by?.toString(), 
+                dailyContribution: dailyContribution || 0, 
+                monthlyContribution: monthlyContribution || 0 
+            };
         } catch (error) {
-            // Log and re-throw the error to propagate it to the caller.
-            console.error('Error retrieving goal by ID:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while getting goal by id:', error);
+            throw wrapServiceError(error);
         }
     }
 
     async updateTransaction(accessToken: string, goalId: string, transactionData: { amount: number; transaction_id?: string; date?: Date }): Promise<boolean> {
         try {
-            // Decode and validate the access token to extract the user ID associated with it.
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
-
             // Call the repository to update the goal contribution by its ID.
             const updatedGoal = await this._goalRepository.updateTransaction(goalId, transactionData);
 
-            // Emit socket event to notify user about goal updation
-            eventBus.emit('goal_updated', updatedGoal);
+            const resultDTO = GoalMapper.toDTO(updatedGoal);
 
-            return updatedGoal._id ? true : false;
+            // Emit socket event to notify user about goal updation
+            eventBus.emit('goal_updated', resultDTO);
+
+            return resultDTO._id ? true : false;
         } catch (error) {
-            // Log and re-throw the error to propagate it to the caller.
-            console.error('Error updating transaction ID:', error);
-            throw new Error((error as Error).message);
+            console.error('Error while updating transaction:', error);
+            throw wrapServiceError(error);
         }
     }
 
-    // Retrieves all active goals that require monthly payment notifications.
     async getGoalsForNotifyMonthlyGoalPayments(): Promise<IGoalDTO[]> {
         try {
             // Fetch goals that are due for monthly payment reminders
             const goals = await this._goalRepository.getGoalsForNotifyMonthlyGoalPayments();
 
-            // Return the list of goals to be processed for notifications
-            return goals;
-        } catch (error) {
-            // Log the error for debugging purposes
-            console.error('Error fetching goals for monthly payment notifications:', error);
+            const resultDTO = GoalMapper.toDTOs(goals);
 
-            // Re-throw the error with a descriptive message
-            throw new Error((error as Error).message);
+            return resultDTO;
+        } catch (error) {
+            console.error('Error while creating goal expiry notification:', error);
+            throw wrapServiceError(error);
         }
     }
 }

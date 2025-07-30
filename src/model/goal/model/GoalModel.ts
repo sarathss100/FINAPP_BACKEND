@@ -1,6 +1,6 @@
 import mongoose, { Model } from 'mongoose';
-import IGoal from '../interfaces/IGoal';
 import GoalSchema from '../schema/GoalSchema';
+import IGoalDocument from '../interfaces/IGoal';
 
-export const GoalModel: Model<IGoal> = mongoose.model<IGoal>('Goals', GoalSchema);
+export const GoalModel: Model<IGoalDocument> = mongoose.model<IGoalDocument>('Goals', GoalSchema);
 
