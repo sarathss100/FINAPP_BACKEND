@@ -1,9 +1,7 @@
-import { SubscriptionDTO } from '../../../dtos/subscriptions/subscriptionDTO';
+import ISubscriptionDocument from '../../../model/subscription/interfaces/ISubscription';
 
-interface ISubscriptionManagemenRepository {
-    createSubscription(subscriptionData: SubscriptionDTO): Promise<void>;
-    getExpiredSubscriptions(): Promise<SubscriptionDTO[]>;
+export default interface ISubscriptionRepository {
+    createSubscription(subscriptionData: Partial<ISubscriptionDocument>): Promise<void>;
+    getExpiredSubscriptions(): Promise<ISubscriptionDocument[]>;
     updateSubscriptionStatus(subscriptionId: string, newStatus: 'active' | 'expired' | 'cancelled'): Promise<void>;
 }
-
-export default ISubscriptionManagemenRepository;

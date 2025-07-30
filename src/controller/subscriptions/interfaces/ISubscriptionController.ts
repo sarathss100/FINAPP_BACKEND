@@ -1,7 +1,5 @@
 import { Request, Response } from 'express';
 
-interface ISubscriptionController {
+export default interface ISubscriptionController {
     initiatePayment(request: Request, response: Response): Promise<void>;
 }
-
-export default ISubscriptionController;

@@ -1,43 +1,32 @@
-import { decodeAndValidateToken } from '../../utils/auth/tokenUtils';
-import { AuthenticationError } from '../../error/AppError';
-import { ErrorMessages } from '../../constants/errorMessages';
-import { StatusCodes } from '../../constants/statusCodes';
 import IInsuranceService from './interfaces/ISubscriptionService';
-import ISubscriptionManagemenRepository from '../../repositories/subscriptions/interfaces/ISubscriptionManagemenRepository';
-import SubscriptionManagementRepository from '../../repositories/subscriptions/SubscriptionManagementRepository';
+import ISubscriptionRepository from '../../repositories/subscriptions/interfaces/ISubscriptionManagemenRepository';
+import SubscriptionRepository from '../../repositories/subscriptions/SubscriptionManagementRepository';
 import { initiatePaymentDTO } from '../../dtos/subscriptions/subscriptionDTO';
 import Stripe from 'stripe';
+import { extractUserIdFromToken, wrapServiceError } from '../../utils/serviceUtils';
 
 // Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-06-30.basil' });
 
-class SubscriptionService implements IInsuranceService {
+export default class SubscriptionService implements IInsuranceService {
     private static _instance: SubscriptionService;
-    private _subscriptionRepository: ISubscriptionManagemenRepository;
+    private _subscriptionRepository: ISubscriptionRepository;
 
-    constructor(subscriptionRepository: ISubscriptionManagemenRepository) {
+    constructor(subscriptionRepository: ISubscriptionRepository) {
         this._subscriptionRepository = subscriptionRepository;
     }
 
     public static get instance(): SubscriptionService {
         if (!SubscriptionService._instance) {
-            const repo = SubscriptionManagementRepository.instance;
+            const repo = SubscriptionRepository.instance;
             SubscriptionService._instance = new SubscriptionService(repo);
         }
         return SubscriptionService._instance;
     }
 
-    /**
-     * Initiates a Stripe payment by creating a Checkout Session for subscription-based payment.
-     * Returns the session URL where the user can complete the payment.
-     */
     async initiatePayment(accessToken: string, formData: initiatePaymentDTO): Promise<string> {
         try {
-            // Decode and validate the access token to extract the user ID
-            const userId = decodeAndValidateToken(accessToken);
-            if (!userId) {
-                throw new AuthenticationError(ErrorMessages.USER_ID_MISSING_IN_TOKEN, StatusCodes.BAD_REQUEST);
-            }
+            const userId = extractUserIdFromToken(accessToken);
 
             // Create a Stripe Checkout Session
             const session = await stripe.checkout.sessions.create({
@@ -68,11 +57,8 @@ class SubscriptionService implements IInsuranceService {
 
             return session.url || '';
         } catch (error) {
-            // Log and rethrow the error for upstream handling
             console.error('Error initiating payment:', error);
-            throw new Error((error as Error).message);
+            throw wrapServiceError(error);
         }
     }
 }
-
-export default SubscriptionService;

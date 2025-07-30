@@ -8,6 +8,7 @@ import UserBaseRepository from '../../repositories/base/UserBaseRespository';
 import IUserBaseRespository from '../../repositories/base/interfaces/IUserBaseRespository';
 import ISubscriptionManagemenRepository from '../../repositories/subscriptions/interfaces/ISubscriptionManagemenRepository';
 import SubscriptionManagementRepository from '../../repositories/subscriptions/SubscriptionManagementRepository';
+import SubscriptionMapper from '../../mappers/subscriptions/SubscriptionMapper';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-06-30.basil' });
 const userBaseRepository: IUserBaseRespository = new UserBaseRepository();
@@ -63,8 +64,10 @@ class WebhookController {
                 payment_method: paymentMethod,
                 transaction_id: transactionId,
             }
+ 
+            const mappingModel = SubscriptionMapper.toModel(data);
         
-            await subscriptionRepository.createSubscription(data);
+            await subscriptionRepository.createSubscription(mappingModel);
 
         }
 

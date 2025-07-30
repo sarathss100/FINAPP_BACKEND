@@ -15,10 +15,10 @@ export const checkAndExpireSubscriptions = async () => {
         for (const subscription of expiredSubscriptions) {
             if (!subscription._id) continue;
             // Update subscription status in subscription model
-            await subscriptionRepository.updateSubscriptionStatus(subscription._id, 'expired');
+            await subscriptionRepository.updateSubscriptionStatus(subscription._id?.toString(), 'expired');
 
             // update user's subscription status
-            await userBaseRepository.updateSubscriptionStatus(subscription.user_id);
+            await userBaseRepository.updateSubscriptionStatus(subscription.user_id?.toString());
 
             console.log(`Subscription expired for user: ${subscription.user_id}`);
             // await sendSubscriptionExpiredEmail(subscription.user_id);

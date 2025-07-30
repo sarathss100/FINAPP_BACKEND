@@ -1,6 +1,7 @@
 import mongoose, { Document } from 'mongoose';
 
-export interface ISubscription extends Document {
+export default interface ISubscriptionDocument extends Document {
+    _id: mongoose.Types.ObjectId;
     user_id: mongoose.Types.ObjectId;
     plan_name: string;
     plan_type: 'monthly' | 'annually';
@@ -12,4 +13,7 @@ export interface ISubscription extends Document {
     status: "active" | "expired" | 'cancelled';
     payment_method: string;
     transaction_id: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+    __v?: number;
 }
