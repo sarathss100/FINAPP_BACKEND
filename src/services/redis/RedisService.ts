@@ -7,42 +7,42 @@ const redisClient = new Redis({
     password: process.env.REDIS_PASSWORD
 });
 
+const REDIS_KEY_PREFIX = 'user_stripe_session:';
+
 class RedisService {
-    /**
-     * Get the Redis client instance.
-     * @returns {Redis} The Redis client instance.
-     */
     getClient(): Redis {
         return redisClient;
     }
 
-    /**
-     * Store a refresh token in Redis.
-     * @param userId The ID of the user.
-     * @param refreshToken The refresh token to store.
-     * @param ttl The time-to-live (TTL) for the token in seconds.
-     */
     async storeRefreshToken(userId: string, refreshToken: string, ttl: number): Promise<void> {
         await redisClient.set(`refresh_token:${userId}`, refreshToken, 'EX', ttl);
     } 
 
-    /**
-     * Retriev a refresb token from Redis.
-     * @param userId The ID of the user.
-     * @returns {Promise<string | null>} The refresh token or null if not found.
-     */
     async getRefreshToken(userId: string): Promise<string | null> {
         return await redisClient.get(`refresh_token:${userId}`);
     }
-    /**
-     * Delete a refresh token from redis 
-     * @param userId The ID of the user.
-     */
+    
     async deleteRefreshToken(userId: string): Promise<boolean | undefined> {
         const response = await redisClient.del(`refresh_token:${userId}`);
         if (response === 1) {
             return true;
         } 
+    }
+
+    async saveUserStripeSession(userId: string, sessionId: string): Promise<void> {
+        // Set with expiration 30 minutes
+        const key = REDIS_KEY_PREFIX + userId;
+        await redisClient.set(key, sessionId, 'EX', 1800);
+    }
+
+    async getUserStripeSession(userId: string): Promise<string | null> {
+        const key = REDIS_KEY_PREFIX + userId;
+        return await redisClient.get(key);
+    }
+
+    async removeUserStripeSession(userId: string): Promise<void> {
+        const key = REDIS_KEY_PREFIX + userId;
+        await redisClient.del(key);
     }
 }
 

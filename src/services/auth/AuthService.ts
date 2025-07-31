@@ -70,6 +70,7 @@ export default class AuthService implements IAuthService {
 
             //Store the refresh token in Redis with a TTL 
             const REFRESH_TOKEN_TTL = 7 * 24 * 60 * 60;
+            
             try {
                 await RedisService.storeRefreshToken(resultDTO.userId, refreshToken, REFRESH_TOKEN_TTL);
             } catch (error) {
