@@ -11,17 +11,17 @@ import './cron/scheduler';
 import { setupSocketListeners } from './sockets/listeners';
 import startAllCrons from './cron/startAllcrons';
 import WebhookController from './controller/webhook/WebhookController';
-// import { startTransactionGenerator } from './aa-simulator/src/cron/startTransactionGenerator';
-// import  { startDebtGenerator } from './aa-simulator/src/cron/startDebtGenerator';
-// import { startInsuranceGenerator } from './aa-simulator/src/cron/startInsuranceGenerator';
+import { startTransactionGenerator } from './aa-simulator/src/cron/startTransactionGenerator';
+import  { startDebtGenerator } from './aa-simulator/src/cron/startDebtGenerator';
+import { startInsuranceGenerator } from './aa-simulator/src/cron/startInsuranceGenerator';
 
 const app = express();
 
 setupSocketListeners();
 startAllCrons();
-// startTransactionGenerator();
-// startDebtGenerator();
-// startInsuranceGenerator();
+startTransactionGenerator();
+startDebtGenerator();
+startInsuranceGenerator();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
