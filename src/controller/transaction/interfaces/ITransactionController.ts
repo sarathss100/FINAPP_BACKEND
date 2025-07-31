@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-interface ITransactionController { 
+export default interface ITransactionController { 
     createTransaction(request: Request, response: Response): Promise<void>;
     getUserTransactions(request: Request, response: Response): Promise<void>;
     getMonthlyTotalIncome(request: Request, response: Response): Promise<void>;
@@ -16,5 +16,3 @@ interface ITransactionController {
     getPaginatedExpenseTransactions(request: Request, response: Response): Promise<void>;
     getPaginatedTransactions(request: Request, response: Response): Promise<void>;
 }
-
-export default ITransactionController;

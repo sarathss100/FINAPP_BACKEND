@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import INotificationDTO from '../../dtos/notification/NotificationDto';
+import INotificationDTO from '../../dtos/notification/NotificationDTO';
 import INotificationDocument from '../../model/notification/interfaces/INotificaiton';
 
 export default class NotificationMapper {

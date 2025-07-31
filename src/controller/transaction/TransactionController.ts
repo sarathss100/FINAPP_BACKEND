@@ -1,26 +1,22 @@
 import ITransactionService from '../../services/transaction/interfaces/ITransaction';
 import ITransactionController from './interfaces/ITransactionController';
 import { Request, Response } from 'express';
-import {
-  AppError,
-  AuthenticationError,
-  ValidationError
-} from '../../error/AppError';
+import { AuthenticationError, ValidationError } from '../../error/AppError';
 import { ErrorMessages } from '../../constants/errorMessages';
 import { StatusCodes } from '../../constants/statusCodes';
-import { ITransactionDTO } from '../../dtos/transaction/TransactionDto';
-import { sendErrorResponse, sendSuccessResponse } from '../../utils/responseHandler';
+import ITransactionDTO from '../../dtos/transaction/TransactionDTO';
+import { sendSuccessResponse } from '../../utils/responseHandler';
 import { SuccessMessages } from '../../constants/successMessages';
 import transactionDTOSchema from '../../validation/transaction/transaction.validation';
+import { handleControllerError } from '../../utils/controllerUtils';
 
-class TransactionController implements ITransactionController {
+export default class TransactionController implements ITransactionController {
   private readonly _transactionService: ITransactionService;
 
   constructor(transactionService: ITransactionService) {
     this._transactionService = transactionService;
   }
 
-  // Handles creating one or more transactions based on the request body.
   async createTransaction(request: Request, response: Response): Promise<void> {
     try {
       const { accessToken } = request.cookies;
@@ -75,15 +71,10 @@ class TransactionController implements ITransactionController {
         });
       }
     } catch (error) {
-      if (error instanceof AppError) {
-        sendErrorResponse(response, error.statusCode, error.message);
-      } else {
-        sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-      }
+      handleControllerError(response, error);
     }
   }
 
-  // Retrieves all transactions associated with the authenticated user.
   async getUserTransactions(request: Request, response: Response): Promise<void> {
     try {
       const { accessToken } = request.cookies;
@@ -92,19 +83,15 @@ class TransactionController implements ITransactionController {
       }
 
       const allTransactions: ITransactionDTO[] = await this._transactionService.getUserTransactions(accessToken);
+
       sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.TRANSACTION_RETRIEVED, {
         allTransactions
       });
     } catch (error) {
-      if (error instanceof AppError) {
-        sendErrorResponse(response, error.statusCode, error.message);
-      } else {
-        sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-      }
+      handleControllerError(response, error);
     }
   }
 
-  // Retrieves the total income for the current and previous month for the authenticated user.
   async getMonthlyTotalIncome(request: Request, response: Response): Promise<void> {
     try {
       const { accessToken } = request.cookies;
@@ -117,15 +104,10 @@ class TransactionController implements ITransactionController {
         ...userMonthlyTotals
       });
     } catch (error) {
-      if (error instanceof AppError) {
-        sendErrorResponse(response, error.statusCode, error.message);
-      } else {
-        sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-      }
+      handleControllerError(response, error);
     }
   }
 
-  // Retrieves the total income for the latest ISO week for the authenticated user.
   async getWeeklyTotalIncome(request: Request, response: Response): Promise<void> {
     try {
       const { accessToken } = request.cookies;
@@ -133,21 +115,16 @@ class TransactionController implements ITransactionController {
         throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
       }
 
-      // BUG FIXED: Previously calling monthly method, now calling correct weekly method
       const weeklyTotalIncome = await this._transactionService.getWeeklyTotalIncome(accessToken);
+
       sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.TRANSACTION_RETRIEVED, {
         weeklyTotalIncome
       });
     } catch (error) {
-      if (error instanceof AppError) {
-        sendErrorResponse(response, error.statusCode, error.message);
-      } else {
-        sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-      }
+      handleControllerError(response, error);
     }
   }
 
-  // Retrieves the total expense for the current month for the authenticated user.
   async getMonthlyTotalExpense(request: Request, response: Response): Promise<void> {
     try {
       const { accessToken } = request.cookies;
@@ -156,19 +133,15 @@ class TransactionController implements ITransactionController {
       }
 
       const totalMonthlyExpense = await this._transactionService.getMonthlyTotalExpense(accessToken);
+
       sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.TRANSACTION_RETRIEVED, {
         totalMonthlyExpense
       });
     } catch (error) {
-      if (error instanceof AppError) {
-        sendErrorResponse(response, error.statusCode, error.message);
-      } else {
-        sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-      }
+      handleControllerError(response, error);
     }
   }
 
-  // Retrieves category-wise expenses for the authenticated user.
   async getCategoryWiseExpense(request: Request, response: Response): Promise<void> {
     try {
       const { accessToken } = request.cookies;
@@ -177,19 +150,15 @@ class TransactionController implements ITransactionController {
       }
 
       const categoryWiseExpenses = await this._transactionService.getCategoryWiseExpense(accessToken);
+
       sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.TRANSACTION_RETRIEVED, {
         categoryWiseExpenses
       });
     } catch (error) {
-      if (error instanceof AppError) {
-        sendErrorResponse(response, error.statusCode, error.message);
-      } else {
-        sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-      }
+      handleControllerError(response, error);
     }
   }
 
-  // Extracts transaction data from an uploaded statement file.
   async extractTransactionData(request: Request, response: Response): Promise<void> {
     try {
       const file = request.file;
@@ -198,19 +167,15 @@ class TransactionController implements ITransactionController {
       }
 
       const extractedStatementData = await this._transactionService.extractTransactionData(file);
+
       sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.EXTRACTED_DATA, {
         extractedStatementData
       });
     } catch (error) {
-      if (error instanceof AppError) {
-        sendErrorResponse(response, error.statusCode, error.message);
-      } else {
-        sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-      }
+      handleControllerError(response, error);
     }
   }
 
-  // Controller to retrieve all INCOME-type transactions for the authenticated user
   async getAllIncomeTransactionsByCategory(request: Request, response: Response): Promise<void> {
     try {
         const { accessToken } = request.cookies;
@@ -219,17 +184,13 @@ class TransactionController implements ITransactionController {
         }
       
         const transactions = await this._transactionService.getAllIncomeTransactionsByCategory(accessToken);
+
         sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.EXTRACTED_DATA, { transactions });
     } catch (error) {
-        if (error instanceof AppError) {
-            sendErrorResponse(response, error.statusCode, error.message);
-        } else {
-            sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-        }
+        handleControllerError(response, error);
     }
   }
 
-  // Controller to retrieve all EXPENSE-type transactions grouped by category for the authenticated user.
   async getAllExpenseTransactionsByCategory(request: Request, response: Response): Promise<void> {
     try {
         const { accessToken } = request.cookies;
@@ -238,17 +199,13 @@ class TransactionController implements ITransactionController {
         }
       
         const transactions = await this._transactionService.getAllExpenseTransactionsByCategory(accessToken);
+
         sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.EXTRACTED_DATA, { transactions });
     } catch (error) {
-        if (error instanceof AppError) {
-            sendErrorResponse(response, error.statusCode, error.message);
-        } else {
-            sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-        }
+        handleControllerError(response, error);
     }
   }
 
-  // Controller to retrieve month-wise income data for the authenticated user.
   async getMonthlyIncomeForChart(request: Request, response: Response): Promise<void> {
     try {
         const { accessToken } = request.cookies;
@@ -257,17 +214,13 @@ class TransactionController implements ITransactionController {
         }
       
         const transactions = await this._transactionService.getMonthlyIncomeForChart(accessToken);
+
         sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.EXTRACTED_DATA, { transactions });
     } catch (error) {
-        if (error instanceof AppError) {
-            sendErrorResponse(response, error.statusCode, error.message);
-        } else {
-            sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-        }
+        handleControllerError(response, error);
     }
   }
 
-  // Controller to retrieve month-wise income data for the authenticated user.
   async getMonthlyExpenseForChart(request: Request, response: Response): Promise<void> {
     try {
         const { accessToken } = request.cookies;
@@ -276,17 +229,13 @@ class TransactionController implements ITransactionController {
         }
       
         const transactions = await this._transactionService.getMonthlyExpenseForChart(accessToken);
+
         sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.EXTRACTED_DATA, { transactions });
     } catch (error) {
-        if (error instanceof AppError) {
-            sendErrorResponse(response, error.statusCode, error.message);
-        } else {
-            sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-        }
+        handleControllerError(response, error);
     }
   }
 
-  // Controller to retrieve paginated income transactions for the authenticated user.
   async getPaginatedIncomeTransactions(request: Request, response: Response): Promise<void> {
     try {
       const { accessToken } = request.cookies;
@@ -309,15 +258,10 @@ class TransactionController implements ITransactionController {
     
       sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.EXTRACTED_DATA, { transactions });
     } catch (error) {
-      if (error instanceof AppError) {
-        sendErrorResponse(response, error.statusCode, error.message);
-      } else {
-        sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-      }
+      handleControllerError(response, error);
     }
   }
 
-  // Controller to retrieve paginated expense transactions for the authenticated user.
   async getPaginatedExpenseTransactions(request: Request, response: Response): Promise<void> {
     try {
         const { accessToken } = request.cookies;
@@ -340,15 +284,10 @@ class TransactionController implements ITransactionController {
       
         sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.EXTRACTED_DATA, { transactions });
     } catch (error) {
-        if (error instanceof AppError) {
-            sendErrorResponse(response, error.statusCode, error.message);
-        } else {
-            sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-        }
+        handleControllerError(response, error);
     }
   }
 
-  // Controller to retrieve paginated income or expense transactions for the authenticated user
   async getPaginatedTransactions(request: Request, response: Response): Promise<void> {
     try {
         const { accessToken } = request.cookies;
@@ -372,13 +311,8 @@ class TransactionController implements ITransactionController {
       
         sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.EXTRACTED_DATA, { transactions });
     } catch (error) {
-        if (error instanceof AppError) {
-            sendErrorResponse(response, error.statusCode, error.message);
-        } else {
-            sendErrorResponse(response, StatusCodes.INTERNAL_SERVER_ERROR, ErrorMessages.INTERNAL_SERVER_ERROR);
-        }
+        handleControllerError(response, error);
     }
   }
 }
 
-export default TransactionController;

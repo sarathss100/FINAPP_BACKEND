@@ -4,7 +4,7 @@ import TransactionController from '../../../controller/transaction/TransactionCo
 import ITransactionController from '../../../controller/transaction/interfaces/ITransactionController';
 import createTransactionRouter from './TransactionRouter';
 
-class TransactionContainer {
+export default class TransactionContainer {
     public readonly controller: ITransactionController;
     public readonly router: ReturnType<typeof createTransactionRouter>;
 
@@ -15,5 +15,3 @@ class TransactionContainer {
         this.router = createTransactionRouter(this.controller);
     }
 }
-
-export default TransactionContainer;

@@ -2,7 +2,7 @@ import AdminRepository from "../../../repositories/admin/AdminRepository";
 import IAdminRepository from "../../../repositories/admin/interfaces/IAdminRepository";
 import transactionTemplates from '../../../aa-simulator/src/data/transaction/transactionTemplates.json';
 import { TransactionPayload } from "../data/transaction/types";
-import { ITransactionDTO } from "../../../dtos/transaction/TransactionDto";
+import ITransactionDTO from "../../../dtos/transaction/TransactionDTO";
 import { TransactionGeneratorService } from "../services/transactionService";
 import IAccountsManagementRepository from "../../../repositories/accounts/interfaces/IAccountsRepository";
 import AccountManagementRepository from "../../../repositories/accounts/AccountsRepository";

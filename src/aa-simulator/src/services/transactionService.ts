@@ -1,7 +1,7 @@
 import { generateAccessToken } from "../../../utils/auth/tokenUtils";
 import TransactionService from "../../../services/transaction/TransactionService";
 import ITransactionService from "../../../services/transaction/interfaces/ITransaction";
-import { ITransactionDTO } from "../../../dtos/transaction/TransactionDto";
+import ITransactionDTO from "../../../dtos/transaction/TransactionDTO";
 import IAuthUserDTO from "../../../dtos/auth/IAuthUserDTO";
 
 const transactionService: ITransactionService = TransactionService.instance;

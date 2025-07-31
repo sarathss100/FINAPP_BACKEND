@@ -1,6 +1,6 @@
 import INotificationService from './interfaces/INotificationService';
 import INotificatonRepository from '../../repositories/notifications/interfaces/INotificaitionRepository'; 
-import INotificationDTO from '../../dtos/notification/NotificationDto'; 
+import INotificationDTO from '../../dtos/notification/NotificationDTO'; 
 import NotificationRepository from '../../repositories/notifications/NotificaitonRepository'; 
 import DebtService from '../../services/debt/DebtService';
 import GoalService from '../../services/goal/GoalService';

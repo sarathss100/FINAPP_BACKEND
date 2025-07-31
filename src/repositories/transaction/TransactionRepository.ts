@@ -1,9 +1,13 @@
-import { ITransactionDTO } from '../../dtos/transaction/TransactionDto';
+import ITransactionDTO from '../../dtos/transaction/TransactionDTO';
 import ITransactionRepository from './interfaces/ITransactionRepository';
 import { TransactionModel } from '../../model/transaction/model/TransactionModel';
+import ITransactionDocument from '../../model/transaction/interfaces/ITransaction';
+import IBaseRepository from '../base_repo/interface/IBaseRepository';
+import BaseRepository from '../base_repo/BaseRepository';
 
-class TransactionRepository implements ITransactionRepository {
+export default class TransactionRepository implements ITransactionRepository {
     private static _instance: TransactionRepository;
+    private baseRepo: IBaseRepository<ITransactionDocument> = new BaseRepository<ITransactionDocument>(TransactionModel);
     public constructor() {};
 
     public static get instance(): TransactionRepository {
@@ -13,151 +17,54 @@ class TransactionRepository implements ITransactionRepository {
         return TransactionRepository._instance;
     }
 
-    // Creates a new transaction history in the database and returns the created transaction in ITransactionDTO format.
-    async createTransaction(data: ITransactionDTO): Promise<ITransactionDTO> { 
+    async createTransaction(data: Partial<ITransactionDocument>): Promise<ITransactionDocument> { 
         try {
-            const result = await TransactionModel.create(data);
-            const createdTransaction: ITransactionDTO = {
-                _id: result._id.toString(),
-                user_id: result.user_id.toString(),
-                account_id: result.account_id.toString(),
-                transaction_type: result.transaction_type as 'INCOME' | 'EXPENSE',
-                type: result.type,
-                category: result.category,
-                amount: result.amount,    
-                credit_amount: result.credit_amount || 0,
-                debit_amount: result.debit_amount || 0,
-                closing_balance: result.closing_balance || 0,
-                currency: result.currency ? result.currency.toString() as 'INR' : 'INR',
-                date: result.date,
-                description: result.description,
-                tags: result.tags,
-                status: result.status,
-                related_account_id: result.related_account_id?.toString(),
-                linked_entities: result.linked_entities?.map((entity) => ({
-                    entity_id: entity.entity_id?.toString(),
-                    entity_type: entity.entity_type,
-                    amount: entity.amount,
-                    currency: entity.currency.toString() as 'INR',
-                })),
-                isDeleted: result.isDeleted || false,
-                deletedAt: result.deletedAt,
-                createdAt: result.createdAt,
-                updatedAt: result.updatedAt,
-            };
-            return createdTransaction;
+            const result = await this.baseRepo.create(data);
+
+            return result;
         } catch (error) {
             throw new Error((error as Error).message);
         }
     }
 
-    // Creates multiple new transaction histories in the database in a single operation.
-    async createBulkTransactions(dataArray: ITransactionDTO[]): Promise<ITransactionDTO[]> {
+    async createBulkTransactions(dataArray: ITransactionDocument[]): Promise<ITransactionDocument[]> {
         try {
             // Use insertMany for bulk insertion (more efficient than multiple create operations)
-            const results = await TransactionModel.insertMany(dataArray, { lean: true });
+            const results = await TransactionModel.insertMany(dataArray);
 
-            // Map each result to the ITransactionDTO format
-            const createdTransactions: ITransactionDTO[] = results.map(result => ({
-                _id: result._id.toString(),
-                user_id: result?.user_id?.toString(),
-                account_id: result.account_id.toString(),
-                transaction_type: result.transaction_type as 'INCOME' | 'EXPENSE',
-                type: result.type,
-                category: result.category,
-                amount: result.amount,
-                credit_amount: result.credit_amount || 0,
-                debit_amount: result.debit_amount || 0,
-                closing_balance: result.closing_balance || 0,
-                currency: result.currency ? result.currency.toString() as 'INR' : 'INR',
-                date: result.date,
-                description: result.description,
-                tags: result.tags,
-                status: result.status,
-                transactionHash: result.transactionHash, // Include the hash in the returned data
-                related_account_id: result.related_account_id?.toString(),
-                linked_entities: result.linked_entities?.map((entity) => ({
-                    entity_id: entity.entity_id?.toString(),
-                    entity_type: entity.entity_type,
-                    amount: entity.amount,
-                    currency: entity?.currency?.toString() as 'INR',
-                })),
-                isDeleted: result.isDeleted || false,
-                deletedAt: result.deletedAt,
-                createdAt: result.createdAt,
-                updatedAt: result.updatedAt,
-            }));
-
-            return createdTransactions;
+            return results;
         } catch (error) {
-            console.error('Error in bulk transaction creation:', error);
             throw new Error((error as Error).message);
         }
     }
 
-    // Retrieves all transactions associated with a specific user from the database.
     async getExistingTransaction(userId: string, transactionHash: string): Promise<boolean> {
         try {
             // Query the database to retrieve all transactions associated with the given `userId`.
-            const result = await TransactionModel.findOne<ITransactionDTO>({ transactionHash });
+            const result = await this.baseRepo.findOne({ transactionHash });
 
-            // it means no transactions were found for the given user, and an error is thrown.
             if (!result) {
                 return false;
             }
 
-            // Return the retrieved transactions as an array of `ITransactionDTO` objects.
             return true;
         } catch (error) {
-            // Log the error for debugging purposes.
             console.error('Error retrieving transaction details:', error);
             return false;
         }
     }
 
-    // Retrieves all transactions associated with a specific user from the database.
-    async getExistingTransactions(allHashes: string[]): Promise<ITransactionDTO[] | undefined> {
+    async getExistingTransactions(allHashes: string[]): Promise<ITransactionDocument[]> {
         try {
             // Query the database to retrieve all transactions associated with the given `userId`.
-            const result = await TransactionModel.find({ transactionHash: { $in: allHashes }});
+            const result = await this.baseRepo.find({ transactionHash: { $in: allHashes }});
 
-            // Map the result to ITransactionDTO format
-            return result.map(transaction => ({
-                _id: transaction._id.toString(),
-                user_id: transaction.user_id.toString(),
-                account_id: transaction.account_id.toString(),
-                transaction_type: transaction.transaction_type,
-                type: transaction.type,
-                category: transaction.category,
-                amount: transaction.amount,
-                credit_amount: transaction.credit_amount || 0,
-                debit_amount: transaction.debit_amount || 0,
-                closing_balance: transaction.closing_balance || 0,
-                currency: transaction.currency as 'INR',
-                date: transaction.date,
-                description: transaction.description,
-                tags: transaction.tags,
-                status: transaction.status,
-                transactionHash: transaction.transactionHash,
-                related_account_id: transaction.related_account_id?.toString(),
-                linked_entities: transaction.linked_entities?.map(entity => ({
-                    entity_id: entity.entity_id?.toString(),
-                    entity_type: entity.entity_type,
-                    amount: entity.amount,
-                    currency: entity.currency as 'INR',
-                })),
-                isDeleted: transaction.isDeleted || false,
-                deletedAt: transaction.deletedAt,
-                createdAt: transaction.createdAt,
-                updatedAt: transaction.updatedAt,
-            }));
+            return result;
         } catch (error) {
-            // Log the error for debugging purposes.
-            console.error('Error retrieving transaction details:', error);
+            throw new Error((error as Error).message);
         }
     }
 
-    // Retrieves income transaction totals grouped by category for the current year for a specific user.
     async getAllIncomeTransactionsByCategory(userId: string): Promise<{category: string, total: number}[]> {
         try {
             const startOfYear = new Date(new Date().getFullYear(), 0, 1);
@@ -188,18 +95,16 @@ class TransactionRepository implements ITransactionRepository {
                     }
                 },
                 {
-                    $sort: { category: 1 } // Optional: sort by category name
+                    $sort: { category: 1 } 
                 }
             ]);
         
             return categoryTotals || [];
         } catch (error) {
-            console.error('Error retrieving income totals by category:', error);
-            throw new Error('Error retrieving income totals by category')
+            throw new Error((error as Error).message);
         }
     }
 
-    // Retrieves expense transaction totals grouped by category for the current year for a specific user.
     async getAllExpenseTransactionsByCategory(userId: string): Promise<{ category: string, total: number }[]> {
         try {
             const startOfYear = new Date(new Date().getFullYear(), 0, 1);
@@ -230,46 +135,35 @@ class TransactionRepository implements ITransactionRepository {
                     }
                 },
                 {
-                    $sort: { category: 1 } // Sort alphabetically by category name
+                    $sort: { category: 1 }
                 }
             ]);
         
             return categoryTotals || [];
         } catch (error) {
-            console.error('Error retrieving expense totals by category:', error);
-            throw new Error('Error retrieving expense totals by category')
-        }
-    }
-
-    // Retrieves all transactions associated with a specific user from the database.
-    async getUserTransactions(userId: string): Promise<ITransactionDTO[]> {
-        try {
-            // Query the database to retrieve all transactions associated with the given `userId`.
-            const result = await TransactionModel.find<ITransactionDTO>({ user_id: userId });
-
-            // it means no transactions were found for the given user, and an error is thrown.
-            if (!result || result.length === 0) {
-                throw new Error('No transactions found for the specified user');
-            }
-
-            // Return the retrieved transactions as an array of `ITransactionDTO` objects.
-            return result;
-        } catch (error) {
-            // Log the error for debugging purposes.
-            console.error('Error retrieving transaction details:', error);
-
-            // Re-throw the error with a more descriptive message, ensuring the caller is informed of the issue.
             throw new Error((error as Error).message);
         }
     }
 
-    // Retrieves all transactions associated with a specific user from the database.
-    async getMonthlyTotalIncome(userId: string): Promise<{currentMonthTotal: number, previousMonthTotal: number }> {
+    async getUserTransactions(userId: string): Promise<ITransactionDocument[]> {
         try {
             // Query the database to retrieve all transactions associated with the given `userId`.
-            const result = await TransactionModel.find({ user_id: userId, transaction_type: 'INCOME' });
+            const result = await TransactionModel.find({ user_id: userId }).sort({ createdAt: -1 });
 
-            // it means no transactions were found for the given user, and an error is thrown.
+            if (!result || result.length === 0) {
+                throw new Error('No transactions found for the specified user');
+            }
+
+            return result;
+        } catch (error) {
+            throw new Error((error as Error).message);
+        }
+    }
+
+    async getMonthlyTotalIncome(userId: string): Promise<{currentMonthTotal: number, previousMonthTotal: number }> {
+        try {
+            const result = await this.baseRepo.find({ user_id: userId, transaction_type: 'INCOME' });
+
             if (!result || result.length === 0) {
                 throw new Error('No transactions found for the specified user');
             }
@@ -301,15 +195,10 @@ class TransactionRepository implements ITransactionRepository {
 
             return { currentMonthTotal, previousMonthTotal };
         } catch (error) {
-            // Log the error for debugging purposes.
-            console.error('Error retrieving transaction details:', error);
-
-            // Re-throw the error with a more descriptive message, ensuring the caller is informed of the issue.
-            throw new Error('Error retrieving transaction details');
+            throw new Error((error as Error).message);
         }
     }
 
-    // Retrieves the total income for the latest calendar week (Sunday - Saturday) for a specific user.
     async getWeeklyTotalIncome(userId: string): Promise<number> {
         try {
             const result = await TransactionModel.aggregate([
@@ -350,24 +239,18 @@ class TransactionRepository implements ITransactionRepository {
             return result[0]?.totalIncome || 0;
 
         } catch (error) {
-            console.error('Error retrieving weekly income:', error);
-            throw new Error(`Failed to retrieve weekly income: ${(error as Error).message}`);
+            throw new Error((error as Error).message);
         }
     }
 
-    /**
-     * Retrieves and calculates the total amount of EXPENSE-type transactions 
-     * made by a specific user in the current calendar month.
-     */
     async getMonthlyTotalExpense(userId: string): Promise<{ currentMonthExpenseTotal: number, previousMonthExpenseTotal: number }> {
         try {
             // Query the database for all EXPENSE transactions associated with the given user ID
-            const result = await TransactionModel.find<ITransactionDTO>({
+            const result = await this.baseRepo.find({
                 user_id: userId,
                 transaction_type: 'EXPENSE'
             });
         
-            // If no matching expense transactions are found, throw an appropriate error
             if (!result || result.length === 0) {
                 throw new Error('No expense transactions found for the specified user');
             }
@@ -399,30 +282,20 @@ class TransactionRepository implements ITransactionRepository {
                 }
             });
         
-            // Return the calculated total expense for the current month
             return { currentMonthExpenseTotal, previousMonthExpenseTotal };
         } catch (error) {
-            // Log the error for debugging purposes
-            console.error('Error calculating monthly expense total:', error);
-        
-            // Re-throw the error with a descriptive message
-            throw new Error(`Failed to retrieve monthly expense total`);
+            throw new Error((error as Error).message);
         }
     }
 
-    /**
-     * Retrieves and calculates the total amount of EXPENSE-type transactions 
-     * made by a specific user in the current calendar month.
-     */
     async getCategoryWiseExpense(userId: string): Promise<{category: string, value: number}[]> {
         try {
             // Query the database for all EXPENSE transactions associated with the given user ID
-            const result = await TransactionModel.find<ITransactionDTO>({
+            const result = await this.baseRepo.find({
                 user_id: userId,
                 transaction_type: 'EXPENSE'
             });
         
-            // If no matching expense transactions are found, throw an appropriate error
             if (!result || result.length === 0) {
                 throw new Error('No expense transactions found for the specified user');
             }
@@ -454,18 +327,12 @@ class TransactionRepository implements ITransactionRepository {
                 value
             }));
 
-            // Return the calculated total expense for the current month
             return getCategoryWiseExpenses.sort((a, b) => b.value - a.value);
         } catch (error) {
-            // Log the error for debugging purposes
-            console.error('Error calculating monthly expense total:', error);
-        
-            // Re-throw the error with a descriptive message
-            throw new Error(`Failed to retrieve monthly expense total`);
+            throw new Error((error as Error).message);
         }
     }
 
-    // Retrieves month-wise income data for the current year for a specific user, suitable for charting.
     async getMonthlyIncomeForChart(userId: string): Promise<{ month: string, amount: number }[]> {
         try {
             const startOfYear = new Date(new Date().getFullYear(), 0, 1);
@@ -520,15 +387,10 @@ class TransactionRepository implements ITransactionRepository {
 
             return monthlyDate;
         } catch (error) {
-            // Log the error for debugging purposes.
-            console.error('Error retrieving transaction details:', error);
-
-            // Re-throw the error with a more descriptive message, ensuring the caller is informed of the issue.
-            throw new Error('Error retrieving transaction details');
+            throw new Error((error as Error).message);
         }
     }
 
-    // Retrieves month-wise expense data for the current year for a specific user, suitable for charting.
     async getMonthlyExpenseForChart(userId: string): Promise<{ month: string, amount: number }[]> {
         try {
             const startOfYear = new Date(new Date().getFullYear(), 0, 1);
@@ -583,15 +445,10 @@ class TransactionRepository implements ITransactionRepository {
         
             return monthlyData;
         } catch (error) {
-            // Log the error for debugging purposes
-            console.error('Error retrieving monthly expense data:', error);
-        
-            // Re-throw the error with a descriptive message
-            throw new Error('Error retrieving monthly expense data');
+            throw new Error((error as Error).message);
         }
     }
 
-    // Retrieves paginated income transactions for a specific user based on various filters.
     async getPaginatedIncomeTransactions(
         userId: string,
         page: number,
@@ -660,7 +517,7 @@ class TransactionRepository implements ITransactionRepository {
                     }
                 },
                 {
-                    $sort: { date: -1 as 1 | -1 }
+                    $sort: { createdAt: -1 as 1 }
                 },
                 {
                     $facet: {
@@ -720,15 +577,10 @@ class TransactionRepository implements ITransactionRepository {
                 totalPages: result[0]?.totalPages || 1,
             }
         } catch (error) {
-            // Log the error for debugging purposes.
-            console.error('Error retrieving transaction details:', error);
-
-            // Re-throw the error with a more descriptive message, ensuring the caller is informed of the issue.
             throw new Error((error as Error).message);
         }
     }
 
-    // Retrieves paginated expense transactions for a specific user based on various filters.
     async getPaginatedExpenseTransactions(
         userId: string,
         page: number = 1,
@@ -797,7 +649,7 @@ class TransactionRepository implements ITransactionRepository {
                     }
                 },
                 {
-                    $sort: { date: -1 as 1 | -1 }
+                    $sort: { createdAt: -1 as 1 }
                 },
                 {
                     $facet: {
@@ -857,15 +709,10 @@ class TransactionRepository implements ITransactionRepository {
                 totalPages: result[0]?.totalPages || 1,
             };
         } catch (error) {
-            // Log the error for debugging purposes.
-            console.error('Error retrieving transaction details:', error);
-        
-            // Re-throw the error with a more descriptive message, ensuring the caller is informed of the issue.
             throw new Error((error as Error).message);
         }
     }
 
-    // Retrieves paginated income or expense transactions for a specific user based on various filters.
     async getPaginatedTransactions(
         userId: string,
         page: number,
@@ -919,7 +766,6 @@ class TransactionRepository implements ITransactionRepository {
                 }
             }
 
-
             let transaction_type = '';
             if (transactionType === 'INCOME') {
                 transaction_type = 'INCOME';
@@ -943,7 +789,7 @@ class TransactionRepository implements ITransactionRepository {
                     }
                 },
                 {
-                    $sort: { date: -1 as 1 | -1 }
+                    $sort: { createdAt: -1 as 1 }
                 },
                 {
                     $facet: {
@@ -1003,13 +849,7 @@ class TransactionRepository implements ITransactionRepository {
                 totalPages: result[0]?.totalPages || 1,
             }
         } catch (error) {
-            // Log the error for debugging purposes.
-            console.error('Error retrieving transaction details:', error);
-
-            // Re-throw the error with a more descriptive message, ensuring the caller is informed of the issue.
             throw new Error((error as Error).message);
         }
     }
 }
-
-export default TransactionRepository;

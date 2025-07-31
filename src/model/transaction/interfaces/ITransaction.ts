@@ -1,6 +1,5 @@
 import { Document, Types } from 'mongoose';
 
-// Predefined enums
 export const TRANSACTION_TYPES = [
     'REGULAR',
     'TRANSFER',
@@ -96,7 +95,7 @@ export const SMART_CATEGORIES = [
     'TRANSFER',
 ] as const;
 
-interface ITransaction extends Document {
+export default interface ITransactionDocument extends Document {
     _id: Types.ObjectId;
     user_id: string;
     account_id: Types.ObjectId;
@@ -120,10 +119,8 @@ interface ITransaction extends Document {
     transactionHash?: string;
     linked_entities?: Array<{
         entity_id: Types.ObjectId;
-        entity_type: 'GOAL' | 'DEBT' | 'INVESTMENT' | 'INSURANCE' | 'LOAN' | 'CREDIT_CARD' | 'SAVINGS_ACCOUNT' | 'MORTGAGE' | 'OTHER';
+        entity_type: 'GOAL' | 'DEBT' | 'INVESTMENT' | 'INSURANCE' | 'TAX_GROUP' | 'LOAN' | 'CREDIT_CARD' | 'SAVINGS_ACCOUNT' | 'CHECKING_ACCOUNT' | 'MORTGAGE' | 'OTHER';
         amount: number;
         currency: string;
     }>;
 }
-
-export default ITransaction;

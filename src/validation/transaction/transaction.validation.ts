@@ -37,7 +37,7 @@ const transactionDTOSchema = z.object({
 // Export the schema for reuse in other parts of the application
 export default transactionDTOSchema;
 
-export interface IParsedTransaction {
+export interface IParsedTransactionDTO {
     date: Date | null;
     description: string;
     transaction_id: string;

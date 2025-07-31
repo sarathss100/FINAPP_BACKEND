@@ -1,15 +1,16 @@
-import { ITransactionDTO } from '../../../dtos/transaction/TransactionDto';
+import ITransactionDTO from '../../../dtos/transaction/TransactionDTO';
+import ITransactionDocument from '../../../model/transaction/interfaces/ITransaction';
 
-interface ITransactionRepository {
-    createTransaction(data: ITransactionDTO): Promise<ITransactionDTO>;
-    createBulkTransactions(dataArray: ITransactionDTO[]): Promise<ITransactionDTO[]>;
-    getUserTransactions(userId: string): Promise<ITransactionDTO[]>;
+export default interface ITransactionRepository {
+    createTransaction(data: Partial<ITransactionDocument>): Promise<ITransactionDocument>;
+    createBulkTransactions(dataArray: Partial<ITransactionDocument>[]): Promise<ITransactionDocument[]>;
+    getUserTransactions(userId: string): Promise<ITransactionDocument[]>;
     getMonthlyTotalIncome(userId: string): Promise<{ currentMonthTotal: number, previousMonthTotal: number }>;
     getWeeklyTotalIncome(userId: string): Promise<number>;
     getMonthlyTotalExpense(userId: string): Promise<{ currentMonthExpenseTotal: number, previousMonthExpenseTotal: number }>;
     getCategoryWiseExpense(userId: string): Promise<{ category: string, value: number }[]>;
     getExistingTransaction(userId: string, transactionHash: string): Promise<boolean>;
-    getExistingTransactions(allHashes: string[]): Promise<ITransactionDTO[] | undefined>;
+    getExistingTransactions(allHashes: string[]): Promise<ITransactionDocument[]>;
     getAllIncomeTransactionsByCategory(userId: string): Promise<{ category: string, total: number }[]>;
     getAllExpenseTransactionsByCategory(userId: string): Promise<{category: string, total: number}[]>;
     getMonthlyIncomeForChart(userId: string): Promise<{ month: string, amount: number }[]>;
@@ -40,5 +41,3 @@ interface ITransactionRepository {
         searchText?: string,
     ): Promise<{ data: ITransactionDTO[], total: number, currentPage: number, totalPages: number }>;
 }
-
-export default ITransactionRepository;

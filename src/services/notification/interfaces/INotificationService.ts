@@ -1,4 +1,4 @@
-import INotificationDTO from '../../../dtos/notification/NotificationDto';
+import INotificationDTO from '../../../dtos/notification/NotificationDTO';
 
 export default interface INotificationService {
     createNotification(accessToken: string, notificationData: INotificationDTO): Promise<INotificationDTO>;

@@ -1,13 +1,13 @@
-import { IParsedTransaction, ITransactionDTO } from '../../../dtos/transaction/TransactionDto';
+import ITransactionDTO, { IParsedTransactionDTO } from "../../../dtos/transaction/TransactionDTO";
 
-interface ITransactionService {
+export default interface ITransactionService {
     createTransaction(accessToken: string, data: ITransactionDTO | ITransactionDTO[]): Promise<ITransactionDTO  | ITransactionDTO[]>;
     getUserTransactions(accessToken: string): Promise<ITransactionDTO[]>;
     getMonthlyTotalIncome(accessToken: string): Promise<{ currentMonthTotal: number, previousMonthTotal: number }>;
     getWeeklyTotalIncome(accessToken: string): Promise<number>;
     getMonthlyTotalExpense(accessToken: string): Promise<{ currentMonthExpenseTotal: number, previousMonthExpenseTotal: number }>;
     getCategoryWiseExpense(accessToken: string): Promise<{ category: string, value: number }[]>;
-    extractTransactionData(file: Express.Multer.File): Promise<IParsedTransaction[]>;
+    extractTransactionData(file: Express.Multer.File): Promise<IParsedTransactionDTO[]>;
     getAllIncomeTransactionsByCategory(accessToken: string): Promise<{ category: string, total: number }[]>;
     getAllExpenseTransactionsByCategory(accessToken: string): Promise<{category: string, total: number}[]>;
     getMonthlyIncomeForChart(accessToken: string): Promise<{ month: string, amount: number }[]>;
@@ -38,5 +38,3 @@ interface ITransactionService {
         searchText?: string,
     ): Promise<{ data: ITransactionDTO[], total: number, currentPage: number, totalPages: number }>;
 }
-
-export default ITransactionService;
