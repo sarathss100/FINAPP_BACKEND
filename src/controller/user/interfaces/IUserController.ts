@@ -7,4 +7,5 @@ export default interface IUserController {
     toggleTwoFactorAuthentication(request: Request, response: Response): Promise<void>;
     deleteUserAccount(request: Request, response: Response): Promise<void>;
     serveProfileImage(request: Request, response: Response): Promise<void>;
+    checkSubscriptionStatus(request: Request, response: Response): Promise<void>;
 }

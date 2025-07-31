@@ -3,7 +3,6 @@ import { SubscriptionModel } from '../../model/subscription/model/SubscriptionMo
 import IBaseRepository from '../base_repo/interface/IBaseRepository';
 import ISubscriptionDocument from '../../model/subscription/interfaces/ISubscription';
 import BaseRepository from '../base_repo/BaseRepository';
-
 export default class SubscriptionRepository implements ISubscriptionRepository {
     private static _instance: SubscriptionRepository;
     private baseRepo: IBaseRepository<ISubscriptionDocument> = new BaseRepository<ISubscriptionDocument>(SubscriptionModel);

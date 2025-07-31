@@ -141,4 +141,20 @@ export default class UserController implements IUserController {
             handleControllerError(response, error);
         }
     }
+
+    async checkSubscriptionStatus(request: Request, response: Response): Promise<void> {
+        try {
+            const { accessToken } = request.cookies;
+
+            if (!accessToken) {
+                throw new AuthenticationError(ErrorMessages.ACCESS_TOKEN_NOT_FOUND, StatusCodes.UNAUTHORIZED);
+            }
+
+            const subscription_status = await this._userService.checkSubscriptionStatus(accessToken);
+
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.OPERATION_SUCCESS, { subscription_status });
+        } catch (error) {
+            handleControllerError(response, error);
+        }
+    }
 }

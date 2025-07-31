@@ -5,6 +5,7 @@ const createSubscriptionRouter = function(subscriptionController: ISubscriptionC
     const router = Router();
 
     router.post('/checkout', subscriptionController.initiatePayment.bind(subscriptionController));
+    router.get('/status', subscriptionController.initiatePayment.bind(subscriptionController));
 
     return router;
 };

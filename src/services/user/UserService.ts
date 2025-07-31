@@ -151,6 +151,20 @@ class UserService implements IUserService {
             throw wrapServiceError(error);
         }
     }
+
+    async checkSubscriptionStatus(accessToken: string): Promise<boolean> {
+        try {
+            const userId = extractUserIdFromToken(accessToken);
+
+            // Delete User Account for a user in the repository layer.
+            const userDetails = await this._userRepository.getUserDetails(userId);
+
+            return !!userDetails.subscription_status;
+        } catch (error) {
+            console.error('Error while checking subscription status: ', error);
+            throw wrapServiceError(error);
+        }
+    }
 }
 
 export default UserService;

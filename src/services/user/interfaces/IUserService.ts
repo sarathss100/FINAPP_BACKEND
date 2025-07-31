@@ -7,6 +7,7 @@ interface IUserService {
     toggleTwoFactorAuthentication(accessToken: string): Promise<boolean>;
     deleteUserAccount(accessToken: string): Promise<boolean>;
     getImageForProxy(imageId: string): Promise<Buffer | string>;
+    checkSubscriptionStatus(accessToken: string): Promise<boolean>;
 }
 
 export default IUserService;
