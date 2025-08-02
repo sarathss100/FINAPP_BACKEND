@@ -166,5 +166,21 @@ export default class AuthController implements IAuthController {
             handleControllerError(response, error);
         }
     }
+
+    async checkUserForSignup(request: Request, response: Response): Promise<void> {
+        try {
+            console.log(`Request comes here`);
+            const { phoneNumber } = request.body;
+            if (!phoneNumber) {
+                throw new AuthenticationError(ErrorMessages.PHONE_NUMBER_MISSING, StatusCodes.BAD_REQUEST);
+            }
+
+            const canSignup = await this._authService.checkUserForSignup(phoneNumber);
+            
+            sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.PHONE_NUMBER_VERIFIED, { canSignup });
+        } catch (error) {
+            handleControllerError(response, error);
+        }
+    }
 }
  

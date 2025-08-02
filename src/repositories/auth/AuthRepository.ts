@@ -30,6 +30,16 @@ export default class AuthRepository extends UserBaseRespository implements IAuth
         }
     }
 
+    async checkUserForSignup(phoneNumber: string): Promise<IUserDocument | null> {
+        try {
+            const result = await this.baseRepo.findOne({ phone_number: phoneNumber });
+            
+            return result;
+        } catch (error) {
+            throw new Error(`${(error as Error).message}`);
+        }
+    }
+
     async resetPassword(data: Partial<IUserDocument>): Promise<boolean> {
         try {
             const result = await this.baseRepo.updateOne({ phone_number: data.phone_number }, { $set: { password: data.password } });

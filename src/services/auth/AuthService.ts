@@ -34,7 +34,7 @@ export default class AuthService implements IAuthService {
                 throw new ValidationError(ErrorMessages.PHONE_NUMBER_MISSING, StatusCodes.BAD_REQUEST);
             }
 
-            const existingUser = await this._authRepository.findByPhoneNumber(signupData.phone_number);
+            const existingUser = await this._authRepository.checkUserForSignup(signupData.phone_number);
 
             if (existingUser) {
                 throw new ValidationError(ErrorMessages.USER_ALREADY_EXISTS, StatusCodes.BAD_REQUEST);
@@ -43,6 +43,8 @@ export default class AuthService implements IAuthService {
             if (!signupData.password) {
                 throw new ValidationError(ErrorMessages.PASSWORD_MISSING, StatusCodes.BAD_REQUEST);
             }
+
+            console.log(`Request comes here`);
 
             const hashedPassword = await this._hasher.hash(signupData.password);
 
@@ -249,6 +251,18 @@ export default class AuthService implements IAuthService {
             return !!isUpdated;
         } catch (error) {
             console.error('Error while resetting password: ', error);
+            throw wrapServiceError(error);
+        }
+    }
+
+    async checkUserForSignup(phoneNumber: string): Promise<boolean> {
+        try {
+            const userDetails = await this._authRepository.checkUserForSignup(phoneNumber);
+            if (userDetails?.status === false) throw new ForbiddenError(ErrorMessages.USER_IS_BLOCKED);
+            if (!userDetails?._id) return true;
+            return false;
+        } catch (error) {
+            console.error('Error while verifying phone number: ', error);
             throw wrapServiceError(error);
         }
     }

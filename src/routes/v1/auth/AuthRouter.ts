@@ -10,6 +10,7 @@ const createAuthRouter = function(authController: IAuthController): Router {
     router.post('/password', authController.resetPassword.bind(authController));
     router.post('/verifications/token', authController.verifyToken.bind(authController));
     router.post('/verifications/phonenumber', authController.verifyPhoneNumber.bind(authController));
+    router.post('/verifications/signup', authController.checkUserForSignup.bind(authController));
 
     return router;
 };

@@ -6,4 +6,5 @@ export default interface IAuthRepository {
     resetPassword(data: Partial<IUserDocument>): Promise<boolean>;
     restoreUserAccount(userId: string): Promise<void>;
     getUserDetails(userId: string): Promise<IUserDocument>;
+    checkUserForSignup(phoneNumber: string): Promise<IUserDocument | null>;
 } 

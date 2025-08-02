@@ -13,5 +13,6 @@ export default interface IAuthService {
     resetPassword(data: IResetPasswordDTO): Promise<boolean>;
     signout(token: string): Promise<boolean>;
     getUserDetails(accessToken: string): Promise<IUserDTO>;
+    checkUserForSignup(phoneNumber: string): Promise<boolean>;
 }
  

@@ -7,6 +7,7 @@ interface IAuthController {
     resetPassword(request: Request, response: Response): Promise<void>;
     signin(request: Request, response: Response): Promise<void>;
     signout(request: Request, response: Response): Promise<void>;
+    checkUserForSignup(request: Request, response: Response): Promise<void>;
 }
 
 export default IAuthController;

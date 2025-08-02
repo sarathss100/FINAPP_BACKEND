@@ -5,7 +5,7 @@ import IDebtService from '../services/debt/interfaces/IDebtService';
 
 const debtService: IDebtService = DebtService.instance;
 
-const markExpiryDebts = new CronJob('0 0 0 * * *', async () => {
+const markExpiryDebts = new CronJob('0 0 * * *', async () => {
     console.log(`[CRON] Running daily debt expiry check at ${moment().format()}`);
     try {
         await debtService.updateExpiry();
