@@ -15,8 +15,8 @@ export const generateSingleDebt = async function() {
 export const startDebtGenerator = function() {
     console.log(`Debt Generator Application Start`);
     
-    // Run Job at 10:00 AM every Monday
-    cron.schedule('*0 10 * * 1', async () => {
+    // Run on the 1st of every month at 10:00 AM
+    cron.schedule('0 10 1 * *', async () => {
         console.log(`\nCron Job Triggered - ${new Date().toLocaleString()}`);
         await generateSingleDebt();
     });

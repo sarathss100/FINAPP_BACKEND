@@ -15,8 +15,8 @@ export const generateSingleInsurance = async function() {
 export const startInsuranceGenerator = function() {
     console.log(`Insurance Generator Application Start`);
 
-    // Schedule Job at Every Monday 10.00 AM
-    cron.schedule('*0 10 * * 1', async () => {
+    // Run on the 1st of every month at 10:00 AM
+    cron.schedule('0 10 1 * *', async () => {
         console.log(`\nCron Job Triggered - ${new Date().toLocaleString()}`);
         await generateSingleInsurance();
     });

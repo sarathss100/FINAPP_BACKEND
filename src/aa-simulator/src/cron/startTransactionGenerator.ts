@@ -14,8 +14,8 @@ export const generateSingleTransaction = async function() {
 export const startTransactionGenerator = function() {
     console.log(`Transaction Generator Application Start`);
 
-    // Schedule Job at Every 4 hours
-    cron.schedule('*0 */4 * * *', async () => {
+    // Run at 10:00 AM and 6:00 PM
+    cron.schedule('0 10,18 * * *', async () => {
         console.log(`\nCron Job Triggered - ${new Date().toLocaleString()}`);
         await generateSingleTransaction();
     });
