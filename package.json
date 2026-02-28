@@ -18,7 +18,7 @@
     "@types/js-cookie": "^3.0.6",
     "@types/moment": "^2.11.29",
     "axios": "^1.8.4",
-    "bcrypt": "^5.1.1",
+    "bcrypt": "^6.0.0",
     "check-disk-space": "^3.4.0",
     "cloudinary": "^2.6.0",
     "cookie-parser": "^1.4.7",
