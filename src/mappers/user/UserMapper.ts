@@ -1,10 +1,10 @@
 import { Types } from 'mongoose';
-import IUserDTO from '../../dtos/base/IUserDTO';
-import IUserDocument from '../../model/user/interfaces/IUser';
+import IAdminUserDTO from '../../dtos/admin/IAdminUserDTO';
 import IAuthUserDTO from '../../dtos/auth/IAuthUserDTO';
+import IUserDTO from '../../dtos/base/IUserDTO';
 import IProfileDTO from '../../dtos/user/IProfileDTO';
 import IProfilePictureDTO from '../../dtos/user/IProfilePictureDTO';
-import IAdminUserDTO from '../../dtos/admin/IAdminUserDTO';
+import IUserDocument from '../../model/user/interfaces/IUser';
 
 export default class UserMapper {
   // Maps IUserDocument (Mongo model) to IUserDTO
@@ -96,7 +96,6 @@ export default class UserMapper {
   // Maps IUserDTO to Partial<IUserDocument> (for create/update)
   static toModel(dto: Partial<IUserDTO>): Partial<IUserDocument> {
     const model: Partial<IUserDocument> = {
-      _id: dto._id,
       first_name: dto.first_name,
       last_name: dto.last_name,
       phone_number: dto.phone_number,

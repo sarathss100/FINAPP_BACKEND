@@ -1,14 +1,14 @@
-import { sendSuccessResponse } from '../../utils/responseHandler';
+import { Request, Response } from 'express';
 import { ErrorMessages } from '../../constants/errorMessages';
 import { StatusCodes } from '../../constants/statusCodes';
-import { Request, Response } from 'express';
+import { SuccessMessages } from '../../constants/successMessages';
+import { IAccountDTO } from '../../dtos/accounts/IAccountsDTO';
 import { ServerError, ValidationError } from '../../error/AppError';
-import { SuccessMessages } from '../../constants/successMessages'; 
-import IAccountsController from './interfaces/IAccountsController';
 import IAccountsService from '../../services/accounts/interfaces/IAccountsService';
-import { IAccountDTO } from '../../dtos/accounts/IAccountsDTO'; 
-import accountValidationSchema from '../../validation/accounts/account.validation';
 import { getAccessTokenOrThrow, handleControllerError } from '../../utils/controllerUtils';
+import { sendSuccessResponse } from '../../utils/responseHandler';
+import accountValidationSchema from '../../validation/accounts/account.validation';
+import IAccountsController from './interfaces/IAccountsController';
 
 export default class AccountsController implements IAccountsController {
     private readonly _accountsService: IAccountsService;
@@ -63,9 +63,9 @@ export default class AccountsController implements IAccountsController {
 
             const { accountId } = request.params;
             const { accountData } = request.body;
-            if (!accountId) {
+            if (!accountId || typeof accountId !== 'string') {
                 throw new ValidationError(ErrorMessages.ACCOUNT_ID_NOT_FOUND, StatusCodes.BAD_REQUEST);
-            } 
+            }
 
             const partialaccountsDTOSchema = accountValidationSchema.partial();
 

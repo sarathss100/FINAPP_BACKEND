@@ -1,13 +1,13 @@
-import { sendSuccessResponse } from '../../utils/responseHandler';
+import { Request, Response } from 'express';
 import { ErrorMessages } from '../../constants/errorMessages';
 import { StatusCodes } from '../../constants/statusCodes';
-import { Request, Response } from 'express';
-import { AppError, ServerError } from '../../error/AppError';
 import { SuccessMessages } from '../../constants/successMessages';
-import IDebtController from './interfaces/IDebtController';
+import { AppError, ServerError, ValidationError } from '../../error/AppError';
 import IDebtService from '../../services/debt/interfaces/IDebtService';
-import debtDTOSchema from '../../validation/debt/debt.validation';
 import { handleControllerError } from '../../utils/controllerUtils';
+import { sendSuccessResponse } from '../../utils/responseHandler';
+import debtDTOSchema from '../../validation/debt/debt.validation';
+import IDebtController from './interfaces/IDebtController';
 
 export default class DebtController implements IDebtController {
     private readonly _debtService: IDebtService;
@@ -129,6 +129,9 @@ export default class DebtController implements IDebtController {
     async deleteDebt(request: Request, response: Response): Promise<void> {
         try {
             const debtId = request.params.id;
+            if (typeof debtId !== 'string') {
+                throw new ValidationError(ErrorMessages.INVALID_INPUT, StatusCodes.BAD_REQUEST);
+            }
 
             const isDeleted = await this._debtService.deleteDebt(debtId);
 
@@ -145,6 +148,9 @@ export default class DebtController implements IDebtController {
     async markAsPaid(request: Request, response: Response): Promise<void> {
         try {
             const debtId = request.params.id;
+            if (typeof debtId !== 'string') {
+                throw new ValidationError(ErrorMessages.INVALID_INPUT, StatusCodes.BAD_REQUEST);
+            }
         
             const isUpdated = await this._debtService.markAsPaid(debtId);
         

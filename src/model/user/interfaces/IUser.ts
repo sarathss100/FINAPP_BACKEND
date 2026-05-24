@@ -1,7 +1,6 @@
 import { Document, Types } from 'mongoose';
 
-export default interface IUserDocument extends Document {
-    _id: string | Types.ObjectId;
+export default interface IUserDocument extends Document<Types.ObjectId> {
     first_name: string;
     last_name: string;
     phone_number: string;

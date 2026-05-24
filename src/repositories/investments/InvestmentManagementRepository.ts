@@ -1,7 +1,7 @@
-import { StockModel, MutualFundModel, BondModel, BusinessModel, ParkingFundModel, EPFOModel, FixedDepositModel, GoldModel, PropertyModel } from '../../model/investments/model/InvestmentModel';
-import IInvestmentManagementRepository from './interfaces/IInvestmentManagementRepository';
-import { InvestmentDTO } from '../../dtos/investments/investmentDTO';
 import mongoose from 'mongoose';
+import { InvestmentDTO } from '../../dtos/investments/investmentDTO';
+import { BondModel, BusinessModel, EPFOModel, FixedDepositModel, GoldModel, MutualFundModel, ParkingFundModel, PropertyModel, StockModel } from '../../model/investments/model/InvestmentModel';
+import IInvestmentManagementRepository from './interfaces/IInvestmentManagementRepository';
 
 const modelMap = {
     STOCK: StockModel,
@@ -32,7 +32,7 @@ class InvestmentManagementRepository implements IInvestmentManagementRepository 
             const mongooseUserId = new mongoose.Types.ObjectId(userId);
             const relatedAccount = new mongoose.Types.ObjectId(investmentData.relatedAccount);
 
-            const Model = modelMap[investmentData.type];
+            const Model = modelMap[investmentData.type] as any;
             if (!Model) throw new Error('Invalid investment type');
 
             const investmentDoc = await Model.create({
@@ -53,7 +53,7 @@ class InvestmentManagementRepository implements IInvestmentManagementRepository 
     // Fetches all investments of a specific type from the database.
     async getInvestments(investmentType: string): Promise<InvestmentDTO[]> {
         try {
-            const Model = modelMap[investmentType as keyof typeof modelMap];
+            const Model = modelMap[investmentType as keyof typeof modelMap] as any;
 
             if (!Model) {
                 throw new Error(`Invalid investment type: ${investmentType}`);
@@ -63,7 +63,7 @@ class InvestmentManagementRepository implements IInvestmentManagementRepository 
             const investmentDocs = await Model.find(); 
 
             // Convert Mongoose documents to plain objects and return as InvestmentDTO[]
-            const plainInvestments = investmentDocs.map(doc => doc.toObject());
+            const plainInvestments = investmentDocs.map((doc: any) => doc.toObject());
 
             return plainInvestments as unknown as InvestmentDTO[];
         } catch (error) {
@@ -77,7 +77,7 @@ class InvestmentManagementRepository implements IInvestmentManagementRepository 
         try {
             if (!investments.length) return;
             const investmentType = investments[0].type;
-            const Model = modelMap[investmentType];
+            const Model = modelMap[investmentType] as any;
 
             if (!Model) throw new Error(`Invalid investment type: ${investmentType}`);
 
@@ -191,7 +191,7 @@ class InvestmentManagementRepository implements IInvestmentManagementRepository 
             const mongooseUserId = new mongoose.Types.ObjectId(userId);
 
             // Loop through each investment model (e.g., StockModel, MutualFundModel)
-            for (const Model of Object.values(modelMap)) {
+            for (const Model of Object.values(modelMap) as any[]) {
                 // Fetch all investments of this type belonging to the user
                 const result = await Model.aggregate([
                     {
@@ -236,7 +236,7 @@ class InvestmentManagementRepository implements IInvestmentManagementRepository 
     // Deletes a single investment document by ID for a given investment type.
     async removeInvestment(investmentType: string, investmentId: string): Promise<InvestmentDTO> {
         try {
-            const Model = modelMap[investmentType as keyof typeof modelMap];
+            const Model = modelMap[investmentType as keyof typeof modelMap] as any;
             if (!Model) {
                 throw new Error(`Invalid investment type: ${investmentType}`);
             }

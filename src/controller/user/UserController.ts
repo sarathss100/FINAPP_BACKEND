@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
-import IUserService from '../../services/user/interfaces/IUserService';
-import IUserController from './interfaces/IUserController';
-import { sendSuccessResponse } from '../../utils/responseHandler';
-import { StatusCodes } from '../../constants/statusCodes';
-import { AuthenticationError, ValidationError } from '../../error/AppError';
-import { ErrorMessages } from '../../constants/errorMessages';
-import { SuccessMessages } from '../../constants/successMessages';
 import { fileTypeFromBuffer } from 'file-type';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { StatusCodes } from '../../constants/statusCodes';
+import { SuccessMessages } from '../../constants/successMessages';
+import { AuthenticationError, ValidationError } from '../../error/AppError';
+import IUserService from '../../services/user/interfaces/IUserService';
 import { handleControllerError } from '../../utils/controllerUtils';
+import { sendSuccessResponse } from '../../utils/responseHandler';
+import IUserController from './interfaces/IUserController';
 
 export default class UserController implements IUserController {
     private readonly _userService: IUserService;
@@ -76,7 +76,7 @@ export default class UserController implements IUserController {
         try {
             const { imageId } = request.params;
 
-            if (!imageId) {
+            if (!imageId || typeof imageId !== 'string') {
                 throw new ValidationError('Image ID is required', StatusCodes.BAD_REQUEST);
             }
 

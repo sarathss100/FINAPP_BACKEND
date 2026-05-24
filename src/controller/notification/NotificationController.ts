@@ -1,13 +1,13 @@
-import { sendSuccessResponse } from '../../utils/responseHandler'; 
-import { ErrorMessages } from '../../constants/errorMessages'; 
-import { StatusCodes } from '../../constants/statusCodes'; 
-import { Request, Response } from 'express'; 
-import { AuthenticationError, ValidationError } from '../../error/AppError'; 
-import { SuccessMessages } from '../../constants/successMessages'; 
-import INotificationController from './interfaces/INotificationController';
+import { Request, Response } from 'express';
+import { ErrorMessages } from '../../constants/errorMessages';
+import { StatusCodes } from '../../constants/statusCodes';
+import { SuccessMessages } from '../../constants/successMessages';
+import { AuthenticationError, ValidationError } from '../../error/AppError';
 import INotificationService from '../../services/notification/interfaces/INotificationService';
-import notificationDTOSchema from '../../validation/notification/notification.validation';
 import { handleControllerError } from '../../utils/controllerUtils';
+import { sendSuccessResponse } from '../../utils/responseHandler';
+import notificationDTOSchema from '../../validation/notification/notification.validation';
+import INotificationController from './interfaces/INotificationController';
 
 export default class NotificationController implements INotificationController {
     private readonly _notificationService: INotificationService;
@@ -89,6 +89,9 @@ export default class NotificationController implements INotificationController {
 
             // Extract the notification ID from the request parameters
             const { notificationId } = request.params;
+            if (typeof notificationId !== 'string') {
+                throw new ValidationError(ErrorMessages.INVALID_INPUT, StatusCodes.BAD_REQUEST);
+            }
 
             // Delegate the archiving operation to the service layer
             const isUpdated = await this._notificationService.updateArchieveStatus(accessToken, notificationId);
@@ -109,6 +112,9 @@ export default class NotificationController implements INotificationController {
 
             // Extract the notification ID from the request parameters
             const { notificationId } = request.params;
+            if (typeof notificationId !== 'string') {
+                throw new ValidationError(ErrorMessages.INVALID_INPUT, StatusCodes.BAD_REQUEST);
+            }
 
             // Delegate the 'mark as read' operation to the service layer
             const isUpdated = await this._notificationService.updateReadStatus(accessToken, notificationId);

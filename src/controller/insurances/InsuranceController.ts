@@ -1,13 +1,13 @@
-import { sendSuccessResponse } from '../../utils/responseHandler';
+import { Request, Response } from 'express';
 import { ErrorMessages } from '../../constants/errorMessages';
 import { StatusCodes } from '../../constants/statusCodes';
-import { Request, Response } from 'express';
-import { AppError } from '../../error/AppError';
 import { SuccessMessages } from '../../constants/successMessages';
-import IInsuranceController from './interfaces/IInsuranceController';
+import { AppError } from '../../error/AppError';
 import IInsuranceService from '../../services/insurances/interfaces/IInsuranceService';
-import { insuranceDTOSchema } from '../../validation/insurances/insurance.validation';
 import { handleControllerError } from '../../utils/controllerUtils';
+import { sendSuccessResponse } from '../../utils/responseHandler';
+import { insuranceDTOSchema } from '../../validation/insurances/insurance.validation';
+import IInsuranceController from './interfaces/IInsuranceController';
 
 export default class InsuranceController implements IInsuranceController {
     private readonly _insuranceService: IInsuranceService;
@@ -35,6 +35,9 @@ export default class InsuranceController implements IInsuranceController {
     async removeInsurance(request: Request, response: Response): Promise<void> {
         try {
             const { id } = request.params;
+            if (typeof id !== 'string') {
+                throw new AppError(ErrorMessages.INVALID_INPUT, StatusCodes.BAD_REQUEST);
+            }
 
             // Delegate to the service layer to remove the insurance
             const isInsuranceRemoved = await this._insuranceService.removeInsurance(id);
@@ -104,6 +107,9 @@ export default class InsuranceController implements IInsuranceController {
     async markPaymentAsPaid(request: Request, response: Response): Promise<void> {
         try {
             const { id } = request.params;
+            if (typeof id !== 'string') {
+                throw new AppError(ErrorMessages.INVALID_INPUT, StatusCodes.BAD_REQUEST);
+            }
         
             // Delegate the update operation to the service layer
             const isUpdated = await this._insuranceService.markPaymentAsPaid(id);

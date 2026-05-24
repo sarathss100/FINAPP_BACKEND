@@ -1,7 +1,6 @@
 import { Document, Types } from 'mongoose';
 
-export default interface IAccountDocument extends Document {
-    _id: string | Types.ObjectId;
+export default interface IAccountDocument extends Document<Types.ObjectId> {
     user_id?: Types.ObjectId;
     account_name: string;
     currency: 'INR';

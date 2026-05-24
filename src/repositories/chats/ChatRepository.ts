@@ -28,7 +28,7 @@ export default class ChatRepository implements IChatRepository {
 
   async getHistory(userId: string): Promise<IChatDocument[]> {
     try {
-      const result = await ChatModel.find({ userId }).sort({ timestamp: 1 }).lean();
+      const result = await ChatModel.find({ userId }).sort({ timestamp: 1 });
         
       return result;
     } catch (error) {

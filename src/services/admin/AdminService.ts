@@ -1,21 +1,21 @@
-import IAdminService from './interfaces/IAdminService';
-import IAdminRepository from '../../repositories/admin/interfaces/IAdminRepository';
-import { ServerError, ValidationError } from '../../error/AppError';
 import { ErrorMessages } from '../../constants/errorMessages';
 import { StatusCodes } from '../../constants/statusCodes';
-import { IHealthStatus } from './health/interfaces/IHealth';
-import { CompositeHealthCheckService } from './health/composite-health';
+import IAdminUserDTO from '../../dtos/admin/IAdminUserDTO';
+import IPaginationMeta from '../../dtos/admin/IPaginationMetaDTO';
+import ISystemMetricsDTO from '../../dtos/admin/ISystemMetricsDTO';
+import { IFaqDTO } from '../../dtos/base/IFaqDTO';
+import { ServerError, ValidationError } from '../../error/AppError';
+import FaqMapper from '../../mappers/faqs/FaqMapper';
+import UserMapper from '../../mappers/user/UserMapper';
+import IAdminRepository from '../../repositories/admin/interfaces/IAdminRepository';
+import { wrapServiceError } from '../../utils/serviceUtils';
 import { ExternalApiHealthCheckService } from './health/api-health';
+import { CompositeHealthCheckService } from './health/composite-health';
+import { IHealthStatus } from './health/interfaces/IHealth';
 import { MongoDbHealthCheckService } from './health/mongodb-health';
 import { RedisHealthCheckService } from './health/redis-health';
 import { ServerHealthCheckService } from './health/server-health';
-import IPaginationMeta from '../../dtos/admin/IPaginationMetaDTO';
-import { IFaqDTO } from '../../dtos/base/IFaqDTO';
-import ISystemMetricsDTO from '../../dtos/admin/ISystemMetricsDTO';
-import UserMapper from '../../mappers/user/UserMapper';
-import { wrapServiceError } from '../../utils/serviceUtils';
-import FaqMapper from '../../mappers/faqs/FaqMapper';
-import IAdminUserDTO from '../../dtos/admin/IAdminUserDTO';
+import IAdminService from './interfaces/IAdminService';
 
 export default class AdminService implements IAdminService {
     private _adminRepository: IAdminRepository;
@@ -173,8 +173,9 @@ export default class AdminService implements IAdminService {
 
     async updateFaq(faqId: string, updatedData: Partial<IFaqDTO>): Promise<boolean> {
         try {
-            // Call the repository method to update the FAQ
-            const isUpdated = await this._adminRepository.updateFaq(faqId, updatedData);
+            // Map DTO to Document and call the repository method to update the FAQ
+            const faqDocument = FaqMapper.toModel(updatedData as IFaqDTO);
+            const isUpdated = await this._adminRepository.updateFaq(faqId, faqDocument);
         
             return isUpdated;
         } catch (error) {

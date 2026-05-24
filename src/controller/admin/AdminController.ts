@@ -1,14 +1,14 @@
-import IAdminService from '../../services/admin/interfaces/IAdminService';
-import IAdminController from './interfaces/IAdminController';
-import { StatusCodes } from '../../constants/statusCodes';
-import { sendSuccessResponse, sendErrorResponse } from '../../utils/responseHandler';
 import { Request, Response } from 'express';
-import { ValidationError } from '../../error/AppError';
 import { ErrorMessages } from '../../constants/errorMessages';
+import { StatusCodes } from '../../constants/statusCodes';
 import { SuccessMessages } from '../../constants/successMessages';
-import faqSchema from '../../validation/base/faq.validation';
-import faqQuerySchema from '../../validation/admin/faqQueryValidation';
+import { ValidationError } from '../../error/AppError';
+import IAdminService from '../../services/admin/interfaces/IAdminService';
 import { handleControllerError } from '../../utils/controllerUtils';
+import { sendErrorResponse, sendSuccessResponse } from '../../utils/responseHandler';
+import faqQuerySchema from '../../validation/admin/faqQueryValidation';
+import faqSchema from '../../validation/base/faq.validation';
+import IAdminController from './interfaces/IAdminController';
 
 export default class AdminController implements IAdminController {
     private readonly _adminService: IAdminService;
@@ -107,7 +107,10 @@ export default class AdminController implements IAdminController {
 
     async deleteFaq(request: Request, response: Response): Promise<void> {
         try {
-            const faqId: string = request.params.id;
+            const faqId = request.params.id;
+            if (typeof faqId !== 'string') {
+                throw new ValidationError(ErrorMessages.INVALID_INPUT, StatusCodes.BAD_REQUEST);
+            }
 
             // Call the delete FAQ method in the admin service
             const isRemoved = await this._adminService.deleteFaq(faqId);
@@ -120,7 +123,10 @@ export default class AdminController implements IAdminController {
 
     async togglePublish(request: Request, response: Response): Promise<void> {
         try {
-            const faqId: string = request.params.id;
+            const faqId = request.params.id;
+            if (typeof faqId !== 'string') {
+                throw new ValidationError(ErrorMessages.INVALID_INPUT, StatusCodes.BAD_REQUEST);
+            }
         
             // Call the service method to toggle the publish status
             const isToggled = await this._adminService.togglePublish(faqId);
@@ -133,7 +139,10 @@ export default class AdminController implements IAdminController {
 
     async updateFaq(request: Request, response: Response): Promise<void> {
         try {
-            const faqId: string = request.params.id;
+            const faqId = request.params.id;
+            if (typeof faqId !== 'string') {
+                throw new ValidationError(ErrorMessages.INVALID_INPUT, StatusCodes.BAD_REQUEST);
+            }
         
             // Validate the request body using zod
             const parsedData = faqSchema.safeParse(request.body);

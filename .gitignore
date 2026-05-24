@@ -7,3 +7,4 @@ private_key.pem
 public_key.pem
 system.log
 analysis.sh
+dist/

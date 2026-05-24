@@ -1,13 +1,13 @@
-import { sendErrorResponse, sendSuccessResponse } from '../../utils/responseHandler';
+import { Request, Response } from 'express';
+import { ZodError } from 'zod';
 import { ErrorMessages } from '../../constants/errorMessages';
 import { StatusCodes } from '../../constants/statusCodes';
-import { Request, Response } from 'express';
-import { AppError, ValidationError } from '../../error/AppError';
 import { SuccessMessages } from '../../constants/successMessages';
+import { AppError, ValidationError } from '../../error/AppError';
 import IInvestmentService from '../../services/investments/interfaces/IInvestmentService';
-import IInvestmentController from './interfaces/IInvestmentController';
-import { ZodError } from 'zod';
+import { sendErrorResponse, sendSuccessResponse } from '../../utils/responseHandler';
 import { InvestmentDTOSchema } from '../../validation/investments/investment.validation';
+import IInvestmentController from './interfaces/IInvestmentController';
 
 class InvestmentController implements IInvestmentController {
     private readonly _investmentService: IInvestmentService;
@@ -161,6 +161,9 @@ class InvestmentController implements IInvestmentController {
     async removeInvestment(request: Request, response: Response): Promise<void> {
         try {
             const { investmentType, investmentId } = request.params;
+            if (typeof investmentType !== 'string' || typeof investmentId !== 'string') {
+                throw new ValidationError(ErrorMessages.INVALID_INPUT, StatusCodes.BAD_REQUEST);
+            }
 
             // Call the service to perform the deletion
             await this._investmentService.removeInvestment(investmentType, investmentId);
