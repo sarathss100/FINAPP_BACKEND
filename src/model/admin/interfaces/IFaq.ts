@@ -1,7 +1,6 @@
 import { Document, Types } from 'mongoose';
 
-export default interface IFaqDocument extends Document {
-    _id: string | Types.ObjectId,
+export default interface IFaqDocument extends Document<Types.ObjectId> {
     question: string;
     answer: string;
     isDeleted?: boolean;
