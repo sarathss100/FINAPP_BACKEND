@@ -17,7 +17,7 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/.env ./.env
+# COPY --from=builder /app/.env ./.env
 
 # Expose app port
 EXPOSE 5000
