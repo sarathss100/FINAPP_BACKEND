@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
-import IAuthController from './ineterfaces/IAuthController';
-import IAuthService from '../../services/auth/interfaces/IAuthService';
-import { sendSuccessResponse } from '../../utils/responseHandler';
+import { ErrorMessages } from '../../constants/errorMessages';
 import { StatusCodes } from '../../constants/statusCodes';
 import { SuccessMessages } from '../../constants/successMessages';
-import { ErrorMessages } from '../../constants/errorMessages';
 import { AuthenticationError, ServerError } from '../../error/AppError';
+import IAuthService from '../../services/auth/interfaces/IAuthService';
 import { handleControllerError } from '../../utils/controllerUtils';
+import { sendSuccessResponse } from '../../utils/responseHandler';
+import IAuthController from './ineterfaces/IAuthController';
 
 export default class AuthController implements IAuthController {
     private readonly _authService: IAuthService;
@@ -23,19 +23,16 @@ export default class AuthController implements IAuthController {
 
             const { accessToken, userId, role } = result;
 
-            response.cookie('accessToken', accessToken, {
+            const cookieOptions = {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production' ? true : false,
-                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-                path: '/'
-            });
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' as const : 'lax' as const,
+                path: '/',
+                maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+            };
 
-            response.cookie('userMetaData', JSON.stringify({ userId, role, isLoggedIn: true }), {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production' ? true : false,
-                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-                path: '/'
-            });
+            response.cookie('accessToken', accessToken, cookieOptions);
+            response.cookie('userMetaData', JSON.stringify({ userId, role, isLoggedIn: true }), cookieOptions);
 
             sendSuccessResponse(response, StatusCodes.CREATED, SuccessMessages.SIGNUP_SUCCESS, { userId, role });
         } catch (error) {
@@ -79,19 +76,16 @@ export default class AuthController implements IAuthController {
 
             const { accessToken, userId, role, is2FA } = result;
 
-            response.cookie('accessToken', accessToken, {
+            const cookieOptions = {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production' ? true : false,
-                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-                path: '/'
-            });
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' as const : 'lax' as const,
+                path: '/',
+                maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+            };
 
-            response.cookie('userMetaData', JSON.stringify({ userId, role, isLoggedIn: true }), {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production' ? true : false,
-                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-                path: '/'
-            });
+            response.cookie('accessToken', accessToken, cookieOptions);
+            response.cookie('userMetaData', JSON.stringify({ userId, role, isLoggedIn: true }), cookieOptions);
 
             sendSuccessResponse(response, StatusCodes.CREATED, SuccessMessages.SIGNIN_SUCCESS, { userId, role, is2FA });
         } catch (error) {
@@ -116,7 +110,6 @@ export default class AuthController implements IAuthController {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production'? true : false,
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-                domain: process.env.NODE_ENV === 'production' ? '.finapp.my' : undefined,
                 path: '/'
             });
 
@@ -124,7 +117,6 @@ export default class AuthController implements IAuthController {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production'? true : false,
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-                domain: process.env.NODE_ENV === 'production' ? '.finapp.my' : undefined,
                 path: '/'
             });
 
