@@ -3,10 +3,9 @@ const corsOptions = {
     origin: [
         'https://finapp.my',       
         'https://www.finapp.my',  
-        'https://finapp-frontend-k3fx.vercel.app', 
+        'https://finapp-frontend-eta.vercel.app/', 
         'http://localhost:3000',
-        'http://127.0.0.1:3000',
-        'https://finapp-frontend-9nj24ij0m-sarathss100s-projects.vercel.app'
+        'http://127.0.0.1:3000'
     ],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     credentials: true
