@@ -106,12 +106,17 @@ export default class InsuranceService implements IInsuranceService {
         }
     }
 
-    async getClosestNextPaymentDate(accessToken: string): Promise<InsuranceDTO> {
+    async getClosestNextPaymentDate(accessToken: string): Promise<InsuranceDTO | null> {
         try {
             const userId = extractUserIdFromToken(accessToken);
         
             // Delegate to the repository to fetch the closest next payment date for the user
             const insurance = await this._insuranceRepository.getClosestNextPaymentDate(userId);
+
+            // Return null if no insurance found
+            if (!insurance) {
+                return null;
+            }
 
             const resultDTO = InsuranceMapper.toDTO(insurance);
         

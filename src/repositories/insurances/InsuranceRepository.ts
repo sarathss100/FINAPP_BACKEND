@@ -97,7 +97,7 @@ export default class InsuranceRepository implements IInsuranceRepository {
         }
     }
 
-    async getClosestNextPaymentDate(userId: string): Promise<IInsuranceDocument> {
+    async getClosestNextPaymentDate(userId: string): Promise<IInsuranceDocument | null> {
         try {
             const results = await InsuranceModel.aggregate([
                 {
@@ -118,8 +118,9 @@ export default class InsuranceRepository implements IInsuranceRepository {
                 }
             ]);
 
+            // Return null if no results found instead of throwing error
             if (!results || results.length === 0) {
-                throw new Error(`Failed to get closest next payment data`);
+                return null;
             }
 
             const insurance = results[0];

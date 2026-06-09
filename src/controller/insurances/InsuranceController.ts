@@ -98,6 +98,12 @@ export default class InsuranceController implements IInsuranceController {
             // Delegate to the service layer to fetch the closest next payment date
             const insurance = await this._insuranceService.getClosestNextPaymentDate(accessToken);
         
+            // Return null if no insurance found (user has no active insurance policies)
+            if (!insurance) {
+                sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.NEXT_PAYMENT_DATE_RETRIEVED, { insurance: null });
+                return;
+            }
+
             sendSuccessResponse(response, StatusCodes.OK, SuccessMessages.NEXT_PAYMENT_DATE_RETRIEVED, { insurance });
         } catch (error) {
             handleControllerError(response, error);
