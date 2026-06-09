@@ -16,8 +16,8 @@ export const setupSocketIO = function(server: HTTPServer): void {
             origin: socketOrigins,
             methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
             credentials: true,
-            allowEIO3: true
         },
+        allowEIO3: true,
         path: '/socket.io',
     });
 
