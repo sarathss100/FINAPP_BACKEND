@@ -1,18 +1,29 @@
-import IUserRepository from '../../repositories/user/interfaces/IUserRepository';
-import IUserService from './interfaces/IUserService';
-import { ServerError } from '../../error/AppError';
 import { ErrorMessages } from '../../constants/errorMessages';
 import { StatusCodes } from '../../constants/statusCodes';
-import uploadToCloudinary, { deleteImage } from '../../services/cloudinary/cloudinaryService';
-import generateUniqueId from '../../utils/user/generateUniqueId';
-import { extractUserIdFromToken, wrapServiceError } from '../../utils/serviceUtils';
-import UserMapper from '../../mappers/user/UserMapper';
 import IProfileDTO from '../../dtos/user/IProfileDTO';
+import { ServerError } from '../../error/AppError';
+import UserMapper from '../../mappers/user/UserMapper';
+import IUserRepository from '../../repositories/user/interfaces/IUserRepository';
+import uploadToCloudinary, { deleteImage } from '../../services/cloudinary/cloudinaryService';
+import { extractUserIdFromToken, wrapServiceError } from '../../utils/serviceUtils';
+import generateUniqueId from '../../utils/user/generateUniqueId';
+import IUserService from './interfaces/IUserService';
 
 class UserService implements IUserService {
     private _userRepository: IUserRepository;
+    
     constructor(userRepository: IUserRepository) {
         this._userRepository = userRepository;
+    }
+
+    /**
+     * Helper method to construct proxy URLs safely
+     * @param imageId - The image ID
+     * @returns The properly formatted proxy URL
+     */
+    private getProxyImageUrl(imageId: string): string {
+        const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+        return `${baseUrl}/api/v1/user/images/${imageId}`;
     }
 
     async getUserProfileDetails(accessToken: string): Promise<IProfileDTO> {
@@ -56,7 +67,7 @@ class UserService implements IUserService {
 
             if (!isProfilePictureUpdated) throw new ServerError(ErrorMessages.FAILED_TO_UPLOAD_PROFILE_PICTURE, StatusCodes.INTERNAL_SERVER_ERROR);
 
-            const proxyUrl = `${process.env.BASE_URL}/api/user/images/${imageId}`;
+            const proxyUrl = this.getProxyImageUrl(imageId);
 
             // Return proxy URL instead of direct Cloudinary URL 
             return proxyUrl;
@@ -77,10 +88,10 @@ class UserService implements IUserService {
 
             if (!resultDTO.imageUrl) {
                 // Return proxy URL for default image 
-                return `${process.env.BASE_URL}/api/user/images/default`;
+                return this.getProxyImageUrl('default');
             }
 
-            const proxyUrl = `${process.env.BASE_URL}/api/v1/user/images/${resultDTO.imageId}`;
+            const proxyUrl = this.getProxyImageUrl(resultDTO.imageId);
 
             // Return proxy URL instead of direct Cloudinary URL
             return proxyUrl;
