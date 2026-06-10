@@ -6,7 +6,7 @@ export default interface IInsuranceRepository {
     getUserInsuranceCoverageTotal(userId: string): Promise<number>;
     getUserTotalPremiumAmount(userId: string): Promise<number>;
     getAllInsurances(userId: string): Promise<IInsuranceDocument[]>;
-    getClosestNextPaymentDate(userId: string): Promise<IInsuranceDocument>;
+    getClosestNextPaymentDate(userId: string): Promise<IInsuranceDocument | null>;
     markPaymentAsPaid(insuranceId: string): Promise<IInsuranceDocument>;
     markExpiredInsurances(): Promise<void>;
     getInsuranceForNotifyInsurancePayments(): Promise<IInsuranceDocument[]>;

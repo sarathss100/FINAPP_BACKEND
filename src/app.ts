@@ -18,10 +18,10 @@ import { startInsuranceGenerator } from './aa-simulator/src/cron/startInsuranceG
 const app = express();
 
 setupSocketListeners();
-startAllCrons();
-startTransactionGenerator();
-startDebtGenerator();
-startInsuranceGenerator();
+// startAllCrons();
+// startTransactionGenerator();
+// startDebtGenerator();
+// startInsuranceGenerator();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
