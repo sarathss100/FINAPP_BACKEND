@@ -34,7 +34,7 @@ export default class AuthController implements IAuthController {
             response.cookie('accessToken', accessToken, cookieOptions);
             response.cookie('userMetaData', JSON.stringify({ userId, role, isLoggedIn: true }), cookieOptions);
 
-            sendSuccessResponse(response, StatusCodes.CREATED, SuccessMessages.SIGNUP_SUCCESS, { userId, role });
+            sendSuccessResponse(response, StatusCodes.CREATED, SuccessMessages.SIGNUP_SUCCESS, { userId, role, accessToken });
         } catch (error) {
             handleControllerError(response, error);
         }
@@ -87,7 +87,7 @@ export default class AuthController implements IAuthController {
             response.cookie('accessToken', accessToken, cookieOptions);
             response.cookie('userMetaData', JSON.stringify({ userId, role, isLoggedIn: true }), cookieOptions);
 
-            sendSuccessResponse(response, StatusCodes.CREATED, SuccessMessages.SIGNIN_SUCCESS, { userId, role, is2FA });
+            sendSuccessResponse(response, StatusCodes.CREATED, SuccessMessages.SIGNIN_SUCCESS, { userId, role, is2FA, accessToken });
         } catch (error) {
             handleControllerError(response, error);
         }
